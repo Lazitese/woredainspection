@@ -48,8 +48,14 @@ export default async function AnalyticsPage(props: { searchParams: Promise<{ ran
     total_views: 0,
     unique_visitors: 0,
     bounce_rate: 0,
+    session_duration: "0m 0s",
+    views_change_pct: 0,
+    visitors_change_pct: 0,
+    bounce_change_pct: 0,
     time_series: [],
     top_pages: [],
+    entry_pages: [],
+    exit_pages: [],
     top_referrers: [],
     devices: [],
     locations: []
@@ -59,9 +65,21 @@ export default async function AnalyticsPage(props: { searchParams: Promise<{ ran
 
   return (
     <DashboardLayout>
-      <div className="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 md:p-8 font-sans">
-        <div className="mx-auto max-w-6xl space-y-8">
-          <Suspense fallback={<div className="h-full flex items-center justify-center p-12"><div className="animate-pulse flex flex-col gap-4 w-full"><div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div><div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div></div></div>}>
+      <div className="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 md:p-8 font-sans min-h-screen">
+        <div className="mx-auto max-w-6xl">
+          <Suspense fallback={
+            <div className="h-full flex items-center justify-center p-12">
+              <div className="animate-pulse flex flex-col gap-4 w-full">
+                <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-24 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+                  ))}
+                </div>
+                <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+              </div>
+            </div>
+          }>
             <DashboardUI initialData={analyticsData} currentRange={range} />
           </Suspense>
         </div>

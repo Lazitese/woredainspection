@@ -2,7 +2,7 @@
 
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyNewPeriodEnrollment, notifyFinalScoreApproved } from '@/lib/notify';
-import { normalizePhoneToE164 } from '@/app/actions/auth';
+import { normalizePhoneToE164 } from '@/lib/phone';
 
 export async function createAssessmentPeriodAction(periodName: string, year: string, periodHalf: string) {
   try {

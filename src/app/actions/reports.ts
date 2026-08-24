@@ -6,7 +6,7 @@ import { canSubmitReport, ReportPeriod } from '@/lib/et-calendar';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { createClient } from '@/utils/supabase/server';
 import { sortFormSchemas } from '@/utils/schemaSort';
-import { normalizePhoneToE164 } from '@/app/actions/auth';
+import { normalizePhoneToE164 } from '@/lib/phone';
 
 export async function createRepresentativeAction(formData: FormData) {
   try {

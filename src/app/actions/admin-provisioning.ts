@@ -3,7 +3,7 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
 import { notifyAdminCreated } from '@/lib/notify';
-import { normalizePhoneToE164 } from '@/app/actions/auth';
+import { normalizePhoneToE164 } from '@/lib/phone';
 
 function generateTempPassword(length = 6) {
   const charset = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
