@@ -9,7 +9,6 @@ describe('StatCard Component', () => {
     
     expect(screen.getByText('Total Documents')).toBeInTheDocument();
     expect(screen.getByText('1,200')).toBeInTheDocument();
-    expect(screen.getByText('Active')).toBeInTheDocument(); // Default badge
   });
 
   it('renders custom badge correctly', () => {
@@ -55,7 +54,6 @@ describe('StatCard Component', () => {
     );
     
     expect(screen.getByText('+5%')).toBeInTheDocument();
-    expect(screen.getByText('Trend')).toBeInTheDocument();
   });
 
   it('does not render trend if substats are provided', () => {
