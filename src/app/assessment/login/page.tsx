@@ -39,18 +39,7 @@ export default function AssessmentLoginPage() {
         throw new Error(error.message === 'Invalid login credentials' ? 'የተሳሳተ ስልክ ቁጥር ወይም የይለፍ ቃል (Invalid credentials)' : error.message);
       }
 
-      // Check if they are actually a regular assessment user, not a representative or admin
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('system_role')
-        .eq('user_id', data.user!.id)
-        .maybeSingle();
-
-      if (profile?.system_role === 'representative') {
-        await supabase.auth.signOut();
-        throw new Error("መዳረሻ አልተፈቀደም፡ እባክዎ በተወካይ መግቢያ ይጠቀሙ (Access Denied: Please use the Representative login).");
-      }
-
+      // Block admin accounts from using the assessment portal
       const { data: adminProfile } = await supabase
         .from('admin_profiles')
         .select('id')
@@ -61,6 +50,9 @@ export default function AssessmentLoginPage() {
         await supabase.auth.signOut();
         throw new Error("መዳረሻ አልተፈቀደም፡ እባክዎ በአስተዳዳሪ መግቢያ ይጠቀሙ (Access Denied: Please use the Admin login).");
       }
+      
+      // Allow: representatives can also be enrolled in assessment periods
+      // No block on system_role === 'representative'
       
       // Force change password on first login
       const needsPasswordChange = data.user?.user_metadata?.force_password_change || data.user?.user_metadata?.requires_password_change;
