@@ -6,14 +6,15 @@ import { IconMap2, IconTable, IconEdit, IconPlus } from "@tabler/icons-react";
 import { RegionReportTab } from "./RegionReportTab";
 import { AggregatedDataTab } from "./AggregatedDataTab";
 import { FormSchema } from "@/components/dashboard/forms/FormTableRenderer";
+import { getCurrentFiscalYear, ReportPeriod } from "@/lib/et-calendar";
 
 export function AdminReportsTabsView({ initialReports, initialSchemas }: { initialReports: any[], initialSchemas: FormSchema[] }) {
   const [activeTab, setActiveTab] = useState<'region' | 'aggregated'>('region');
   const reports = initialReports;
-
   const schemas = initialSchemas;
-  const currentYear = 2016; 
-  const currentPeriod = "3ኛ ሩብ አመት";
+  
+  const [currentYear, setCurrentYear] = useState<number>(getCurrentFiscalYear());
+  const [currentPeriod, setCurrentPeriod] = useState<ReportPeriod>("1ኛ ሩብ አመት");
 
   return (
     <div className="space-y-6">
@@ -53,7 +54,7 @@ export function AdminReportsTabsView({ initialReports, initialSchemas }: { initi
 
       <div className="bg-surface-primary rounded-2xl border border-border-light shadow-sm p-3 sm:p-6">
         {activeTab === 'region' && (
-          <RegionReportTab initialReports={reports} schemas={schemas} />
+          <RegionReportTab initialReports={reports} schemas={schemas} defaultYear={currentYear} defaultPeriod={currentPeriod} />
         )}
         {activeTab === 'aggregated' && (
           <AggregatedDataTab reports={reports} schemas={schemas} year={currentYear} period={currentPeriod} />

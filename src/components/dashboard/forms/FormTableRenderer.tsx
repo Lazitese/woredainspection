@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IconChevronDown, IconChevronUp, IconCheck } from "@tabler/icons-react";
 import { computeFormCalculations, isCalculatedField } from "@/utils/formCalculations";
+import { formatFormTitle } from "@/utils/formatFormTitle";
 
 export interface FormSchema {
   id: string;
@@ -20,6 +21,7 @@ interface FormTableRendererProps {
   isCompleted?: boolean;
   compact?: boolean;
   readOnly?: boolean;
+  year?: number;
 }
 
 function toPrimitiveString(val: any): string {
@@ -37,7 +39,7 @@ function toPrimitiveString(val: any): string {
   return String(val);
 }
 
-export function FormTableRenderer({ schema, initialData = {}, onChange, isCompleted, compact = false, readOnly = false }: FormTableRendererProps) {
+export function FormTableRenderer({ schema, initialData = {}, onChange, isCompleted, compact = false, readOnly = false, year }: FormTableRendererProps) {
   const [isOpen, setIsOpen] = useState(compact ? true : false);
   
   // Automatically calculate totals, differences, and percentages on the fly
@@ -270,7 +272,7 @@ export function FormTableRenderer({ schema, initialData = {}, onChange, isComple
             {isCompleted ? <IconCheck size={18} /> : <span className="text-sm font-bold">{schema.id.replace('form_', '')}</span>}
           </div>
           <h3 className="font-semibold text-text-primary leading-tight pr-4">
-            {schema.table_title}
+            {formatFormTitle(schema.table_title, year)}
           </h3>
         </div>
         <div className="text-text-muted shrink-0">

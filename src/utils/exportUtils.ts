@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { FormSchema } from '@/components/dashboard/forms/FormTableRenderer';
 import { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
+import { formatFormTitle } from '@/utils/formatFormTitle';
 
 // ----------------------------------------------------------------------
 // EXCEL EXPORTS
@@ -23,7 +24,7 @@ export function exportRegionToExcel(
     
     // Title Rows
     const titleRow = [`የ ${regionName} ${year} ${period} ሪፖርት`];
-    const subtitleRow = [`ቅፅ: ${schema.table_title}`];
+    const subtitleRow = [`ቅፅ: ${formatFormTitle(schema.table_title, year)}`];
     
     rows.push(titleRow);
     rows.push(subtitleRow);
@@ -103,7 +104,7 @@ export function exportAggregatedToExcel(
     
     // Title Rows
     const titleRow = [`የ ${year} ${period} የተጠቃለለ አሃዛዊ አፈጻጸም ሪፖርት`];
-    const subtitleRow = [`ቅፅ: ${schema.table_title}`];
+    const subtitleRow = [`ቅፅ: ${formatFormTitle(schema.table_title, year)}`];
     
     rows.push(titleRow);
     rows.push(subtitleRow);
@@ -410,7 +411,7 @@ export function generateRegionHTMLContent(
     const totalSubCols = schema.columns.reduce((acc, col) => acc + (col.subKeys.length > 0 ? col.subKeys.length : 1), 0);
     const denseStyle = totalSubCols > 12 ? 'style="font-size: 7.5pt;"' : '';
     
-    content += `<div class="form-title">ቅፅ: ${schema.table_title}</div>`;
+    content += `<div class="form-title">ቅፅ: ${formatFormTitle(schema.table_title, year)}</div>`;
     content += `<table ${denseStyle}>`;
     
     // Header Row 1
@@ -472,7 +473,7 @@ export function generateAggregatedHTMLContent(
     const totalSubCols = schema.columns.reduce((acc, col) => acc + (col.subKeys.length > 0 ? col.subKeys.length : 1), 0);
     const denseStyle = totalSubCols > 12 ? 'style="font-size: 7.5pt;"' : '';
 
-    content += `<div class="form-title">ቅፅ: ${schema.table_title}</div>`;
+    content += `<div class="form-title">ቅፅ: ${formatFormTitle(schema.table_title, year)}</div>`;
     content += `<table ${denseStyle}>`;
     
     // Header Row 1

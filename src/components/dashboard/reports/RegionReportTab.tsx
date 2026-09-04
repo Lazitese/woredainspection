@@ -23,6 +23,8 @@ import { RegionReportPDF, NarrationReportPDF } from "./ReportsPDFComponents";
 import { RichTextEditor, RichTextValue } from "@/components/ui/RichTextEditor";
 import { sortFormSchemas } from "@/utils/schemaSort";
 import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
+import { formatFormTitle } from "@/utils/formatFormTitle";
+import { getCurrentFiscalYear } from "@/lib/et-calendar";
 
 interface RegionReportTabProps {
   initialReports: any[];
@@ -50,7 +52,7 @@ export function RegionReportTab({ initialReports, schemas, defaultRegion, defaul
 
   // Hardcode year and period for now as they are filters.
   // Real app: state variables.
-  const [currentYear, setCurrentYear] = useState<number>(defaultYear || 2016);
+  const [currentYear, setCurrentYear] = useState<number>(defaultYear || getCurrentFiscalYear());
   const [currentPeriod, setCurrentPeriod] = useState<string>(defaultPeriod || "3ኛ ሩብ አመት");
 
   const selectedReport = reports.find(r => r.region === selectedRegion);
@@ -321,7 +323,9 @@ export function RegionReportTab({ initialReports, schemas, defaultRegion, defaul
                         ) : (
                           <IconCircleDashed size={18} className="text-text-muted/50 shrink-0" />
                         )}
-                        <h4 className="font-medium text-text-primary text-sm sm:text-base text-left">{schema.table_title}</h4>
+                        <h4 className="font-medium text-text-primary text-sm sm:text-base text-left">
+                          {formatFormTitle(schema.table_title, selectedReport?.year || currentYear)}
+                        </h4>
                       </div>
                       <IconChevronDown 
                         size={18} 
@@ -338,6 +342,7 @@ export function RegionReportTab({ initialReports, schemas, defaultRegion, defaul
                             onChange={() => {}}
                             isCompleted={isCompleted}
                             compact={true}
+                            year={selectedReport?.year || currentYear}
                           />
                         </div>
                         

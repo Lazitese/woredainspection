@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IconChevronDown, IconChevronUp, IconDownload, IconTable, IconFileTypePdf, IconLoader2 } from "@tabler/icons-react";
 import { FormSchema } from "@/components/dashboard/forms/FormTableRenderer";
+import { formatFormTitle } from "@/utils/formatFormTitle";
 import { exportAggregatedToWord } from "@/utils/exportUtils";
 import { downloadPDFDocument } from "@/lib/exportToPDF";
 import { AggregatedReportPDF } from "./ReportsPDFComponents";
@@ -90,7 +91,7 @@ export function AggregatedDataTab({ reports, schemas, year, period }: Aggregated
                     <span className="text-sm font-bold">{schema.id.replace('form_', '')}</span>
                   </div>
                   <h3 className="font-semibold text-text-primary leading-tight">
-                    {schema.table_title}
+                    {formatFormTitle(schema.table_title, year)}
                   </h3>
                 </div>
                 <div className="text-text-muted">

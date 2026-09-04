@@ -7,6 +7,7 @@ import { IconSend, IconDeviceFloppy, IconLoader2, IconAlertCircle, IconDownload,
 import { saveReportFormAction, submitReportAction } from "@/app/actions/reports";
 import { ReportPeriod, canSubmitReport, getCurrentFiscalYear } from "@/lib/et-calendar";
 
+import { formatFormTitle } from "@/utils/formatFormTitle";
 import { sortFormSchemas } from "@/utils/schemaSort";
 
 interface FormsRepViewProps {
@@ -258,8 +259,10 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
                  <div key={key}>{renderFeedbackContent(fb)}</div>
               );
               
-              const schemaTitle = schemas.find(s => s.id === key)?.table_title 
-                || (key === 'narration' ? 'የጽሁፍ ሪፖርት (Narration Report)' : key);
+              const rawTitle = schemas.find(s => s.id === key)?.table_title;
+              const schemaTitle = rawTitle 
+                ? formatFormTitle(rawTitle, currentYear)
+                : (key === 'narration' ? 'የጽሁፍ ሪፖርት (Narration Report)' : key);
               
               if (!fb) return null;
               
@@ -326,6 +329,7 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
                     isCompleted={isCompleted}
                     compact={false}
                     readOnly={isReadOnly}
+                    year={currentYear}
                   />
                 </div>
               );
