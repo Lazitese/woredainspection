@@ -54,7 +54,7 @@ export function Menubar() {
           <div className="relative size-12 overflow-hidden">
             <Image
               src="/logo.jpg"
-              alt="የብልፅግና ኢንስፔክሽን ኮሚሽን ምልክት"
+              alt="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት"
               fill
               sizes="48px"
               className="object-contain"
@@ -64,10 +64,10 @@ export function Menubar() {
           </div>
           <div className="hidden sm:block">
             <div className="text-sm font-bold leading-tight text-slate-900">
-              የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር
+              የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና
             </div>
-            <div className="text-sm font-medium leading-tight text-slate-700">
-              ኮሚሽን ዋና ጽ/ቤት
+            <div className="text-xs font-medium leading-tight text-slate-700">
+              የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት
             </div>
           </div>
         </Link>

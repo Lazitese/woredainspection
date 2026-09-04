@@ -10,8 +10,8 @@ interface RegionalHeatmapProps {
 
 const DEFAULT_HEATMAP_DATA: RegionalGapMatrix[] = [
   {
-    region: 'አዲስ አበባ',
-    zone: 'ዞን 01 / ክፍለ ከተማ',
+    region: 'ወረዳ 1',
+    zone: '',
     categoryGaps: {
       'Governance & Compliance': 1.2,
       'Financial Standards': 2.4,
@@ -23,8 +23,8 @@ const DEFAULT_HEATMAP_DATA: RegionalGapMatrix[] = [
     overallAvgGap: 1.68,
   },
   {
-    region: 'ኦሮሚያ',
-    zone: 'ምስራቅ ሸዋ',
+    region: 'ወረዳ 2',
+    zone: '',
     categoryGaps: {
       'Governance & Compliance': 0.8,
       'Financial Standards': 1.9,
@@ -36,8 +36,8 @@ const DEFAULT_HEATMAP_DATA: RegionalGapMatrix[] = [
     overallAvgGap: 1.77,
   },
   {
-    region: 'አማራ',
-    zone: 'ጎንደር ዞን',
+    region: 'ወረዳ 5',
+    zone: '',
     categoryGaps: {
       'Governance & Compliance': 1.7,
       'Financial Standards': 2.8,
@@ -49,8 +49,8 @@ const DEFAULT_HEATMAP_DATA: RegionalGapMatrix[] = [
     overallAvgGap: 1.88,
   },
   {
-    region: 'ሲዳማ',
-    zone: 'ሐዋሳ ከተማ',
+    region: 'ወረዳ 10',
+    zone: '',
     categoryGaps: {
       'Governance & Compliance': 0.7,
       'Financial Standards': 1.4,
@@ -62,8 +62,8 @@ const DEFAULT_HEATMAP_DATA: RegionalGapMatrix[] = [
     overallAvgGap: 1.05,
   },
   {
-    region: 'ትግራይ',
-    zone: 'መቀሌ ማዕከላዊ',
+    region: 'ልዩ ወረዳ 1',
+    zone: '',
     categoryGaps: {
       'Governance & Compliance': 2.1,
       'Financial Standards': 2.7,
@@ -105,10 +105,10 @@ export const RegionalHeatmap: React.FC<RegionalHeatmapProps> = ({ heatmapData = 
         <div>
           <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
             <IconMapPins className="text-brand-blue" size={22} />
-            የክልሎች እና ዞኖች የስልጠና ፍላጎት ንጽጽር (Regional Training Needs Distribution)
+            የወረዳዎች የስልጠና ፍላጎት ንጽጽር (Woreda Training Needs Distribution)
           </h3>
           <p className="text-xs text-text-muted mt-1">
-            በየክልሉ እና ዞኑ ያሉ የአባላት የስልጠና ፍላጎት ደረጃዎች በየዘርፉ የተለዩበት ንጽጽር::
+            በየወረዳው ያሉ የአባላት የስልጠና ፍላጎት ደረጃዎች በየዘርፉ የተለዩበት ንጽጽር::
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export const RegionalHeatmap: React.FC<RegionalHeatmapProps> = ({ heatmapData = 
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-secondary/50 text-[11px] font-semibold text-text-muted uppercase tracking-wider border-b border-border/40">
-              <th className="py-3.5 px-4 min-w-[160px]">ክልል / ዞን</th>
+              <th className="py-3.5 px-4 min-w-[160px]">ወረዳ</th>
               {categories.map((cat) => (
                 <th key={cat} className="py-3.5 px-3 text-center min-w-[130px]">
                   {cat}
@@ -147,10 +147,9 @@ export const RegionalHeatmap: React.FC<RegionalHeatmapProps> = ({ heatmapData = 
             {heatmapData.map((row) => {
               const overallStyle = getHeatmapColor(row.overallAvgGap);
               return (
-                <tr key={`${row.region}-${row.zone}`} className="hover:bg-surface-secondary/20 transition-colors">
+                <tr key={row.region} className="hover:bg-surface-secondary/20 transition-colors">
                   <td className="py-3.5 px-4 whitespace-nowrap">
                     <div className="font-bold text-text-primary">{row.region}</div>
-                    <div className="text-[11px] text-text-muted">{row.zone}</div>
                   </td>
 
                   {categories.map((cat) => {

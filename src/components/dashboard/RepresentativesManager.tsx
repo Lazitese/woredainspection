@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { IconPlus, IconPhone, IconMapPin, IconLoader2, IconCheck, IconTrash, IconKey } from "@tabler/icons-react";
 import { createRepresentativeAction } from "@/app/actions/reports";
-
-const ETHIOPIA_REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤን-ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ሲዳማ', 'ደ/ም/ኢ/ያ', 'ደቡብ ኢ/ያ', 'ማዕ/ኢ/ያ', 'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል ተቋማት'
-];
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 export function RepresentativesManager({ initialRepresentatives }: { initialRepresentatives: any[] }) {
   const [reps, setReps] = useState(initialRepresentatives);
@@ -101,7 +98,7 @@ export function RepresentativesManager({ initialRepresentatives }: { initialRepr
             <IconUsers size={32} />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">ምንም ተወካይ የለም</h3>
-          <p className="text-slate-500 dark:text-slate-400 max-w-sm">እስካሁን ምንም የክልል ተወካይ አልተመዘገበም። "አዲስ አክል" የሚለውን በመጫን ይጀምሩ።</p>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm">እስካሁን ምንም የወረዳ ተወካይ አልተመዘገበም። "አዲስ አክል" የሚለውን በመጫን ይጀምሩ።</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -257,7 +254,7 @@ export function RepresentativesManager({ initialRepresentatives }: { initialRepr
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">ክልል (Region)</label>
+                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">ወረዳ (Woreda)</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <IconMapPin size={18} className="text-slate-400 dark:text-slate-500" />
@@ -267,9 +264,9 @@ export function RepresentativesManager({ initialRepresentatives }: { initialRepr
                       required
                       className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white text-sm font-medium appearance-none"
                     >
-                      <option value="">ክልል ይምረጡ</option>
-                      {ETHIOPIA_REGIONS.map(r => (
-                        <option key={r} value={r}>{r === 'ፌዴራል ተቋማት' ? 'ተቋማት' : r}</option>
+                      <option value="">ወረዳ ይምረጡ</option>
+                      {AKAKI_KALITY_WOREDAS.map(r => (
+                        <option key={r} value={r}>{r}</option>
                       ))}
                     </select>
                   </div>

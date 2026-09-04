@@ -81,7 +81,7 @@ function PublicNeedFormContent() {
               className="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white/40 shadow-sm"
             />
             <div>
-              <h1 className="text-xl sm:text-2xl font-black leading-tight">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ</h1>
+              <h1 className="text-xl sm:text-2xl font-black leading-tight">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ</h1>
             </div>
           </div>
           <p className="text-xs sm:text-sm text-blue-100 leading-relaxed max-w-2xl">
@@ -99,7 +99,7 @@ function PublicNeedFormContent() {
         {/* Clean Footer */}
         <footer className="text-center text-[11px] text-text-muted py-4 space-y-1">
           <p>© 2018 ICODiS</p>
-          <p>የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</p>
+          <p>የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</p>
         </footer>
       </div>
     </div>

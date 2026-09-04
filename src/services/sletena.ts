@@ -246,7 +246,7 @@ export const sletenaService = {
         await supabase.from('sletena_categories').upsert([
           {
             id: submission.categoryId,
-            title: 'የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ',
+            title: 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ',
             description: 'በሁሉም የፓርቲና የኮሚሽን መመሪያዎች ላይ የአመራር እና አባላትን የስልጠና ፍላጎት ለመሰብሰብ የተዘጋጀ::',
             date_created: new Date().toISOString().split('T')[0],
             is_active: true,
@@ -398,7 +398,7 @@ export const sletenaService = {
           id: submission.id,
           category_id: submission.categoryId,
           participant_name: submission.participantName || 'ተሳታፊ / አኖኒመስ',
-          region: submission.region || 'አዲስ አበባ',
+          region: submission.region || 'ወረዳ 1',
           trainer_rating: submission.trainerRating || 5,
           content_rating: submission.contentRating || 5,
           venue_logistics_rating: submission.venueLogisticsRating || 5,

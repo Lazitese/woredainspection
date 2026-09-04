@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useCallback } from "react";
 import Map, { Source, Layer, MapRef, Popup, NavigationControl, Marker, LayerProps } from "react-map-gl/mapbox";
-import { ETHIOPIA_BOUNDS, REGION_BOUNDS, ZONE_CAPITALS } from "@/lib/geojson-utils";
+import { ETHIOPIA_BOUNDS, REGION_BOUNDS } from "@/lib/geojson-utils";
 import { regionsData } from "@/lib/regions-data";
 import { IconMapPin, IconX, IconFilter, IconShieldLock, IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
@@ -129,13 +129,11 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
   const data = initialData;
   const [hoverInfo, setHoverInfo] = useState<any>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>("");
-  const [selectedZone, setSelectedZone] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
 
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const region = e.target.value;
     setSelectedRegion(region);
-    setSelectedZone("");
 
     if (region && REGION_BOUNDS[region]) {
       const [minLng, minLat, maxLng, maxLat] = REGION_BOUNDS[region];
@@ -147,38 +145,13 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
         { padding: 40, duration: 1500 }
       );
     } else {
-      // Reset to Ethiopia
+      // Reset to bounds
       mapRef.current?.fitBounds(
         [
           [ETHIOPIA_BOUNDS[0], ETHIOPIA_BOUNDS[1]],
           [ETHIOPIA_BOUNDS[2], ETHIOPIA_BOUNDS[3]],
         ],
         { padding: 20, duration: 1500 }
-      );
-    }
-  };
-
-  const handleZoneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const zone = e.target.value;
-    setSelectedZone(zone);
-
-    if (zone && ZONE_CAPITALS[zone]) {
-      const capital = ZONE_CAPITALS[zone];
-      mapRef.current?.easeTo({
-        center: [capital.lng, capital.lat],
-        zoom: 9.5,
-        duration: 1500,
-        pitch: 45,
-      });
-    } else if (!zone && selectedRegion && REGION_BOUNDS[selectedRegion]) {
-      // Zoom back out to Region if Zone is cleared
-      const [minLng, minLat, maxLng, maxLat] = REGION_BOUNDS[selectedRegion];
-      mapRef.current?.fitBounds(
-        [
-          [minLng, minLat],
-          [maxLng, maxLat],
-        ],
-        { padding: 40, duration: 1500, pitch: 0 }
       );
     }
   };
@@ -195,7 +168,6 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
         duration: 1000,
       });
       if (feature.properties.region) setSelectedRegion(feature.properties.region);
-      if (feature.properties.zone) setSelectedZone(feature.properties.zone);
     }
   }, []);
 
@@ -222,20 +194,7 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
     return { ...data, features };
   }, [data, selectedType]);
 
-  const activePopupInfo = useMemo(() => {
-    if (hoverInfo) return hoverInfo;
-    if (selectedZone) {
-      const f: any = data.features.find((f: any) => f.properties.zone === selectedZone);
-      if (f && f.geometry && 'coordinates' in f.geometry) {
-        return {
-          longitude: f.geometry.coordinates[0],
-          latitude: f.geometry.coordinates[1],
-          properties: f.properties
-        };
-      }
-    }
-    return null;
-  }, [hoverInfo, selectedZone, data]);
+  const activePopupInfo = hoverInfo;
 
   const criticalFeatures = useMemo(() => {
     return filteredData.features.filter((f: any) => f.properties.complaint_count >= 50);
@@ -293,39 +252,18 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600 dark:text-white/70">ክልል (Region)</label>
+              <label className="text-xs font-medium text-slate-600 dark:text-white/70">ወረዳ (Woreda)</label>
               <select
                 value={selectedRegion}
                 onChange={handleRegionChange}
                 className="w-full bg-white dark:bg-black/50 border border-slate-200 dark:border-white/20 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-400 dark:focus:ring-white/50 outline-none transition-all shadow-sm"
               >
-                <option value="">ሁሉም ክልሎች (All Regions)</option>
+                <option value="">ሁሉም ወረዳዎች (All Woredas)</option>
                 {Object.keys(regionsData).map((region) => (
                   <option key={region} value={region}>
                     {region}
                   </option>
                 ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600 dark:text-white/70">ዞን/ክፍለ ከተማ (Zone)</label>
-              <select
-                value={selectedZone}
-                onChange={handleZoneChange}
-                disabled={!selectedRegion}
-                className={cn(
-                  "w-full border border-slate-200 dark:border-white/20 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-slate-400 dark:focus:ring-white/50 outline-none transition-all shadow-sm text-slate-900 dark:text-white",
-                  !selectedRegion ? "bg-slate-100 dark:bg-black/20 opacity-50 cursor-not-allowed" : "bg-white dark:bg-black/50"
-                )}
-              >
-                <option value="">ሁሉም ዞኖች (All Zones)</option>
-                {selectedRegion &&
-                  regionsData[selectedRegion]?.map((zone) => (
-                    <option key={zone} value={zone}>
-                      {zone}
-                    </option>
-                  ))}
               </select>
             </div>
           </div>
@@ -361,7 +299,7 @@ export function ComplaintsHeatmap({ initialData }: { initialData: GeoJSON.Featur
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-[#fafafa] tracking-tight">{selectedRegion}</h3>
-                <div className="text-[10px] text-slate-500 dark:text-white/40 uppercase tracking-widest font-mono mt-0.5">የክልል ማጠቃለያ (Region Summary)</div>
+                <div className="text-[10px] text-slate-500 dark:text-white/40 uppercase tracking-widest font-mono mt-0.5">የወረዳ ማጠቃለያ (Woreda Summary)</div>
               </div>
             </div>
             

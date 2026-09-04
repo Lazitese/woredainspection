@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { FormSchema } from '@/components/dashboard/forms/FormTableRenderer';
+import { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
 
 // ----------------------------------------------------------------------
 // EXCEL EXPORTS
@@ -21,7 +22,7 @@ export function exportRegionToExcel(
     const rows: any[] = [];
     
     // Title Rows
-    const titleRow = [`የ ${regionName} ክልል ${year} ${period} ሪፖርት`];
+    const titleRow = [`የ ${regionName} ${year} ${period} ሪፖርት`];
     const subtitleRow = [`ቅፅ: ${schema.table_title}`];
     
     rows.push(titleRow);
@@ -94,12 +95,8 @@ export function exportAggregatedToExcel(
 ) {
   const wb = XLSX.utils.book_new();
   
-  // All 14 known regions for aggregation, or dynamically extract
-  const regions = [
-    "ኦሮሚያ", "አማራ", "ሶማሌ", "አፋር", "ቤንሻንጉል ጉሙዝ", "ጋምቤላ", 
-    "ሀረሪ", "ሲዳማ", "ደቡብ ምዕራብ ኢትዮጵያ", "ደቡብ ኢትዮጵያ", "ማዕከላዊ ኢትዮጵያ", 
-    "አዲስ አበባ", "ድሬዳዋ", "ፌዴራል"
-  ];
+  // All woredas for aggregation
+  const regions = AKAKI_KALITY_WOREDAS;
 
   schemas.forEach((schema) => {
     const rows: any[] = [];
@@ -113,7 +110,7 @@ export function exportAggregatedToExcel(
     rows.push([]); // empty row
 
     // Header Row 1
-    const header1 = ["ክልል (Region)"];
+    const header1 = ["ወረዳ (Woreda)"];
     schema.columns.forEach(col => {
       if (col.subKeys.length > 0) {
         col.subKeys.forEach(() => header1.push(col.key));
@@ -403,7 +400,7 @@ export function generateRegionHTMLContent(
 ): string {
   let content = `
     <div class="report-header">
-      <div class="report-title">የ ${regionName} ክልል አሃዛዊ ሪፖርት</div>
+      <div class="report-title">የ ${regionName} አሃዛዊ ሪፖርት</div>
       <div class="report-subtitle">በጀት ዓመት: ${year} | የሪፖርት ጊዜ: ${period}</div>
     </div>
   `;
@@ -469,11 +466,7 @@ export function generateAggregatedHTMLContent(
     </div>
   `;
   
-  const regions = [
-    "ኦሮሚያ", "አማራ", "ሶማሌ", "አፋር", "ቤንሻንጉል ጉሙዝ", "ጋምቤላ", 
-    "ሀረሪ", "ሲዳማ", "ደቡብ ምዕራብ ኢትዮጵያ", "ደቡብ ኢትዮጵያ", "ማዕከላዊ ኢትዮጵያ", 
-    "አዲስ አበባ", "ድሬዳዋ", "ፌዴራል"
-  ];
+  const regions = AKAKI_KALITY_WOREDAS;
 
   schemas.forEach((schema, index) => {
     const totalSubCols = schema.columns.reduce((acc, col) => acc + (col.subKeys.length > 0 ? col.subKeys.length : 1), 0);
@@ -483,7 +476,7 @@ export function generateAggregatedHTMLContent(
     content += `<table ${denseStyle}>`;
     
     // Header Row 1
-    content += `<tr><th class="region-name">ክልል (Region)</th>`;
+    content += `<tr><th class="region-name">ወረዳ (Woreda)</th>`;
     schema.columns.forEach(col => {
       const colspan = col.subKeys.length > 0 ? col.subKeys.length : 1;
       content += `<th colspan="${colspan}">${col.key}</th>`;
@@ -569,7 +562,7 @@ export function generateNarrationHTMLContent(
 ): string {
   let content = `
     <div class="report-header">
-      <div class="report-title">የ ${regionName} ክልል የጽሁፍ ሪፖርት</div>
+      <div class="report-title">የ ${regionName} የጽሁፍ ሪፖርት</div>
       <div class="report-subtitle">በጀት ዓመት: ${year} | የሪፖርት ጊዜ: ${period}</div>
     </div>
     <div class="form-title">የጽሁፍ ሪፖርት (Narration Report)</div>

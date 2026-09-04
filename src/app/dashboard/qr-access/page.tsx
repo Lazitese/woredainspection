@@ -33,7 +33,7 @@ interface CategoryOption {
 const CATEGORIES: CategoryOption[] = [
   {
     id: 'public_hq',
-    title: 'ኮሚሽን ዋና ጽ/ቤት',
+    title: 'የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት',
     subtitle: 'ለህዝብ ክፍት የሆኑ የኮሚሽኑ ሰነዶችና መረጃዎች',
     badge: 'ህዝባዊ ሰነዶች',
     icon: IconBuilding,
@@ -164,7 +164,7 @@ export default function QRAccessPage() {
               <IconShieldCheck size={14} /> የደህንነትና የQR መዳረሻ ማስተዳደሪያ
             </div>
             <h1 className="text-3xl sm:text-4xl font-light text-text-primary tracking-tight">የQR መዳረሻ አስተዳደር</h1>
-            <p className="text-sm text-text-secondary mt-1">ለኮሚሽኑ ዋና ጽ/ቤት እና ሚስጥራዊ ሰነዶች ማረጋገጫ QR ኮድ ማመንጫ</p>
+            <p className="text-sm text-text-secondary mt-1">ለአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት እና ሚስጥራዊ ሰነዶች ማረጋገጫ QR ኮድ ማመንጫ</p>
           </div>
         </div>
 

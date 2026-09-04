@@ -87,7 +87,7 @@ const SPECIFIC_ROLE_OPTIONS = [
     id: 'reports_officer' as SpecificRoleType,
     title: '5. የሪፖርት እና ስታቲስቲክስ ሃላፊ',
     badge: 'አስተዳዳሪ ዴስክ — /dashboard/forms',
-    desc: 'የክልል ተወካዮች ሪፖርቶችን፣ የቅጽ አሞላል ሁኔታዎችን፣ የስታቲስቲክስ ዳታና ግራፎችን ይከታተላል፣ ያጸድቃል።',
+    desc: 'የወረዳ ተወካዮች ሪፖርቶችን፣ የቅጽ አሞላል ሁኔታዎችን፣ የስታቲስቲክስ ዳታና ግራፎችን ይከታተላል፣ ያጸድቃል።',
     icon: IconChartBar,
   },
   {

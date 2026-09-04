@@ -344,14 +344,12 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
     }))
     .sort((a, b) => b.count - a.count);
 
-  const zoneWoredaMap: Record<string, { region: string; zone: string; woreda: string; count: number }> = {};
+  const zoneWoredaMap: Record<string, { region: string; count: number }> = {};
   needSubs.forEach((sub) => {
-    const key = `${sub.region || 'ያልተገለጸ'}_${sub.zone || 'ያልተገለጸ'}_${sub.woreda || 'ያልተገለጸ'}`;
+    const key = sub.region || 'ያልተገለጸ';
     if (!zoneWoredaMap[key]) {
       zoneWoredaMap[key] = {
         region: sub.region || 'ያልተገለጸ',
-        zone: sub.zone || 'ያልተገለጸ',
-        woreda: sub.woreda || 'ያልተገለጸ',
         count: 0,
       };
     }
@@ -380,7 +378,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
             <div className="space-y-1.5">
               <div className="text-[11px] font-black text-blue-950 tracking-widest uppercase flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full bg-blue-950 inline-block shadow-xs" />
-                የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት
+                የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት
               </div>
               <h1 className="text-3xl font-black text-slate-950 tracking-tight leading-tight">
                 {category ? category.title : reportTitle}
@@ -496,9 +494,11 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
 
               <div className="bg-amber-50/80 p-3.5 rounded-xl border border-amber-300/80 space-y-1">
                 <div className="font-black text-amber-950 text-[11px]">የቅድሚያ ትኩረት አቅጣጫ</div>
-                <div className="font-black text-amber-900 text-sm">አፋር ክልል፣ ትግራይ ክልል፣ አዲስ አበባ</div>
+                <div className="font-black text-amber-900 text-sm">
+                  {regionList.slice(0, 3).map(r => r.label).join('፣ ') || 'ወረዳ 1፣ ወረዳ 2፣ ልዩ ወረዳ 1'}
+                </div>
                 <div className="text-[10px] text-amber-950 font-medium">
-                  ከፍተኛ የተሳታፊ ቁጥር ባስመዘገቡ 3 ዋና ዋና አካባቢዎች ይጀመራል።
+                  ከፍተኛ የተሳታፊ ቁጥር ባስመዘገቡ 3 ዋና ዋና ወረዳዎች ይጀመራል።
                 </div>
               </div>
             </div>
@@ -509,7 +509,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 1 ከ 6</span>
         </div>
@@ -546,9 +546,9 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
             <div className="flex justify-between items-center border-b border-slate-200 pb-2">
               <h3 className="font-black text-slate-950 text-xs flex items-center gap-2">
                 <span className="mr-1 inline-block">🗺️</span>
-                <span>ለ) የክልል / ከተማ ተሳትፎ ስርጭት (Regional Distribution)</span>
+                <span>ለ) የወረዳ ተሳትፎ ስርጭት (Woreda Distribution)</span>
               </h3>
-              <span className="text-[10px] font-bold text-slate-500">Ranked Chart ({regionList.length} ክልሎች)</span>
+              <span className="text-[10px] font-bold text-slate-500">Ranked Chart ({regionList.length} ወረዳዎች)</span>
             </div>
             <SvgRankedBarChart data={regionList} barColor="#0f2942" />
           </ExecutiveSection>
@@ -558,7 +558,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 2 ከ 6</span>
         </div>
@@ -679,7 +679,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 3 ከ 6</span>
         </div>
@@ -729,7 +729,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 4 ከ 6</span>
         </div>
@@ -754,15 +754,13 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
             <div className="bg-slate-900 text-white px-5 py-3 flex justify-between items-center">
               <h3 className="font-black text-xs tracking-wide flex items-center gap-2">
                 <span className="mr-1 inline-block">📍</span>
-                <span>ሐ) የዞን/ክፍለ ከተማ እና ወረዳ ዝርዝር ተሳትፎ (Zone & Woreda Breakdown)</span>
+                <span>ሐ) የወረዳ ዝርዝር ተሳትፎ (Woreda Breakdown)</span>
               </h3>
-              <span className="text-[10px] text-slate-300 font-bold font-mono">{zoneWoredaRows.length} አካባቢዎች — ክፍል 1</span>
+              <span className="text-[10px] text-slate-300 font-bold font-mono">{zoneWoredaRows.length} ወረዳዎች — ክፍል 1</span>
             </div>
             <table className="w-full text-left border-collapse text-[11px]">
               <thead>
                 <tr className="bg-slate-100 text-slate-950 font-black border-b border-slate-300">
-                  <th className="p-3">ክልል / ከተማ</th>
-                  <th className="p-3">ዞን / ክፍለ ከተማ</th>
                   <th className="p-3">ወረዳ</th>
                   <th className="p-3 text-right">የተሞሉ ቅጾች ብዛት</th>
                 </tr>
@@ -771,8 +769,6 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
                 {zoneWoredaRows.slice(0, Math.ceil(zoneWoredaRows.length / 2)).map((r, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'}>
                     <td className="p-3 font-black text-slate-950">{r.region}</td>
-                    <td className="p-3 text-slate-800 font-medium">{r.zone}</td>
-                    <td className="p-3 text-slate-800 font-medium">{r.woreda}</td>
                     <td className="p-3 text-right font-black text-blue-950 font-mono">{r.count}</td>
                   </tr>
                 ))}
@@ -785,7 +781,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 5 ከ 6</span>
         </div>
@@ -810,15 +806,13 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
             <div className="bg-slate-900 text-white px-5 py-3 flex justify-between items-center">
               <h3 className="font-black text-xs tracking-wide flex items-center gap-2">
                 <span className="mr-1 inline-block">📍</span>
-                <span>ሐ) የዞን/ክፍለ ከተማ እና ወረዳ ዝርዝር ተሳትፎ (Zone & Woreda Breakdown) — ክፍል 2</span>
+                <span>ሐ) የወረዳ ዝርዝር ተሳትፎ (Woreda Breakdown) — ክፍል 2</span>
               </h3>
-              <span className="text-[10px] text-slate-300 font-bold font-mono">{zoneWoredaRows.length} አካባቢዎች — ክፍል 2</span>
+              <span className="text-[10px] text-slate-300 font-bold font-mono">{zoneWoredaRows.length} ወረዳዎች — ክፍል 2</span>
             </div>
             <table className="w-full text-left border-collapse text-[11px]">
               <thead>
                 <tr className="bg-slate-100 text-slate-950 font-black border-b border-slate-300">
-                  <th className="p-3">ክልል / ከተማ</th>
-                  <th className="p-3">ዞን / ክፍለ ከተማ</th>
                   <th className="p-3">ወረዳ</th>
                   <th className="p-3 text-right">የተሞሉ ቅጾች ብዛት</th>
                 </tr>
@@ -827,16 +821,14 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
                 {zoneWoredaRows.slice(Math.ceil(zoneWoredaRows.length / 2)).map((r, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'}>
                     <td className="p-3 font-black text-slate-950">{r.region}</td>
-                    <td className="p-3 text-slate-800 font-medium">{r.zone}</td>
-                    <td className="p-3 text-slate-800 font-medium">{r.woreda}</td>
                     <td className="p-3 text-right font-black text-blue-950 font-mono">{r.count}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="bg-slate-200 font-black text-slate-950 border-t-2 border-slate-400">
-                  <td colSpan={3} className="p-3 font-black">
-                    ድምር ጠቅላላ (Total Submissions Across All Locations)
+                  <td className="p-3 font-black">
+                    ድምር ጠቅላላ (Total Submissions)
                   </td>
                   <td className="p-3 text-right font-black text-blue-950 text-xs font-mono">
                     {zoneWoredaRows.reduce((acc, r) => acc + r.count, 0)} ቅጾች
@@ -851,7 +843,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t-2 border-slate-900 flex justify-between items-center text-[10px] text-slate-600 font-medium tracking-wide">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-extrabold text-slate-900">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-extrabold text-slate-900">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <div className="text-right">
             <strong className="font-mono text-blue-950">ገጽ 6 ከ 6</strong>

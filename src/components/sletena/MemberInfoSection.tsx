@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MembershipLevel } from '@/types/sletena';
-import { regionsData } from '@/lib/regions-data';
+import { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
 import { IconUserCheck, IconId, IconPhone, IconUser, IconBuildingStore, IconMapPin } from '@tabler/icons-react';
 
 interface MemberInfoSectionProps {
@@ -42,22 +42,8 @@ export const MemberInfoSection: React.FC<MemberInfoSectionProps> = ({
   region,
   zone,
   woreda = '',
-  maxWoredas = 14,
   onChange,
 }) => {
-  const availableZones = React.useMemo(() => {
-    if (!region) return [];
-    if (regionsData[region]) return regionsData[region];
-    const foundKey = Object.keys(regionsData).find(
-      (k) => k.startsWith(region) || region.startsWith(k)
-    );
-    return foundKey ? regionsData[foundKey] : [];
-  }, [region]);
-
-  const woredaOptions = React.useMemo(() => {
-    const count = Math.max(1, Math.min(maxWoredas, 50));
-    return Array.from({ length: count }, (_, i) => `ወረዳ ${(i + 1).toString().padStart(2, '0')}`);
-  }, [maxWoredas]);
 
   return (
     <div className="bg-surface-primary border border-border/50 rounded-2xl p-6 shadow-sm space-y-4">
@@ -129,10 +115,10 @@ export const MemberInfoSection: React.FC<MemberInfoSectionProps> = ({
           </select>
         </div>
 
-        {/* Region / City */}
+        {/* Woreda */}
         <div>
           <label className="block text-xs font-semibold text-text-secondary mb-1 flex items-center gap-1.5">
-            <IconBuildingStore size={15} className="text-text-muted" /> ክልል / ከተማ
+            <IconBuildingStore size={15} className="text-text-muted" /> ወረዳ
           </label>
           <select
             value={region}
@@ -142,65 +128,10 @@ export const MemberInfoSection: React.FC<MemberInfoSectionProps> = ({
             }}
             className="w-full px-3 py-2 text-xs bg-surface-secondary/50 border border-border/50 rounded-xl text-text-primary focus:outline-none focus:border-brand-blue"
           >
-            <option value="">-- ክልል/ከተማ ይምረጡ --</option>
-            {Object.keys(regionsData).map((r) => (
+            <option value="">-- ወረዳ ይምረጡ --</option>
+            {AKAKI_KALITY_WOREDAS.map((r) => (
               <option key={r} value={r}>
                 {r}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Zone / Sub-city */}
-        <div>
-          <label className="block text-xs font-semibold text-text-secondary mb-1">
-            {region === 'አዲስ አበባ' ? 'ክፍለ ከተማ' : 'ዞን / ክፍለ ከተማ'}
-          </label>
-          <select
-            value={zone}
-            disabled={!region}
-            onChange={(e) => {
-              const newZone = e.target.value;
-              onChange({ zone: newZone, woreda: '' });
-            }}
-            className={`w-full px-3 py-2 text-xs bg-surface-secondary/50 border border-border/50 rounded-xl text-text-primary focus:outline-none focus:border-brand-blue ${
-              !region ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <option value="">
-              {!region
-                ? '-- በቅድሚያ ክልል ይምረጡ --'
-                : region === 'አዲስ አበባ'
-                ? '-- ክፍለ ከተማ ይምረጡ --'
-                : '-- ዞን ይምረጡ --'}
-            </option>
-            {availableZones.map((z) => (
-              <option key={z} value={z}>
-                {z}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Woreda */}
-        <div>
-          <label className="block text-xs font-semibold text-text-secondary mb-1 flex items-center gap-1.5">
-            <IconMapPin size={15} className="text-text-muted" /> ወረዳ
-          </label>
-          <select
-            disabled={!zone}
-            value={woreda}
-            onChange={(e) => onChange({ woreda: e.target.value })}
-            className={`w-full px-3 py-2 text-xs bg-surface-secondary/50 border border-border/50 rounded-xl text-text-primary focus:outline-none focus:border-brand-blue cursor-pointer ${
-              !zone ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <option value="">
-              {!zone ? '-- በቅድሚያ ዞን ይምረጡ --' : '-- ወረዳ ይምረጡ --'}
-            </option>
-            {woredaOptions.map((w) => (
-              <option key={w} value={w}>
-                {w}
               </option>
             ))}
           </select>

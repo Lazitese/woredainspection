@@ -180,7 +180,7 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
       {/* Header section with Dropdowns */}
       <div className="bg-surface-primary rounded-2xl p-6 border border-border-light shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="flex-1 w-full">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight mb-4">የ{userProfile?.region} ክልል ሪፖርት ማቅረቢያ</h1>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight mb-4">የ{userProfile?.region} ሪፖርት ማቅረቢያ</h1>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

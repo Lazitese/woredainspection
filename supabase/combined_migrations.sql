@@ -5150,4 +5150,36 @@ ALTER TABLE public_files
 ADD CONSTRAINT public_files_category_check 
 CHECK (category IN ('መተዳደርያ ደንብ', 'የኮሚሽኑ መመሪያዎች', 'የፓርቲ መመሪያዎች', 'የኮሚሽኑ ሚስጥራዊ ሰነዶች', 'ሌላ'));
 
+-- 20260905: Akaki Kality Sub-City 17 Woredas migration
+DO $$ BEGIN
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 1';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 2';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 3';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 4';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 5';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 6';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 7';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 8';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 9';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 10';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 12';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ወረዳ 13';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ልዩ ወረዳ 1';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ልዩ ወረዳ 2';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ልዩ ወረዳ 3';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ልዩ ወረዳ 4';
+  ALTER TYPE public.ethiopia_region ADD VALUE IF NOT EXISTS 'ልዩ ወረዳ 5';
+EXCEPTION WHEN others THEN NULL;
+END $$;
 
+DO $$ BEGIN
+  ALTER TABLE public.user_profiles ALTER COLUMN region TYPE text;
+EXCEPTION WHEN others THEN NULL;
+END $$;
+
+
+
+
+-- Add sla_notified and reminder_notified to complaints table
+ALTER TABLE public.complaints ADD COLUMN IF NOT EXISTS sla_notified BOOLEAN DEFAULT false;
+ALTER TABLE public.complaints ADD COLUMN IF NOT EXISTS reminder_notified BOOLEAN DEFAULT false;

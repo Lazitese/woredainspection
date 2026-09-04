@@ -8,7 +8,7 @@ export default function RepresentativeLayout({ children }: { children: ReactNode
     <div className="min-h-screen bg-surface-secondary flex flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-surface-primary border-r border-border-light flex flex-col">
         <div className="p-6 border-b border-border-light flex items-center justify-center">
-          <h1 className="text-xl font-bold text-brand-blue tracking-tight">ክልል ሪፖርት አቅራቢ</h1>
+          <h1 className="text-xl font-bold text-brand-blue tracking-tight">የወረዳ ሪፖርት አቅራቢ</h1>
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <Link href="/representative/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-blue/10 text-brand-blue font-medium transition-colors">

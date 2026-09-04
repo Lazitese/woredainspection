@@ -193,7 +193,7 @@ export default function CreateNewsPage() {
               >
                 <option value="ዓበይት ዜናዎች">ዓበይት ዜናዎች</option>
                 <option value="ሳምንታዊ ዜናዎች">ሳምንታዊ ዜናዎች</option>
-                <option value="የክልል ዜናዎች">የክልል ዜናዎች</option>
+                <option value="የክፍለ ከተማ ዜናዎች">የክፍለ ከተማ ዜናዎች</option>
                 <option value="መልዕክቶች">መልዕክቶች</option>
               </select>
             </div>

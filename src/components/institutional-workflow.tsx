@@ -4,19 +4,19 @@ import { Users, Landmark, MapPin, Building2, Home, Briefcase, Share2, HeartHands
 import type { LucideIcon } from "lucide-react";
 
 const leftSteps = [
-  { label: "የብልፅግና ኮሚሽን", icon: Landmark },
-  { label: "የክልል/ከተማ/ፌተአ ኮሚሽን", icon: Landmark },
-  { label: "የዞን/ልዩ ወረዳ/ከተማ ኮሚሽን", icon: Landmark },
-  { label: "የወረዳ/ከተማ ኮሚሽን", icon: Landmark },
+  { label: "የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን", icon: Landmark },
+  { label: "የወረዳ ኮሚሽን", icon: Landmark },
+  { label: "የልዩ ወረዳ ኮሚሽን", icon: Landmark },
   { label: "የቀበሌ ኮሚሽን", icon: Landmark },
+  { label: "የብልፅግና ህብረት", icon: Users },
 ];
 
 const rightSteps = [
-  { label: "የኮሚሽኑ ዋና ጽ/ቤት", icon: Landmark },
-  { label: "የክልል/ከተማ ቅርንጫፍ ጽ/ቤት", icon: Landmark },
-  { label: "የዞን/ልዩ ወረዳ/ከተማ ቅ/ጽ/ቤት", icon: Landmark },
-  { label: "የወረዳ/ከተማ ቅርንጫፍ ጽ/ቤት", icon: Landmark },
+  { label: "የክ/ከተማው ኮሚሽን ፅ/ቤት", icon: Landmark },
+  { label: "የወረዳ ቅርንጫፍ ጽ/ቤት", icon: Landmark },
+  { label: "የልዩ ወረዳ ቅርንጫፍ ጽ/ቤት", icon: Landmark },
   { label: "የቀበሌ ቅርንጫፍ ጽ/ቤት", icon: Landmark },
+  { label: "የህብረት ማስተባበሪያ", icon: Briefcase },
 ];
 
 function ArrowDown() {

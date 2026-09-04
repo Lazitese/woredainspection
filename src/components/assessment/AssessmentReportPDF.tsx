@@ -171,7 +171,7 @@ export function AssessmentReportPDF({
   const today = new Date().toLocaleDateString('en-GB');
 
   return (
-    <Document title={`${user?.full_name || 'Assessment'} Report`} author="Federal Inspection">
+    <Document title={`${user?.full_name || 'Assessment'} Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="portrait" style={styles.page}>
         <Text style={styles.title}>{'የአፈጻጸም ምዘና ሪፖርት'}</Text>
 
@@ -196,7 +196,7 @@ export function AssessmentReportPDF({
             <Text style={[styles.infoValueCell, { borderRight: 'none' }]}>{profile?.current_responsibility_com || '-'}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabelCell}>{'ክልል / ክፍለ ከተማ'}</Text>
+            <Text style={styles.infoLabelCell}>{'ወረዳ / ክፍለ ከተማ'}</Text>
             <Text style={styles.infoValueCell}>{profile?.region || profile?.subcity || '-'}</Text>
             <Text style={styles.infoLabelCell}>{'ዞን / ወረዳ'}</Text>
             <Text style={[styles.infoValueCell, { borderRight: 'none' }]}>{profile?.zone || profile?.woreda || '-'}</Text>

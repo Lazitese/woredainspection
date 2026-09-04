@@ -12,8 +12,8 @@ export function FormsAdminView({ initialRepresentatives, initialReports, initial
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">የክልል ሪፖርቶች (Regional Reports)</h1>
-          <p className="text-text-muted mt-1">የክልል ሪፖርት አቅራቢዎችን እና ሪፖርቶችን ያስተዳድሩ</p>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">የወረዳ ሪፖርቶች (Woreda Reports)</h1>
+          <p className="text-text-muted mt-1">የወረዳ ሪፖርት አቅራቢዎችን እና ሪፖርቶችን ያስተዳድሩ</p>
         </div>
         
         <div className="flex bg-surface-primary p-1 rounded-xl shadow-sm border border-border-light">

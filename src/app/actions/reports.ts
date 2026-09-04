@@ -213,11 +213,11 @@ export async function saveReportFormAction(
     const payload = {
       user_id: userId,
       submitter_id: userId,
-      title: `የ${region} ክልል ${period} ሪፖርት`,
+      title: `የ${region} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),
       period_category: getPeriodCategory(period),
-      submitter_level: 'region',
+      submitter_level: 'woreda',
       region_name: region,
       region,
       year,
@@ -277,11 +277,11 @@ export async function submitReportAction(
     const payload = {
       user_id: userId,
       submitter_id: userId,
-      title: `የ${region} ክልል ${period} ሪፖርት`,
+      title: `የ${region} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),
       period_category: getPeriodCategory(period),
-      submitter_level: 'region',
+      submitter_level: 'woreda',
       region_name: region,
       region,
       year,
@@ -361,7 +361,7 @@ export async function provideAdminFeedbackAction(
           email: (user as any).email,
           name: user.full_name || 'ተወካይ',
           subject: 'ICODiS — የሪፖርት ግብረ መልስ',
-          message: `ለ${report.region} ክልል ባስገቡት ሪፖርት ላይ ግብረ መልስ ተሰጥቷል። እባክዎ ዳሽቦርድዎን ይጎብኙ።`,
+          message: `ለ${report.region} ባስገቡት ሪፖርት ላይ ግብረ መልስ ተሰጥቷል። እባክዎ ዳሽቦርድዎን ይጎብኙ።`,
           loginPath: '/representative/login',
         });
       }

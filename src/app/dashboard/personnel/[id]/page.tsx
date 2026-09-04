@@ -13,11 +13,7 @@ import * as z from "zod";
 import { COMMISSION_POSITIONS, OFFICE_CATEGORIES, Personnel } from "@/types";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { ImageCropperModal } from "@/components/ui/ImageCropperModal";
-
-const ETHIOPIA_REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤኒሻንጉል ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ሲዳማ', 
-  'ደቡብ ምዕራብ ኢትዮጵያ', 'ደቡብ ኢትዮጵያ', 'ማዕከላዊ ኢትዮጵያ', 'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል ተቋማት'
-];
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 const editPersonnelSchema = z.object({
   positionId: z.string().optional(),
@@ -88,14 +84,9 @@ export default function EditPersonnelPage({ params }: { params: Promise<{ id: st
         ) || OFFICE_CATEGORIES[0];
 
         const rawReg = data.region || '';
-        const matchedRegion = ETHIOPIA_REGIONS.find(r => 
+        const matchedRegion = AKAKI_KALITY_WOREDAS.find(r => 
           r === rawReg || 
-          r.replace(/\s+/g, '') === rawReg.replace(/\s+/g, '') ||
-          (rawReg.includes('ማዕከላዊ') && r.includes('ማዕከላዊ')) ||
-          (rawReg.includes('ደቡብ ምዕራብ') && r.includes('ደቡብ ምዕራብ')) ||
-          (rawReg.includes('ደቡብ ኢ') && r.includes('ደቡብ ኢ')) ||
-          (rawReg.includes('ድሬ') && r.includes('ድሬ')) ||
-          (rawReg.includes('ቤን') && r.includes('ቤን'))
+          r.replace(/\s+/g, '') === rawReg.replace(/\s+/g, '')
         ) || rawReg;
         
         reset({
@@ -319,14 +310,14 @@ export default function EditPersonnelPage({ params }: { params: Promise<{ id: st
 
               {officeId === 'branch' && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-widest">ክልል / ቅርንጫፍ (Region)</label>
+                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-widest">ወረዳ / ቅርንጫፍ (Woreda)</label>
                   <select {...register('region')} className="w-full bg-surface-primary border border-border/50 rounded-xl p-4 text-sm text-text-primary focus:outline-none focus:border-brand-yellow/50 transition-colors appearance-none cursor-pointer">
-                    <option value="">ክልል ይምረጡ...</option>
-                    {ETHIOPIA_REGIONS.map(reg => (
+                    <option value="">ወረዳ ይምረጡ...</option>
+                    {AKAKI_KALITY_WOREDAS.map(reg => (
                       <option key={reg} value={reg}>{reg}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-text-muted">ይህ ክፍል የሚሞላው ለቅርንጫፍ ጽ/ቤት ብቻ ነው</p>
+                  <p className="text-xs text-text-muted">ይህ ክፍል የሚሞላው ለወረዳ ጽ/ቤት ብቻ ነው</p>
                 </div>
               )}
             </div>

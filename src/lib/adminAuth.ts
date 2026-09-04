@@ -9,7 +9,10 @@ export async function verifyAdminUser(userId: string, email?: string): Promise<b
       .maybeSingle();
 
     // Auto-heal missing profile record for initial default superadmin/admin accounts
-    const isSuperAdminEmail = email === 'superadmin@commission.gov' || email === 'admin@commission.gov';
+    const isSuperAdminEmail = 
+      email === 'admin@akakikality.gov.et' || 
+      email === 'superadmin@commission.gov' || 
+      email === 'admin@commission.gov';
 
     if (!profile && isSuperAdminEmail && email) {
       const { data: newProfile } = await supabaseAdmin

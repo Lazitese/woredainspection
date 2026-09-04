@@ -66,10 +66,10 @@ export const PrintableReport = forwardRef<HTMLDivElement, PrintableReportProps>(
             <td className="p-2" style={{ border: '1px solid black', padding: '6px' }}>{profile?.current_responsibility_com || '-'}</td>
           </tr>
           <tr>
-            <td className="p-2 font-bold" style={{ border: '1px solid black', padding: '6px', fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>ክልል / ክፍለ ከተማ</td>
-            <td className="p-2" style={{ border: '1px solid black', padding: '6px' }}>{profile?.region || profile?.subcity || '-'}</td>
-            <td className="p-2 font-bold" style={{ border: '1px solid black', padding: '6px', fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>ዞን / ወረዳ</td>
-            <td className="p-2" style={{ border: '1px solid black', padding: '6px' }}>{profile?.zone || profile?.woreda || '-'}</td>
+            <td className="p-2 font-bold" style={{ border: '1px solid black', padding: '6px', fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>ክፍለ ከተማ</td>
+            <td className="p-2" style={{ border: '1px solid black', padding: '6px' }}>{profile?.subcity || 'አቃቂ ቃሊቲ'}</td>
+            <td className="p-2 font-bold" style={{ border: '1px solid black', padding: '6px', fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>ወረዳ</td>
+            <td className="p-2" style={{ border: '1px solid black', padding: '6px' }}>{profile?.woreda || profile?.region || '-'}</td>
           </tr>
           <tr>
             <td className="p-2 font-bold" style={{ border: '1px solid black', padding: '6px', fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>የምዘና ጊዜ</td>

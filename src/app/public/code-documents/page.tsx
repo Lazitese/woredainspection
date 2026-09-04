@@ -49,7 +49,7 @@ export default function PublicCodeDocumentsPage() {
     return d.title.toLowerCase().includes(q) || (d.description?.toLowerCase().includes(q) ?? false);
   });
 
-  const officeName = OFFICES.find(o => o.code === selectedOffice)?.name || 'ኮሚሽን ዋና ጽ/ቤት';
+  const officeName = OFFICES.find(o => o.code === selectedOffice)?.name || 'የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት';
   const mainCategory = MAIN_CATEGORIES.find(m => m.code === selectedMain);
   const subs = selectedMain ? (SUB_CATEGORIES[selectedMain] || []) : [];
   const subCategory = subs.find(s => s.code === selectedSub);
@@ -88,7 +88,7 @@ export default function PublicCodeDocumentsPage() {
             <Image src="/logo.jpg" alt="Commission Logo" fill className="object-cover" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold leading-tight">የኮሚሽን ዋና ጽ/ቤት ህዝባዊ ሰነዶች</span>
+            <span className="text-sm font-bold leading-tight">የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት ህዝባዊ ሰነዶች</span>
             <span className="text-xs text-text-muted leading-tight">ለህዝብ ክፍት የሆኑ የኮሚሽኑ ሰነዶች ማውጫ</span>
           </div>
         </div>

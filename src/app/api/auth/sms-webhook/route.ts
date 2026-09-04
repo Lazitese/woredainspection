@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         recipients: [formattedPhone],
-        message: `Your Federal Inspection Assessment login code is: ${otp}`,
+        message: `የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት - Your verification code is: ${otp}`,
       }),
     });
 

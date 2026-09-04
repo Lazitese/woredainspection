@@ -34,7 +34,7 @@ export function AdminReportsTabsView({ initialReports, initialSchemas }: { initi
               }`}
             >
               <IconMap2 size={18} />
-              በክልል (By Region)
+              በወረዳ (By Woreda)
             </button>
             <button
               onClick={() => setActiveTab('aggregated')}

@@ -11,12 +11,14 @@ import { IconBrandFacebook, IconBrandX, IconBrandLinkedin, IconBrandWhatsapp } f
 // Members are grouped by office tab in a 1-row slidable carousel.
 
 const OFFICE_TABS = [
-  { id: 'commission-members', label: 'ኮሚሽን አባላት', labelEn: 'Commission Members' },
-  { id: 'main', label: 'ኮሚሽን ዋና ጽ/ቤት', labelEn: 'Main Office' },
-  { id: 'branch', label: 'ኮሚሽን ቅርንጫፍ ጽ/ቤት', labelEn: 'Branch Office' },
+  { id: 'deputy-chairperson', label: 'ም/ሰብሳቢ', labelEn: 'Deputy Chairperson' },
+  { id: 'chairperson-secretary', label: 'ሰብሳቢና ፀሀፊ', labelEn: 'Chairperson & Secretary' },
+  { id: 'leadership-members', label: 'አመራር አባላት', labelEn: 'Leadership Members' },
+  { id: 'committee-members', label: 'ኮሚቴ አባላት', labelEn: 'Committee Members' },
+  { id: 'branch', label: 'ቅ/ጽ/ቤት ሀላፊ', labelEn: 'Woreda Branch Heads' },
 ];
 
-function MemberCard({ member }: { member: Personnel }) {
+function MemberCard({ member, activeTab }: { member: Personnel; activeTab: string }) {
   const [imageError, setImageError] = useState(false);
 
   const rawPhoto = member.photo?.trim();
@@ -59,8 +61,8 @@ function MemberCard({ member }: { member: Personnel }) {
                   {member.nameAm || member.name}
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-slate-500 line-clamp-2">
-                  {member.positionAm === 'ኮሚሽን ቅርንጫፍ ጽ/ቤት ኃላፊ' && member.region 
-                    ? `የ ${member.region} ኮሚሽን ቅርንጫፍ ጽ/ቤት ኃላፊ` 
+                  {member.region && !member.positionAm.includes(member.region)
+                    ? `የ${member.region} ኮሚሽን ቅ/ጽ/ቤት ኃላፊ`
                     : member.positionAm}
                 </p>
               </div>
@@ -116,7 +118,11 @@ function MemberCard({ member }: { member: Personnel }) {
           </div>
           <p className="mt-4 flex items-center gap-1.5 text-xs font-medium text-slate-400">
             <svg className="size-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            {member.officeCategoryAm}
+            {activeTab === 'deputy-chairperson' ? 'ም/ሰብሳቢ' :
+             activeTab === 'chairperson-secretary' ? 'ሰብሳቢና ፀሀፊ' :
+             activeTab === 'leadership-members' ? 'አመራር አባላት' :
+             activeTab === 'committee-members' ? 'ኮሚቴ አባላት' :
+             'ቅ/ጽ/ቤት ሀላፊ'}
           </p>
         </div>
       </div>
@@ -128,21 +134,30 @@ function getRegionRank(regionStr?: string): number {
   if (!regionStr) return 999;
   const str = regionStr.trim();
   
-  if (str.includes('ኦሮሚያ') || str.toLowerCase().includes('oromia')) return 1;
-  if (str.includes('አማራ') || str.toLowerCase().includes('amhara')) return 2;
-  if (str.includes('ሱማሌ') || str.includes('ሶማሌ') || str.toLowerCase().includes('somali')) return 3;
-  if (str.includes('አፋር') || str.toLowerCase().includes('afar')) return 4;
-  if (str.includes('ቤን') || str.includes('ቤኒሻንጉል') || str.toLowerCase().includes('benishangul')) return 5;
-  if (str.includes('ጋምቤላ') || str.toLowerCase().includes('gambella')) return 6;
-  if (str.includes('ሐረሪ') || str.toLowerCase().includes('harari')) return 7;
-  if (str.includes('ሲዳማ') || str.toLowerCase().includes('sidama')) return 8;
-  if (str.includes('ደ/ም/ኢ/ያ') || str.includes('ምዕራብ') || str.toLowerCase().includes('south west')) return 9;
-  if (str.includes('ደቡብ ኢ/ያ') || (str.includes('ደቡብ') && !str.includes('ምዕራብ')) || (str.toLowerCase().includes('south') && !str.toLowerCase().includes('west'))) return 10;
-  if (str.includes('ማዕ/ኢ/ያ') || str.includes('ማዕከላዊ') || str.toLowerCase().includes('central')) return 11;
-  if (str.includes('አዲስ አበባ') || str.toLowerCase().includes('addis')) return 12;
-  if (str.includes('ድሬ') || str.toLowerCase().includes('dire')) return 13;
-  if (str.includes('ፌዴራል') || str.toLowerCase().includes('federal')) return 14;
+  if (str.includes('ወረዳ 1') && !str.includes('ወረዳ 10') && !str.includes('ወረዳ 12') && !str.includes('ወረዳ 13') && !str.includes('ልዩ')) return 1;
+  if (str.includes('ወረዳ 2') && !str.includes('ልዩ')) return 2;
+  if (str.includes('ወረዳ 3') && !str.includes('ልዩ')) return 3;
+  if (str.includes('ወረዳ 4') && !str.includes('ልዩ')) return 4;
+  if (str.includes('ወረዳ 5') && !str.includes('ልዩ')) return 5;
+  if (str.includes('ወረዳ 6')) return 6;
+  if (str.includes('ወረዳ 7')) return 7;
+  if (str.includes('ወረዳ 8')) return 8;
+  if (str.includes('ወረዳ 9')) return 9;
+  if (str.includes('ወረዳ 10')) return 10;
+  if (str.includes('ወረዳ 12')) return 11;
+  if (str.includes('ወረዳ 13')) return 12;
+  if (str.includes('ልዩ ወረዳ')) return 13;
 
+  return 999;
+}
+
+function getLeadershipRank(nameStr?: string): number {
+  if (!nameStr) return 999;
+  const str = nameStr.trim();
+  if (str.includes('ፈይሳ') || str.includes('ፈይሳ ከባሽ')) return 1;
+  if (str.includes('የሺ') || str.includes('የሺ አክሊሉ')) return 2;
+  if (str.includes('አህመድ') || str.includes('አህመድ ኡርጎ')) return 3;
+  if (str.includes('ሀብለወርቅ') || str.includes('ሀብለወርቅ ጌትነት')) return 4;
   return 999;
 }
 
@@ -150,33 +165,26 @@ function getCommissionMemberRank(nameStr?: string): number {
   if (!nameStr) return 999;
   const str = nameStr.trim();
 
-  if (str.includes('ደስታ ተስፋው') || str.includes('ደስታ')) return 1;
-  if (str.includes('ያሲን ሀቢብ') || str.includes('ያሲን')) return 2;
-  if (str.includes('ሀብታሙ ሲሳይ') || str.includes('ሀብታሙ')) return 3;
-  if (str.includes('አብዱል ሃኪም') || str.includes('አብዱልሃኪም') || str.includes('አብዱል')) return 4;
-  if (str.includes('ሀፍታይ') || str.includes('ሀፍታይ ገ/እግዚአብሔር')) return 5;
-  if (str.includes('ቢንያም') || str.includes('ቢንያም መንገሻ')) return 6;
-  if (str.includes('ሮዛ') || str.includes('ሮዛ ቢያ')) return 7;
-  if (str.includes('ጀማል') || str.includes('ጀማል ከዲር')) return 8;
-  if (str.includes('እሱባለው') || str.includes('እሱባለው መሠለ')) return 9;
-  if (str.includes('ኦላዶ') || str.includes('ኦላዶ ኦሎ')) return 10;
-  if (str.includes('ማርታ') || str.includes('ማርታ ሉዊጂ')) return 11;
-  if (str.includes('መሐሙድ') || str.includes('መሐሙድ ዩሱፍ') || str.includes('መህሙድ')) return 12;
-  if (str.includes('ቻም') || str.includes('ቻም ኡቦንግ')) return 13;
-  if (str.includes('እመቤት') || str.includes('እመቤት ኢሳያስ')) return 14;
+  if (str.includes('ፈይሳ') || str.includes('ፈይሳ ከባሽ')) return 1;
+  if (str.includes('የሺ') || str.includes('የሺ አክሊሉ')) return 2;
+  if (str.includes('አህመድ') || str.includes('አህመድ ኡርጎ')) return 3;
+  if (str.includes('መስታወት') || str.includes('መስታወት ደጀኔ')) return 4;
+  if (str.includes('በየነ') || str.includes('በየነ ቱሉ')) return 5;
+  if (str.includes('ብሩክ') || str.includes('ብሩክ ዘርጋው')) return 6;
+  if (str.includes('ተመስገን') || str.includes('ተመስገን አየለ')) return 7;
+  if (str.includes('ደረጄ') || str.includes('ደረጄ በድሉ')) return 8;
+  if (str.includes('ሰላማዊት')) return 9;
 
   return 999;
 }
 
 function getPositionRank(pos?: string): number {
   if (!pos) return 99;
-  if (pos.includes('ዋና ኮሚሽነር')) return 1;
-  if (pos.includes('ምክትል ኮሚሽነር')) return 2;
-  if (pos.includes('ጸሃፊ') || pos.includes('ጽህፈት ቤት ሃላፊ')) return 3;
-  if (pos.includes('ስራ አመራር')) return 4;
-  if (pos.includes('ማኔጅመንት')) return 5;
-  if (pos.includes('ቅርንጫፍ')) return 6;
-  if (pos.includes('አባል')) return 7;
+  if (pos.includes('ምክትል ሰብሳቢ') || pos.includes('ም/ሰብሳቢ')) return 1;
+  if (pos.includes('ሰብሳቢና ፀሀፊ') || pos.includes('ሰብሳቢ ፀሀፊ')) return 2;
+  if (pos.includes('አመራር')) return 3;
+  if (pos.includes('ኮሚቴ አባል') || pos.includes('አባል')) return 4;
+  if (pos.includes('ቅርንጫፍ') || pos.includes('ቅ/ጽ/ቤት')) return 5;
   return 10;
 }
 
@@ -200,20 +208,61 @@ export function MembersSection() {
 
   const currentOffice = activePersonnel
     .filter(p => {
-      if (activeTab === 'main') return p.officeCategory === 'Main Office' || p.officeCategoryAm === 'ኮሚሽን ዋና ጽ/ቤት' || p.officeCategoryAm === 'ኮሚሽን ጽ/ቤት';
-      if (activeTab === 'branch') return p.officeCategory === 'Branch Office' || p.officeCategoryAm === 'ኮሚሽን ቅርንጫፍ ጽ/ቤት';
-      if (activeTab === 'commission-members') return p.officeCategory === 'Commission Members' || p.officeCategoryAm === 'ኮሚሽን አባላት';
+      if (activeTab === 'deputy-chairperson') {
+        return (
+          p.officeCategory?.includes('deputy-chairperson') || 
+          p.officeCategoryAm === 'ም/ሰብሳቢ' || 
+          p.positionAm?.includes('ም/ሰብሳቢ') || 
+          p.positionAm?.includes('ምክትል ሰብሳቢ')
+        );
+      }
+      if (activeTab === 'chairperson-secretary') {
+        return (
+          p.officeCategory?.includes('chairperson-secretary') || 
+          p.officeCategoryAm === 'ሰብሳቢና ፀሀፊ' || 
+          p.positionAm?.includes('ሰብሳቢና ፀሀፊ') || 
+          p.positionAm?.includes('ሰብሳቢ ፀሀፊ')
+        );
+      }
+      if (activeTab === 'leadership-members') {
+        return (
+          p.officeCategory?.includes('leadership-members') || 
+          p.officeCategoryAm?.includes('አመራር') ||
+          p.positionAm?.includes('አመራር')
+        );
+      }
+      if (activeTab === 'committee-members') {
+        return (
+          p.officeCategory?.includes('committee-members') || 
+          p.officeCategoryAm?.includes('ኮሚቴ') || 
+          p.positionAm?.includes('ኮሚቴ')
+        );
+      }
+      if (activeTab === 'branch') {
+        return (
+          p.officeCategory?.includes('branch') || 
+          p.officeCategoryAm?.includes('ቅርንጫፍ') || 
+          p.officeCategoryAm?.includes('ቅ/ጽ/ቤት') || 
+          p.officeCategoryAm?.includes('ወረዳ') || 
+          Boolean(p.region)
+        );
+      }
       return false;
     })
     .sort((a, b) => {
+      if (activeTab === 'leadership-members') {
+        const rankA = getLeadershipRank(a.nameAm || a.name);
+        const rankB = getLeadershipRank(b.nameAm || b.name);
+        if (rankA !== rankB) return rankA - rankB;
+      }
+      if (activeTab === 'committee-members') {
+        const rankA = getCommissionMemberRank(a.nameAm || a.name);
+        const rankB = getCommissionMemberRank(b.nameAm || b.name);
+        if (rankA !== rankB) return rankA - rankB;
+      }
       if (activeTab === 'branch') {
         const rankA = getRegionRank(a.region);
         const rankB = getRegionRank(b.region);
-        if (rankA !== rankB) return rankA - rankB;
-      }
-      if (activeTab === 'commission-members') {
-        const rankA = getCommissionMemberRank(a.nameAm || a.name);
-        const rankB = getCommissionMemberRank(b.nameAm || b.name);
         if (rankA !== rankB) return rankA - rankB;
       }
       const posA = getPositionRank(a.positionAm || a.position);
@@ -297,7 +346,7 @@ export function MembersSection() {
             </div>
 
             {/* Slide Navigation Buttons */}
-            {currentOffice.length > 0 && (
+            {currentOffice.length > 1 && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleScroll('left')}
@@ -341,7 +390,7 @@ export function MembersSection() {
           >
             {currentOffice.map((member) => (
               <div key={member.id} className="snap-start shrink-0">
-                <MemberCard member={member} />
+                <MemberCard member={member} activeTab={activeTab} />
               </div>
             ))}
           </div>

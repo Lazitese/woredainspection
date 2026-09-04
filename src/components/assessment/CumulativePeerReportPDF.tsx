@@ -210,7 +210,7 @@ export function CumulativePeerReportPDF({
   score20 = 0,
 }: CumulativePeerReportPDFProps) {
   return (
-    <Document title={`${user?.full_name || 'Member'}_20Percent_Peer_Report`} author="Federal Inspection">
+    <Document title={`${user?.full_name || 'Member'}_20Percent_Peer_Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="portrait" style={styles.page}>
         <Text style={styles.title}>{'የ 20% የአቻዎች/አመራር ድምር ምዘና ሪፖርት'}</Text>
         <Text style={styles.subtitle}>{'ቅፅ-2: የአቻዎች ምዘና ዝርዝር ውጤት እና ሂስ ማጠቃለያ'}</Text>

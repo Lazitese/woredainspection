@@ -3,6 +3,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { FormSchema } from '@/components/dashboard/forms/FormTableRenderer';
+import { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
 
 // Register Benaiah font (Ethiopic Unicode font bundled in /public/Benaiah.ttf)
 Font.register({
@@ -113,11 +114,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const ALL_REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤንሻንጉል ጉሙዝ', 'ጋምቤላ', 
-  'ሀረሪ', 'ሲዳማ', 'ደቡብ ምዕራብ ኢትዮጵያ', 'ደቡብ ኢትዮጵያ', 'ማዕከላዊ ኢትዮጵያ', 
-  'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል'
-];
+const ALL_REGIONS = AKAKI_KALITY_WOREDAS;
 
 interface AggregatedReportPDFProps {
   year: number;
@@ -130,7 +127,7 @@ export function AggregatedReportPDF({ year, period, reports, schemas }: Aggregat
   const PRINTABLE_WIDTH = 801.89; // A4 Landscape width (841.89) minus 40pt padding
 
   return (
-    <Document title={`Aggregated Report ${year} ${period}`} author="Federal Inspection">
+    <Document title={`Aggregated Report ${year} ${period}`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       {schemas.map((schema) => {
         const totalSubCols = schema.columns.reduce(
           (acc, col) => acc + (col.subKeys.length > 0 ? col.subKeys.length : 1),
@@ -185,7 +182,7 @@ export function AggregatedReportPDF({ year, period, reports, schemas }: Aggregat
                 {/* Header Row 1 */}
                 <View style={styles.headerRow1}>
                   <Text style={[styles.th, { width: regionColWidth, fontSize, textAlign: 'left', paddingLeft: 4 }]}>
-                    {'ክልል (Region)'}
+                    {'ወረዳ (Woreda)'}
                   </Text>
                   {schema.columns.map((col, idx) => {
                     const numSubs = col.subKeys.length > 0 ? col.subKeys.length : 1;
@@ -318,7 +315,7 @@ export function RegionReportPDF({ regionName, year, period, formsData, schemas }
   const PRINTABLE_WIDTH = 801.89;
 
   return (
-    <Document title={`${regionName} Region Report`} author="Federal Inspection">
+    <Document title={`${regionName} Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       {schemas.map((schema) => {
         const data = formsData?.[schema.id] || {};
         const totalSubCols = schema.columns.reduce(
@@ -334,7 +331,7 @@ export function RegionReportPDF({ regionName, year, period, formsData, schemas }
         return (
           <Page key={schema.id} size="A4" orientation="landscape" style={styles.page}>
             <View style={styles.header}>
-              <Text style={styles.title}>{`የ ${regionName} ክልል አሃዛዊ ሪፖርት`}</Text>
+              <Text style={styles.title}>{`የ ${regionName} አሃዛዊ ሪፖርት`}</Text>
               <Text style={styles.subtitle}>{`በጀት ዓመት: ${year} | የሪፖርት ጊዜ: ${period}`}</Text>
             </View>
 
@@ -455,10 +452,10 @@ export function NarrationReportPDF({ regionName, year, period, narrationData }: 
     (typeof narrationData === 'string' ? narrationData : 'ምንም የጽሁፍ ሪፖርት አልቀረበም (No narration report provided)');
 
   return (
-    <Document title={`${regionName} Narration Report`} author="Federal Inspection">
+    <Document title={`${regionName} Narration Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="portrait" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>{`የ ${regionName} ክልል የጽሁፍ ሪፖርት`}</Text>
+          <Text style={styles.title}>{`የ ${regionName} የጽሁፍ ሪፖርት`}</Text>
           <Text style={styles.subtitle}>{`በጀት ዓመት: ${year} | የሪፖርት ጊዜ: ${period}`}</Text>
         </View>
 

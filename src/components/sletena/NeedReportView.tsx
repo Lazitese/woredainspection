@@ -113,15 +113,13 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
       .sort((a, b) => b.count - a.count);
   }, [submissions]);
 
-  const zoneWoredaTableData = useMemo(() => {
-    const table: Record<string, { region: string; zone: string; woreda: string; count: number }> = {};
+  const woredaTableData = useMemo(() => {
+    const table: Record<string, { region: string; count: number }> = {};
     filteredSubmissions.forEach((s) => {
-      const key = `${s.region || 'N/A'}-${s.zone || 'N/A'}-${s.woreda || 'N/A'}`;
+      const key = s.region || 'ያልተገለጸ';
       if (!table[key]) {
         table[key] = {
           region: s.region || 'ያልተገለጸ',
-          zone: s.zone || 'ያልተገለጸ',
-          woreda: s.woreda || 'ያልተገለጸ',
           count: 0,
         };
       }
@@ -387,10 +385,10 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
           </div>
 
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            {/* Region Filter */}
+            {/* Woreda Filter */}
             <div className="flex items-center gap-1.5 bg-surface-secondary/50 px-3 py-1.5 rounded-xl border border-border/40 text-xs">
               <IconMapPin size={15} className="text-brand-blue" />
-              <span className="font-bold text-text-muted">ክልል:</span>
+              <span className="font-bold text-text-muted">ወረዳ:</span>
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
@@ -419,7 +417,7 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
         <div className="flex justify-end items-center">
           <div className="flex items-center gap-1.5 bg-surface-secondary/80 px-4 py-2 rounded-xl border border-border/50 text-xs shadow-2xs">
             <IconMapPin size={16} className="text-brand-blue" />
-            <span className="font-extrabold text-text-muted">ክልል ያጣሩ:</span>
+            <span className="font-extrabold text-text-muted">ወረዳ ያጣሩ:</span>
             <select
               value={regionFilter}
               onChange={(e) => setRegionFilter(e.target.value)}
@@ -655,14 +653,14 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
             </div>
           </div>
 
-          {/* Region Submissions Responsive Distribution */}
+          {/* Woreda Submissions Responsive Distribution */}
           <div className="bg-surface-secondary/30 border border-border/40 rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-text-primary uppercase tracking-wide">
-                ለ) የክልል / ከተማ ተሳትፎ ስርጭት (Regional Distribution)
+                ለ) የወረዳ ተሳትፎ ስርጭት (Woreda Distribution)
               </h4>
               <span className="text-[10px] font-extrabold px-2 py-0.5 bg-brand-blue/10 text-brand-blue rounded-md border border-brand-blue/20">
-                {regionStatsData.length} ክልሎች/ከተሞች
+                {regionStatsData.length} ወረዳዎች
               </span>
             </div>
 
@@ -684,48 +682,44 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
             </div>
 
             <div className="text-[11px] text-text-muted italic pt-1 text-center border-t border-border/30">
-              በአጠቃላይ ከ <span className="font-bold text-text-primary">{regionStatsData.length}</span> ክልሎች/ከተሞች ምላሽ ተሰብስቧል።
+              በአጠቃላይ ከ <span className="font-bold text-text-primary">{regionStatsData.length}</span> ወረዳዎች ምላሽ ተሰብስቧል።
             </div>
           </div>
         </div>
 
-        {/* Zone & Woreda Geographic Table */}
+        {/* Woreda Geographic Table */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-text-primary uppercase tracking-wide">
-              ሐ) የዞን/ክፍለ ከተማ እና ወረዳ ዝርዝር ተሳትፎ (Zone & Woreda Breakdown Table)
+              ሐ) የወረዳ ዝርዝር ተሳትፎ (Woreda Breakdown Table)
             </h4>
             <span className="text-[10px] font-extrabold px-2.5 py-0.5 bg-brand-blue/10 text-brand-blue rounded-md border border-brand-blue/20">
-              {zoneWoredaTableData.length} የተለዩ አካባቢዎች
+              {woredaTableData.length} ወረዳዎች
             </span>
           </div>
           <div className="overflow-x-auto rounded-xl border border-border/40 max-h-56 overflow-y-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-secondary text-text-secondary font-bold uppercase sticky top-0 z-10">
                 <tr>
-                  <th className="p-2.5">ክልል / ከተማ</th>
-                  <th className="p-2.5">ዞን / ክፍለ ከተማ</th>
                   <th className="p-2.5">ወረዳ</th>
                   <th className="p-2.5 text-right">የተሞሉ ቅጾች ብዛት</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">
-                {zoneWoredaTableData.map((row, idx) => (
+                {woredaTableData.map((row, idx) => (
                   <tr key={idx} className="hover:bg-surface-secondary/40">
                     <td className="p-2.5 font-bold text-text-primary">{row.region}</td>
-                    <td className="p-2.5 text-text-secondary">{row.zone}</td>
-                    <td className="p-2.5 text-text-secondary">{row.woreda}</td>
                     <td className="p-2.5 text-right font-black text-brand-blue">{row.count}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot className="bg-surface-secondary/90 font-bold border-t border-border/50 sticky bottom-0 z-10">
                 <tr>
-                  <td colSpan={3} className="p-2.5 text-text-primary font-black">
-                    ድምር ጠቅላላ (Total Submissions Across All Locations)
+                  <td className="p-2.5 text-text-primary font-black">
+                    ድምር ጠቅላላ (Total Submissions)
                   </td>
                   <td className="p-2.5 text-right font-black text-brand-blue text-sm">
-                    {zoneWoredaTableData.reduce((acc, r) => acc + r.count, 0)} ቅጾች
+                    {woredaTableData.reduce((acc, r) => acc + r.count, 0)} ቅጾች
                   </td>
                 </tr>
               </tfoot>
@@ -1046,7 +1040,7 @@ export const NeedReportView: React.FC<NeedReportViewProps> = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-text-primary">{f.name}</span>
                     <span className="text-[10px] font-semibold text-text-muted bg-surface-primary px-2 py-0.5 rounded border border-border/40">
-                      {f.region} / {f.zone}
+                      {f.region}
                     </span>
                   </div>
                   <p className="text-xs text-text-secondary leading-relaxed bg-surface-primary/70 p-3 rounded-lg border border-border/30">

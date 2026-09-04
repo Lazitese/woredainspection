@@ -12,11 +12,7 @@ import { useState } from "react";
 import { ImageCropperModal } from "@/components/ui/ImageCropperModal";
 import * as z from "zod";
 import { COMMISSION_POSITIONS, OFFICE_CATEGORIES, Personnel } from "@/types";
-
-const ETHIOPIA_REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤኒሻንጉል ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ሲዳማ', 
-  'ደቡብ ምዕራብ ኢትዮጵያ', 'ደቡብ ኢትዮጵያ', 'ማዕከላዊ ኢትዮጵያ', 'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል ተቋማት'
-];
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 // @BACKEND: Independent validation schema for personnel creation matching the form fields.
 const createPersonnelSchema = z.object({
@@ -236,14 +232,14 @@ export default function CreatePersonnelPage() {
               {/* Conditional Region for Branch Office */}
               {officeId === 'branch' && (
                 <div className="flex flex-col gap-2 col-span-2">
-                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-widest">ክልል / ቅርንጫፍ (Region)</label>
+                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-widest">ወረዳ / ቅርንጫፍ (Woreda)</label>
                   <select {...register('region')} className="w-full bg-surface-primary border border-border/50 rounded-xl p-4 text-sm text-text-primary focus:outline-none focus:border-brand-blue/50 transition-colors appearance-none cursor-pointer">
-                    <option value="">ክልል ይምረጡ...</option>
-                    {ETHIOPIA_REGIONS.map(reg => (
+                    <option value="">ወረዳ ይምረጡ...</option>
+                    {AKAKI_KALITY_WOREDAS.map(reg => (
                       <option key={reg} value={reg}>{reg}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-text-muted">ይህ ክፍል የሚሞላው ለቅርንጫፍ ጽ/ቤት ብቻ ነው</p>
+                  <p className="text-xs text-text-muted">ይህ ክፍል የሚሞላው ለወረዳ ጽ/ቤት ብቻ ነው</p>
                 </div>
               )}
             </div>

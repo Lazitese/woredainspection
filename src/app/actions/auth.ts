@@ -203,15 +203,27 @@ export async function registerUserAction(formData: FormData) {
 export async function resolveLoginEmail(identifier: string, portalRole?: 'representative' | 'admin' | 'assessment') {
   const lowerId = identifier.trim().toLowerCase();
 
-  if (lowerId === 'superadmin') {
-    return { email: 'superadmin@commission.gov' };
-  }
-
-  if (lowerId === 'admin') {
-    return { email: 'admin@commission.gov' };
+  if (lowerId === 'superadmin' || lowerId === 'admin') {
+    return { email: 'admin@akakikality.gov.et' };
   }
 
   if (identifier.includes('@')) {
+    const rawEmail = identifier.trim().toLowerCase();
+    if (rawEmail === 'superadmin@commission.gov' || rawEmail === 'admin@commission.gov') {
+      return { email: 'admin@akakikality.gov.et' };
+    }
+    const woredaMatch = rawEmail.match(/^woreda(\d+)@/);
+    if (woredaMatch) {
+      const num = parseInt(woredaMatch[1], 10);
+      const padded = num.toString().padStart(2, '0');
+      return { email: `2519110000${padded}@federal.local` };
+    }
+    const specialMatch = rawEmail.match(/^specialworeda(\d+)@/);
+    if (specialMatch) {
+      const num = parseInt(specialMatch[1], 10);
+      const code = 20 + num;
+      return { email: `2519110000${code}@federal.local` };
+    }
     return { email: identifier.trim() };
   }
   

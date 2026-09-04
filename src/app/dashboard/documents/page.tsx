@@ -8,12 +8,7 @@ import { documentService, MAIN_CATEGORIES, SUB_CATEGORIES } from "@/services/doc
 import { publicFilesService, PublicFile, PublicFileCategory } from "@/services/publicFiles";
 import { Document, OFFICES } from "@/types";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-
-const ETHIOPIA_REGIONS = [
-  'አዲስ አበባ', 'ድሬዳዋ', 'ኦሮሚያ', 'አማራ', 'ደቡብ ኢትዮጵያ', 
-  'ደቡብ ምዕራብ ኢትዮጵያ', 'ማዕከላዊ ኢትዮጵያ', 'ሲዳማ', 'ሶማሌ', 
-  'አፋር', 'ቤንሻንጉል ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ፌዴራል ተቋማት'
-];
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 const fileTypeMeta: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
   PDF: { icon: <IconFileText size={18} stroke={1.8} />, color: 'text-danger', bg: 'bg-danger/10' },
@@ -310,7 +305,7 @@ export default function DocumentsPage() {
 
             {!loading && viewLevel === 'region' && selectedOffice === 'branch' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {ETHIOPIA_REGIONS.map((region) => (
+                {AKAKI_KALITY_WOREDAS.map((region) => (
                   <button key={region} onClick={() => navigateTo('main', 'branch', region)} className="group bg-surface-primary rounded-lg border border-border/50 p-4 hover:border-brand-blue/50 transition-all text-left flex items-center gap-3">
                     <div className="w-8 h-8 rounded-md bg-brand-yellow/10 flex items-center justify-center shrink-0">
                       <IconMapPin size={16} className="text-brand-yellow" />

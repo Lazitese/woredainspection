@@ -198,9 +198,9 @@ export default async function DashboardPage() {
             <div>
               <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
                 <IconBuilding size={18} className="text-brand-blue" />
-                የኮሚሽኑ ቅርንጫፍ ጽሕፈት ቤቶች አወቃቀር
+                የኮሚሽኑ የወረዳ ጽሕፈት ቤቶች አወቃቀር
               </h2>
-              <p className="text-xs text-text-secondary mt-0.5">በ 13 ቱም ክልሎችና አስተዳደሮች ያሉ የቅርንጫፍ ጽ/ቤት ኃላፊዎች</p>
+              <p className="text-xs text-text-secondary mt-0.5">በ 17 ቱም ወረዳዎችና ልዩ ወረዳዎች ያሉ የወረዳ ጽ/ቤት ኃላፊዎች</p>
             </div>
             <Link href="/dashboard/personnel" className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
               አመራሮችን ማስተዳደር <IconArrowUpRight size={14} />

@@ -138,11 +138,11 @@ export function AllAssessmentsReportPDF({ user, profile, history = [] }: AllAsse
   const dateStr = new Date().toLocaleDateString('am-ET');
 
   return (
-    <Document title={`${user?.full_name || 'User'}_All_Assessments_Report`} author="Federal Inspection ICODiS">
+    <Document title={`${user?.full_name || 'User'}_All_Assessments_Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን</Text>
+          <Text style={styles.title}>የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</Text>
           <Text style={styles.subtitle}>የተጠቃሚው አጠቃላይ የምዘና ታሪክ ሪፖርት (All Assessments History Report)</Text>
         </View>
 

@@ -22,6 +22,7 @@ import { downloadPDFDocument } from "@/lib/exportToPDF";
 import { RegionReportPDF, NarrationReportPDF } from "./ReportsPDFComponents";
 import { RichTextEditor, RichTextValue } from "@/components/ui/RichTextEditor";
 import { sortFormSchemas } from "@/utils/schemaSort";
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 interface RegionReportTabProps {
   initialReports: any[];
@@ -31,10 +32,7 @@ interface RegionReportTabProps {
   defaultPeriod?: string;
 }
 
-const ALL_REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤን-ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ሲዳማ', 
-  'ደ/ም/ኢ/ያ', 'ደቡብ ኢ/ያ', 'ማዕ/ኢ/ያ', 'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል ተቋማት'
-];
+const ALL_REGIONS = AKAKI_KALITY_WOREDAS;
 
 export function RegionReportTab({ initialReports, schemas, defaultRegion, defaultYear, defaultPeriod }: RegionReportTabProps) {
   const [reports, setReports] = useState(initialReports);
@@ -173,8 +171,8 @@ export function RegionReportTab({ initialReports, schemas, defaultRegion, defaul
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-text-primary">የክልል ሪፖርቶች (Regional Reports)</h2>
-            <p className="text-sm text-text-muted mt-1">ሪፖርቱን ለመመልከት ከታች ካሉት ክልሎች አንዱን ይምረጡ</p>
+            <h2 className="text-xl font-bold text-text-primary">የወረዳ ሪፖርቶች (Woreda Reports)</h2>
+            <p className="text-sm text-text-muted mt-1">ሪፖርቱን ለመመልከት ከታች ካሉት ወረዳዎች አንዱን ይምረጡ</p>
           </div>
         </div>
 
@@ -217,14 +215,14 @@ export function RegionReportTab({ initialReports, schemas, defaultRegion, defaul
         onClick={() => setSelectedRegion("")}
         className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary mb-6 transition-colors px-2 py-1 rounded-lg hover:bg-surface-secondary w-fit"
       >
-        <span className="text-lg leading-none">&larr;</span> ወደ ኋላ ተመለስ (Back to Regions)
+        <span className="text-lg leading-none">&larr;</span> ወደ ኋላ ተመለስ (Back to Woredas)
       </button>
 
       {!selectedReport ? (
         <div className="flex flex-col items-center justify-center text-center bg-surface-secondary/20 rounded-2xl border border-dashed border-border-medium py-24 px-6">
           <IconCircleDashed size={48} className="text-text-muted/30 mb-4" stroke={1} />
           <h3 className="text-xl font-medium text-text-primary mb-2">ሪፖርት አልቀረበም</h3>
-          <p className="text-sm text-text-muted">የ{selectedRegion} ክልል እስካሁን ሪፖርት አላስገባም። ሪፖርት ሲያስገቡ እዚህ ማየት ይችላሉ።</p>
+          <p className="text-sm text-text-muted">የ{selectedRegion} እስካሁን ሪፖርት አላስገባም። ሪፖርት ሲያስገቡ እዚህ ማየት ይችላሉ።</p>
         </div>
       ) : (
         <div className="space-y-6 max-w-5xl mx-auto">

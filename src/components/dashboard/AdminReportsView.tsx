@@ -15,7 +15,7 @@ export function AdminReportsView({ initialReports }: { initialReports: any[] }) 
 
   const handleDownload = () => {
     // Basic CSV download logic
-    let csv = "ክልል,ዓመት,ወቅት,ሁኔታ\n";
+    let csv = "ወረዳ,ዓመት,ወቅት,ሁኔታ\n";
     reports.forEach(r => {
       csv += `${r.region},${r.year},${r.period},${r.status}\n`;
     });
@@ -91,14 +91,14 @@ export function AdminReportsView({ initialReports }: { initialReports: any[] }) 
             <IconFileDescription size={32} />
           </div>
           <h3 className="text-lg font-semibold text-text-primary mb-1">ምንም ሪፖርት አልደረሰም</h3>
-          <p className="text-text-muted max-w-sm">በአሁኑ ጊዜ የተላኩ የክልል ሪፖርቶች የሉም።</p>
+          <p className="text-text-muted max-w-sm">በአሁኑ ጊዜ የተላኩ የወረዳ ሪፖርቶች የሉም።</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border-light">
           <table className="w-full text-left text-sm text-text-secondary">
             <thead className="bg-surface-secondary text-text-primary font-semibold uppercase tracking-wider text-xs">
               <tr>
-                <th className="px-4 py-3 border-b border-border-light">ክልል</th>
+                <th className="px-4 py-3 border-b border-border-light">ወረዳ</th>
                 <th className="px-4 py-3 border-b border-border-light">ዓመት / ወቅት</th>
                 <th className="px-4 py-3 border-b border-border-light">ሁኔታ</th>
                 <th className="px-4 py-3 border-b border-border-light">የተላከበት ጊዜ</th>

@@ -83,9 +83,12 @@ export interface DocumentFile {
 
 export type OfficeType = 'main' | 'branch';
 
+export { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
+export type { AkakiKalityWoreda } from '@/lib/regions-data';
+
 export const OFFICES: { code: OfficeType; name: string }[] = [
-  { code: 'main', name: 'ኮሚሽን ዋና ጽ/ቤት' },
-  { code: 'branch', name: 'ቅርንጫፍ ጽ/ቤቶች' },
+  { code: 'main', name: 'የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት' },
+  { code: 'branch', name: 'የወረዳ ቅርንጫፍ ጽ/ቤቶች' },
 ];
 
 export interface Document {
@@ -104,18 +107,25 @@ export interface Document {
 
 // @BACKEND: Commission hierarchy positions — both Amharic and English names.
 export const COMMISSION_POSITIONS = [
+  { id: 'deputy-chairperson', nameAm: 'ም/ሰብሳቢ', nameEn: 'Deputy Chairperson' },
+  { id: 'chairperson-secretary', nameAm: 'ሰብሳቢና ፀሀፊ', nameEn: 'Chairperson & Secretary' },
+  { id: 'leadership-member', nameAm: 'አመራር አባል', nameEn: 'Leadership Member' },
+  { id: 'committee-member', nameAm: 'ኮሚቴ አባል', nameEn: 'Committee Member' },
+  { id: 'leadership-committee-member', nameAm: 'አመራርና ኮሚቴ አባል', nameEn: 'Leadership & Committee Member' },
+  { id: 'branch-head', nameAm: 'የወረዳ ኮሚሽን ቅ/ጽ/ቤት ኃላፊ', nameEn: 'Woreda Branch Head' },
+  // Backward compatibility aliases
   { id: 'chief', nameAm: 'ዋና ኮሚሽነር', nameEn: 'Chief Commissioner' },
   { id: 'deputy', nameAm: 'ምክትል ኮሚሽነር', nameEn: 'Deputy Commissioner' },
   { id: 'secretary', nameAm: 'የኮሚሽን ጸሃፊና ጽህፈት ቤት ሃላፊ', nameEn: 'Secretary & Office Head' },
-  { id: 'member', nameAm: 'ኮሚሽን አባል', nameEn: 'Commission Member' },
-  { id: 'management-committee', nameAm: 'የኮሚሽን ስራ አመራር ኮሚቴ አባላት', nameEn: 'Work Management Committee Members' },
-  { id: 'management', nameAm: 'ኮሚሽን ማኔጅመንት አባላት', nameEn: 'Commission Management Members' },
-  { id: 'branch-head', nameAm: 'ኮሚሽን ቅርንጫፍ ጽ/ቤት ኃላፊ', nameEn: 'Branch Office Head' },
 ] as const;
 
 export const OFFICE_CATEGORIES = [
-  { id: 'main', nameAm: 'ኮሚሽን ዋና ጽ/ቤት', nameEn: 'Main Office' },
-  { id: 'branch', nameAm: 'ኮሚሽን ቅርንጫፍ ጽ/ቤት', nameEn: 'Branch Office' },
+  { id: 'deputy-chairperson', nameAm: 'ም/ሰብሳቢ', nameEn: 'Deputy Chairperson' },
+  { id: 'chairperson-secretary', nameAm: 'ሰብሳቢና ፀሀፊ', nameEn: 'Chairperson & Secretary' },
+  { id: 'leadership-members', nameAm: 'አመራር አባላት', nameEn: 'Leadership Members' },
+  { id: 'committee-members', nameAm: 'ኮሚቴ አባላት', nameEn: 'Committee Members' },
+  { id: 'branch', nameAm: 'ቅ/ጽ/ቤት ሀላፊ', nameEn: 'Woreda Branch Office' },
+  // Backward compatibility alias
   { id: 'commission-members', nameAm: 'ኮሚሽን አባላት', nameEn: 'Commission Members' },
 ] as const;
 

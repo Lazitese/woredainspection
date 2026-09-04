@@ -20,17 +20,18 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://federalinspection.gov.et'),
   title: {
-    default: "የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን | የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ",
-    template: "%s | የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን"
+    default: "የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት",
+    template: "%s | የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት"
   },
-  description: "በመንግሥት አገልግሎቶች ውስጥ ጥራትና ተጠያቂነትን ማረጋገጥ።",
+  description: "የአቃቂ ቃሊቲ ክፍለ ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የተቀናጀ የኮሚሽን ሥራዎች ዲጂታል ሥርዓት (ICODiS)።",
   keywords: [
-    "ኢትዮጵያ",
-    "ብልፅግና",
+    "አቃቂ ቃሊቲ",
+    "ክፍለ ከተማ",
+    "ብልጽግና",
     "ኢንስፔክሽን",
-    "መንግሥት",
-    "ተጠያቂነት",
     "ሥነ-ምግባር",
+    "ኮሚሽን",
+    "ተጠያቂነት",
   ],
   alternates: {
     canonical: '/',
@@ -39,20 +40,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "am_ET",
     url: "/",
-    siteName: "የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን",
+    siteName: "የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት",
     images: [
       {
         url: "/logo.jpg",
         width: 1200,
         height: 630,
-        alt: "የብልፅግና ኢንስፔክሽን ኮሚሽን ምልክት",
+        alt: "የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን",
-    description: "በመንግሥት አገልግሎቶች ውስጥ ጥራትና ተጠያቂነትን ማረጋገጥ።",
+    title: "የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት",
+    description: "የአቃቂ ቃሊቲ ክፍለ ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የተቀናጀ የኮሚሽን ሥራዎች ዲጂታል ሥርዓት (ICODiS)።",
     images: ["/logo.jpg"],
   },
 };

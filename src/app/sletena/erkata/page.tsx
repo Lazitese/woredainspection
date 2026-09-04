@@ -82,7 +82,7 @@ function PublicSatisfactionFormContent() {
             />
             <div>
               <h1 className="text-xl sm:text-2xl font-black leading-tight">
-                የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የድህረ-ስልጠና ዕርካታ መሙያ ቅጽ
+                የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ መሙያ ቅጽ
               </h1>
             </div>
           </div>
@@ -101,7 +101,7 @@ function PublicSatisfactionFormContent() {
         {/* Clean Footer */}
         <footer className="text-center text-[11px] text-text-muted py-4 space-y-1">
           <p>© 2018 ICODiS</p>
-          <p>የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</p>
+          <p>የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</p>
         </footer>
       </div>
     </div>

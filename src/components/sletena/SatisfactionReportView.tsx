@@ -132,20 +132,18 @@ export const SatisfactionReportView: React.FC<SatisfactionReportViewProps> = ({
   }, [categories, submissions]);
 
   // --- Section 1: ጥሬ ሃቅ Demographic Analytics ---
-  const zoneWoredaStats = useMemo(() => {
-    const table: Record<string, { region: string; zone: string; woreda: string; count: number }> = {};
+  const woredaStats = useMemo(() => {
+    const table: Record<string, { woreda: string; count: number }> = {};
     relevantSubmissions.forEach((s) => {
-      if (!s.region) return;
-      const key = `${s.region}-${s.zone || 'N/A'}-${s.woreda || 'N/A'}`;
-      if (!table[key]) {
-        table[key] = {
-          region: s.region,
-          zone: s.zone || 'ያልተገለጸ',
-          woreda: s.woreda || 'ያልተገለጸ',
+      const woredaName = s.region || s.woreda;
+      if (!woredaName) return;
+      if (!table[woredaName]) {
+        table[woredaName] = {
+          woreda: woredaName,
           count: 0,
         };
       }
-      table[key].count += 1;
+      table[woredaName].count += 1;
     });
     return Object.values(table).sort((a, b) => b.count - a.count);
   }, [relevantSubmissions]);
@@ -549,20 +547,16 @@ export const SatisfactionReportView: React.FC<SatisfactionReportViewProps> = ({
           <div className="space-y-3 bg-surface-secondary/30 p-4 rounded-xl border border-border/40">
             <h4 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
               <IconMapPin size={16} className="text-brand-blue" />
-              የተሳታፊዎች ዞን እና ወረዳ ስርጭት (Sub-city & Woreda Breakdown)
+              የተሳታፊዎች የወረዳ ስርጭት (Woreda Breakdown)
             </h4>
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-              {zoneWoredaStats.length === 0 ? (
+              {woredaStats.length === 0 ? (
                 <div className="text-xs text-text-muted p-3 text-center">ምንም አካባቢ አልተመዘገበም</div>
               ) : (
-                zoneWoredaStats.map((item, idx) => (
+                woredaStats.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-xs p-2 bg-surface-primary/70 rounded-lg border border-border/30">
                     <div className="flex items-center gap-1.5 font-bold text-text-primary">
-                      <span>{item.region}</span>
-                      <span className="text-text-muted font-normal">• {item.zone}</span>
-                      {item.woreda !== 'ያልተገለጸ' && (
-                        <span className="text-brand-blue font-bold">• {item.woreda}</span>
-                      )}
+                      <span>{item.woreda}</span>
                     </div>
                     <span className="text-[11px] font-extrabold text-brand-blue bg-brand-blue/10 px-2 py-0.5 rounded-md shrink-0">
                       {item.count} ተሳታፊ ({Math.round((item.count / Math.max(relevantSubmissions.length, 1)) * 100)}%)

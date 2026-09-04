@@ -105,7 +105,7 @@ export function AdminHistoryView({ initialReports, initialSchemas }: { initialRe
                 onChange={(e) => setSelectedRegion(e.target.value)}
                 className="px-3 py-2 bg-surface-primary border border-border-medium rounded-lg text-sm text-text-primary outline-none focus:ring-2 focus:ring-brand-blue/20 flex-1 min-w-[150px] max-w-[200px]"
               >
-                {regions.map(r => <option key={r} value={r}>{r === 'All' ? 'ሁሉም ክልሎች (All)' : r}</option>)}
+                {regions.map(r => <option key={r} value={r}>{r === 'All' ? 'ሁሉም ወረዳዎች (All)' : r}</option>)}
               </select>
               <select 
                 value={selectedYear} 

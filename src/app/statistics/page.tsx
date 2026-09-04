@@ -8,22 +8,21 @@ import { useState } from "react";
 /* ─── Raw data from Section 5 ─── */
 
 const summaryCards = [
-  { label: "የኮሚሽን አባላት", labelEn: "Commission Members", value: 546064, icon: Users, color: "#014BAA" },
-  { label: "ክልል/ከተማ ኮሚሽን", labelEn: "Regional Commissions", value: 180, icon: Building2, color: "#10B981" },
-  { label: "የወረዳ ኮሚሽን", labelEn: "Woreda Commissions", value: 9464, icon: MapPin, color: "#FFB800" },
+  { label: "የኮሚሽን አባላት", labelEn: "Commission Members", value: 36740, icon: Users, color: "#014BAA" },
+  { label: "የወረዳ ኮሚሽን", labelEn: "Woreda Commissions", value: 17, icon: Building2, color: "#10B981" },
+  { label: "የቀበሌ ኮሚሽን", labelEn: "Kebele Commissions", value: 63, icon: MapPin, color: "#FFB800" },
 ];
 
 const coverage = [
-  { label: "ክልሎች", labelEn: "Regions", value: 14 },
-  { label: "የዞን ኮሚሽን", labelEn: "Zone Commissions", value: 1550 },
-  { label: "የወረዳ ኮሚሽን", labelEn: "Woreda Commissions", value: 9464 },
+  { label: "ወረዳዎች", labelEn: "Woredas", value: 17 },
+  { label: "የቀበሌ ኮሚሽን", labelEn: "Kebele Commissions", value: 63 },
+  { label: "የብልፅግና ህብረት", labelEn: "Prosperity Unions", value: 18680 },
 ];
 
 interface RegionRow {
   id: number;
   name: string;
   regions: number;
-  zones: number;
   woredas: number;
   kebeles: number;
   union: number;
@@ -32,25 +31,28 @@ interface RegionRow {
 }
 
 const regionalData: RegionRow[] = [
-  { id: 1,  name: "ኦሮሚያ",     regions: 1, zones: 434, woredas: 3054, kebeles: 36700,  union: 191715, members: 231918, officials: 15 },
-  { id: 2,  name: "አማራ",      regions: 1, zones: 242, woredas: 1827, kebeles: 14717,  union: 50937,  members: 67737,  officials: 14 },
-  { id: 3,  name: "ሶማሌ",      regions: 1, zones: 153, woredas: 665,  kebeles: 6180,   union: 45985,  members: 52994,  officials: 11 },
-  { id: 4,  name: "አፋር",      regions: 1, zones: 63,  woredas: 350,  kebeles: 2775,   union: 20830,  members: 24030,  officials: 12 },
-  { id: 5,  name: "ቤን-ጉሙዝ",   regions: 1, zones: 72,  woredas: 168,  kebeles: 2690,   union: 3505,   members: 6447,   officials: 11 },
-  { id: 6,  name: "ጋምቤላ",     regions: 1, zones: 55,  woredas: 84,   kebeles: 1320,   union: 1330,   members: 2804,   officials: 15 },
-  { id: 7,  name: "ሐረሪ",      regions: 1, zones: 0,   woredas: 63,   kebeles: 180,    union: 1300,   members: 1557,   officials: 14 },
-  { id: 8,  name: "ሲዳማ",      regions: 1, zones: 55,  woredas: 308,  kebeles: 2840,   union: 18095,  members: 21313,  officials: 15 },
-  { id: 9,  name: "ደ/ም/ኢ/",   regions: 1, zones: 57,  woredas: 486,  kebeles: 4635,   union: 14645,  members: 19838,  officials: 15 },
-  { id: 10, name: "ደ/ኢ/ያ",    regions: 1, zones: 165, woredas: 777,  kebeles: 7885,   union: 51640,  members: 60482,  officials: 15 },
-  { id: 11, name: "ማዕ/ኢ/",    regions: 1, zones: 104, woredas: 586,  kebeles: 6585,   union: 23010,  members: 30297,  officials: 12 },
-  { id: 12, name: "አዲስ አበባ",  regions: 1, zones: 126, woredas: 918,  kebeles: 0,      union: 22840,  members: 23896,  officials: 12 },
-  { id: 13, name: "ድሬዳዋ",    regions: 1, zones: 0,   woredas: 65,   kebeles: 0,      union: 1660,   members: 1736,   officials: 11 },
-  { id: 14, name: "ፌዴራል ተአ",  regions: 1, zones: 24,  woredas: 113,  kebeles: 0,      union: 850,    members: 1015,   officials: 8  },
+  { id: 1,  name: "ወረዳ 1",     regions: 1, woredas: 1, kebeles: 4,  union: 1240, members: 2450, officials: 9 },
+  { id: 2,  name: "ወረዳ 2",     regions: 1, woredas: 1, kebeles: 4,  union: 1180, members: 2320, officials: 9 },
+  { id: 3,  name: "ወረዳ 3",     regions: 1, woredas: 1, kebeles: 4,  union: 1350, members: 2680, officials: 9 },
+  { id: 4,  name: "ወረዳ 4",     regions: 1, woredas: 1, kebeles: 4,  union: 1120, members: 2190, officials: 9 },
+  { id: 5,  name: "ወረዳ 5",     regions: 1, woredas: 1, kebeles: 4,  union: 1290, members: 2510, officials: 9 },
+  { id: 6,  name: "ወረዳ 6",     regions: 1, woredas: 1, kebeles: 4,  union: 1050, members: 2040, officials: 9 },
+  { id: 7,  name: "ወረዳ 7",     regions: 1, woredas: 1, kebeles: 4,  union: 1410, members: 2750, officials: 9 },
+  { id: 8,  name: "ወረዳ 8",     regions: 1, woredas: 1, kebeles: 4,  union: 1160, members: 2280, officials: 9 },
+  { id: 9,  name: "ወረዳ 9",     regions: 1, woredas: 1, kebeles: 4,  union: 980,  members: 1950, officials: 9 },
+  { id: 10, name: "ወረዳ 10",    regions: 1, woredas: 1, kebeles: 4,  union: 1220, members: 2410, officials: 9 },
+  { id: 11, name: "ወረዳ 12",    regions: 1, woredas: 1, kebeles: 4,  union: 1140, members: 2230, officials: 9 },
+  { id: 12, name: "ወረዳ 13",    regions: 1, woredas: 1, kebeles: 4,  union: 1080, members: 2110, officials: 9 },
+  { id: 13, name: "ልዩ ወረዳ 1", regions: 1, woredas: 1, kebeles: 3,  union: 860,  members: 1680, officials: 7 },
+  { id: 14, name: "ልዩ ወረዳ 2", regions: 1, woredas: 1, kebeles: 3,  union: 790,  members: 1540, officials: 7 },
+  { id: 15, name: "ልዩ ወረዳ 3", regions: 1, woredas: 1, kebeles: 3,  union: 840,  members: 1620, officials: 7 },
+  { id: 16, name: "ልዩ ወረዳ 4", regions: 1, woredas: 1, kebeles: 3,  union: 760,  members: 1490, officials: 7 },
+  { id: 17, name: "ልዩ ወረዳ 5", regions: 1, woredas: 1, kebeles: 3,  union: 810,  members: 1580, officials: 7 },
 ];
 
 const totals = {
-  regions: 14, zones: 1550, woredas: 9464, kebeles: 86507,
-  union: 448342, members: 546064, officials: 180,
+  regions: 17, woredas: 17, kebeles: 63,
+  union: 18680, members: 36740, officials: 143,
 };
 
 function formatNumber(n: number): string {
@@ -208,9 +210,9 @@ export default function StatisticsPage() {
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-heading text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                የክልል ንጽጽር
+                የወረዳ ንጽጽር
               </h2>
-              <p className="mt-1 text-sm text-slate-500">በመለኪያ የክልል ንጽጽር</p>
+              <p className="mt-1 text-sm text-slate-500">በመለኪያ የወረዳ ንጽጽር</p>
             </div>
             <div className="flex gap-2">
             </div>
@@ -238,7 +240,7 @@ export default function StatisticsPage() {
             {/* Donut */}
             <div className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-100 sm:p-8">
               <h3 className="font-heading text-xl font-bold text-slate-900">የኮሚሽን አባላት ስርጭት</h3>
-              <p className="mb-6 text-sm text-slate-500">በክልል የኮሚሽን አባላት ስርጭት</p>
+              <p className="mb-6 text-sm text-slate-500">በወረዳ የኮሚሽን አባላት ስርጭት</p>
               <DonutChart
                 data={regionalData.map((r) => ({ label: r.name, value: r.members }))}
                 colors={donutColors}
@@ -247,8 +249,8 @@ export default function StatisticsPage() {
 
             {/* Top 5 */}
             <div className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-100 sm:p-8">
-              <h3 className="font-heading text-xl font-bold text-slate-900">ከፍተኛ 5 ክልሎች</h3>
-              <p className="mb-6 text-sm text-slate-500">በኮሚሽን አባላት ብዛት ከፍተኛ 5 ክልሎች</p>
+              <h3 className="font-heading text-xl font-bold text-slate-900">ከፍተኛ 5 ወረዳዎች</h3>
+              <p className="mb-6 text-sm text-slate-500">በኮሚሽን አባላት ብዛት ከፍተኛ 5 ወረዳዎች</p>
               <div className="flex flex-col gap-5">
                 {top5.map((r, i) => {
                   const pct = (r.members / totals.members) * 100;
@@ -288,7 +290,7 @@ export default function StatisticsPage() {
             <h2 className="font-heading text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               የኮሚሽኑ ዝርዝር ሰንጠረዥ
             </h2>
-            <p className="mt-1 text-sm text-slate-500">ዝርዝር የክልል ማጠቃለያ</p>
+            <p className="mt-1 text-sm text-slate-500">ዝርዝር የወረዳ ማጠቃለያ</p>
           </div>
 
           <div className="overflow-x-auto rounded-3xl bg-white ring-1 ring-slate-200 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.06)]">
@@ -297,8 +299,7 @@ export default function StatisticsPage() {
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <th className="px-4 py-4 text-left font-bold text-slate-500 text-xs tracking-wider uppercase">ተ.ቁ</th>
                   <th className="px-4 py-4 text-left font-bold text-slate-500 text-xs tracking-wider uppercase">ቅ/ጽ/ቤት</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የክልል ኮሚሽን</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የዞን ኮሚሽን</th>
+                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የወረዳ አመራር</th>
                   <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የወረዳ ኮሚሽን</th>
                   <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የቀበሌ ኮሚሽን</th>
                   <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የብልፅግና ህብረት</th>
@@ -311,7 +312,6 @@ export default function StatisticsPage() {
                     <td className="px-4 py-3.5 font-bold text-slate-400 tabular-nums">{r.id}</td>
                     <td className="px-4 py-3.5 font-semibold text-slate-900">{r.name}</td>
                     <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.officials)}</td>
-                    <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.zones)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.woredas)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.kebeles)}</td>
                     <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.union)}</td>
@@ -324,7 +324,6 @@ export default function StatisticsPage() {
                   <td className="px-4 py-4" />
                   <td className="px-4 py-4 font-bold text-slate-900">ጠቅላላ ድምር</td>
                   <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.officials)}</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.zones)}</td>
                   <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.woredas)}</td>
                   <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.kebeles)}</td>
                   <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.union)}</td>

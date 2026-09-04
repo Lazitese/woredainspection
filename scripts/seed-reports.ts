@@ -22,7 +22,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-const regionsToSeed = ["ኦሮሚያ", "አማራ", "ሶማሌ"];
+const regionsToSeed = ["ወረዳ 1", "ወረዳ 2", "ልዩ ወረዳ 1"];
 
 async function main() {
   console.log('Seeding reports for regions:', regionsToSeed);

@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "akdb.raey.work",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "akdb.raey.work",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "db.raey.work",
         pathname: "/**",
       },

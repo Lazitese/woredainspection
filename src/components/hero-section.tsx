@@ -21,7 +21,7 @@ const TYPING_SPEED = 80;
 const heroStats = [
   { value: 546064, label: "የኮሚሽን አባላት", icon: Users },
   { value: 448342, label: "የህብረት ኮሚሽን", icon: Scale },
-  { value: 14, label: "ክልል/ከተማ.ፌ.ተ.አ", icon: MapPin },
+  { value: 17, label: "ወረዳ/ ክ/ከተማ ልዩ ወረዳ", icon: MapPin },
 ];
 
 function AnimatedNumber({ target, duration = 2000 }: { target: number; duration?: number }) {
@@ -177,7 +177,7 @@ export function HeroSection() {
               <div className="absolute inset-2">
                 <Image
                   src="/logo.jpg"
-                  alt="የብልፅግና ኢንስፔክሽን ኮሚሽን ምልክት"
+                  alt="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት"
                   fill
                   sizes="(max-width: 640px) 112px, 128px"
                   className="object-contain"

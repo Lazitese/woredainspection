@@ -39,13 +39,13 @@ export const SletenaFormBuilder: React.FC<SletenaFormBuilderProps> = ({
 }) => {
   // Form Header Banner Titles
   const [formTitle, setFormTitle] = useState(
-    category?.title || 'የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ'
+    category?.title || 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ'
   );
   const [formSubtitle, setFormSubtitle] = useState(
     category?.description || 'ጊዜዎን ሰተው ስለሚሞሉ እናመሰግናለን'
   );
   const [isActive, setIsActive] = useState(category?.isActive ?? true);
-  const [maxWoredas, setMaxWoredas] = useState<number>(category?.maxWoredas || 14);
+  const [maxWoredas, setMaxWoredas] = useState<number>(category?.maxWoredas || 17);
 
   // Section Header Titles
   const [sec1Title, setSec1Title] = useState('1. ጥሬ ሃቅ');
@@ -59,8 +59,6 @@ export const SletenaFormBuilder: React.FC<SletenaFormBuilderProps> = ({
   const [labelMemberName, setLabelMemberName] = useState('ሙሉ ስም');
   const [labelContact, setLabelContact] = useState('ስልክ ቁጥር');
   const [labelMembershipLevel, setLabelMembershipLevel] = useState('ሀላፊነት ደረጃ');
-  const [labelRegion, setLabelRegion] = useState('ክልል / ከተማ');
-  const [labelZone, setLabelZone] = useState('ዞን / ክፍለ ከተማ');
   const [labelWoreda, setLabelWoreda] = useState('ወረዳ');
 
   // Section 4 Option Labels
@@ -470,53 +468,14 @@ export const SletenaFormBuilder: React.FC<SletenaFormBuilderProps> = ({
               </div>
             </div>
 
-            {/* Field 5: Region */}
+            {/* Field 5: Woreda */}
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1">
-                {labelRegion}
+                {labelWoreda} (የአቃቂ ቃሊቲ ወረዳዎች)
               </label>
               <div className="relative">
                 <select disabled className="w-full px-3 py-2 text-xs bg-surface-secondary/40 border border-border/40 rounded-xl text-text-muted appearance-none cursor-not-allowed">
-                  <option>-- ክልል/ከተማ ይምረጡ --</option>
-                </select>
-                <IconChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" />
-              </div>
-            </div>
-
-            {/* Field 6: Zone */}
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                {labelZone}
-              </label>
-              <div className="relative">
-                <select disabled className="w-full px-3 py-2 text-xs bg-surface-secondary/40 border border-border/40 rounded-xl text-text-muted appearance-none cursor-not-allowed">
-                  <option>-- ዞን/ክፍለ ከተማ ይምረጡ --</option>
-                </select>
-                <IconChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" />
-              </div>
-            </div>
-
-            {/* Field 7: Woreda Dropdown Range */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-text-secondary">
-                  {labelWoreda} (ለክፍለ ከተማ የሚኖሩ ወረዳዎች)
-                </label>
-                <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-text-muted font-bold">የወረዳዎች ብዛት፡</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={maxWoredas}
-                    onChange={(e) => setMaxWoredas(parseInt(e.target.value) || 14)}
-                    className="w-16 px-2 py-0.5 text-xs bg-surface-secondary border border-border/50 rounded-lg text-brand-blue font-black focus:outline-none focus:border-brand-blue text-center cursor-pointer"
-                  />
-                </div>
-              </div>
-              <div className="relative">
-                <select disabled className="w-full px-3 py-2 text-xs bg-surface-secondary/40 border border-border/40 rounded-xl text-text-muted appearance-none cursor-not-allowed">
-                  <option>-- ወረዳ 01 እስከ ወረዳ {maxWoredas.toString().padStart(2, '0')} --</option>
+                  <option>-- ወረዳ ይምረጡ (ወረዳ 1 - 13፣ ልዩ ወረዳ 1 - 5) --</option>
                 </select>
                 <IconChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" />
               </div>

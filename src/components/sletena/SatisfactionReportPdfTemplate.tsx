@@ -159,7 +159,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
   submissions = [],
   category,
   categories = [],
-  reportTitle = 'የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የድህረ-ስልጠና የዕርካታ ምዘና ኦፊሴላዊ ሪፖርት',
+  reportTitle = 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና የዕርካታ ምዘና ኦፊሴላዊ ሪፖርት',
 }) => {
   const subs = submissions || [];
   const count = subs.length;
@@ -341,7 +341,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
             <div className="space-y-1.5">
               <div className="text-[11px] font-black text-blue-950 tracking-widest uppercase flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full bg-blue-950 inline-block shadow-xs" />
-                የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት
+                የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት
               </div>
               <h1 className="text-2xl font-black text-slate-950 tracking-tight leading-tight">
                 {category ? category.title : reportTitle}
@@ -442,7 +442,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገፅ 1 ከ 5</span>
         </div>
@@ -458,7 +458,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="space-y-6">
           {/* MINI PAGE HEADER */}
           <div className="border-b border-slate-300 pb-3 flex justify-between items-center text-xs">
-            <span className="font-black text-blue-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
+            <span className="font-black text-blue-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
             <span className="font-mono text-slate-500 text-[10px]">{currentDateStr}</span>
           </div>
 
@@ -479,9 +479,9 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
             <div className="flex justify-between items-center border-b border-slate-200 pb-2">
               <h3 className="font-black text-slate-950 text-xs flex items-center gap-2">
                 <span className="mr-1 inline-block">🗺️</span>
-                <span>ለ) የተሳታፊዎች የክልል / ከተማ ስርጭት (Regional Distribution)</span>
+                <span>ለ) የተሳታፊዎች የወረዳ ስርጭት (Woreda Distribution)</span>
               </h3>
-              <span className="text-[10px] font-bold text-slate-500">Ranked Chart ({regionList.length} ክልሎች)</span>
+              <span className="text-[10px] font-bold text-slate-500">Ranked Chart ({regionList.length} ወረዳዎች)</span>
             </div>
             <SvgRankedBarChart data={regionList} barColor="#0047AB" />
           </ExecutiveSection>
@@ -491,7 +491,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገፅ 2 ከ 5</span>
         </div>
@@ -507,7 +507,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="space-y-6">
           {/* MINI PAGE HEADER */}
           <div className="border-b border-slate-300 pb-3 flex justify-between items-center text-xs">
-            <span className="font-black text-blue-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
+            <span className="font-black text-blue-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
             <span className="font-mono text-slate-500 text-[10px]">{currentDateStr}</span>
           </div>
 
@@ -572,7 +572,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገፅ 3 ከ 5</span>
         </div>
@@ -588,7 +588,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="space-y-6">
           {/* MINI PAGE HEADER */}
           <div className="border-b border-slate-300 pb-3 flex justify-between items-center text-xs">
-            <span className="font-black text-blue-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
+            <span className="font-black text-blue-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
             <span className="font-mono text-slate-500 text-[10px]">{currentDateStr}</span>
           </div>
 
@@ -650,7 +650,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገፅ 4 ከ 5</span>
         </div>
@@ -666,7 +666,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="space-y-6">
           {/* MINI PAGE HEADER */}
           <div className="border-b border-slate-300 pb-3 flex justify-between items-center text-xs">
-            <span className="font-black text-blue-950">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
+            <span className="font-black text-blue-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን - የድህረ-ስልጠና የዕርካታ ሪፖርት</span>
             <span className="font-mono text-slate-500 text-[10px]">{currentDateStr}</span>
           </div>
 
@@ -710,7 +710,7 @@ export const SatisfactionReportPdfTemplate: React.FC<SatisfactionReportPdfTempla
         <div className="pt-4 border-t-2 border-slate-900 flex justify-between items-center text-[10px] text-slate-600 font-medium tracking-wide">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-extrabold text-slate-900">የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት</span>
+            <span className="font-extrabold text-slate-900">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <div className="text-right">
             <strong className="font-mono text-blue-950">ገፅ 5 ከ 5</strong>

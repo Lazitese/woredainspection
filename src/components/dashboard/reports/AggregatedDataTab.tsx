@@ -4,6 +4,7 @@ import { FormSchema } from "@/components/dashboard/forms/FormTableRenderer";
 import { exportAggregatedToWord } from "@/utils/exportUtils";
 import { downloadPDFDocument } from "@/lib/exportToPDF";
 import { AggregatedReportPDF } from "./ReportsPDFComponents";
+import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
 
 interface AggregatedDataTabProps {
   reports: any[];
@@ -12,10 +13,7 @@ interface AggregatedDataTabProps {
   period: string;
 }
 
-const REGIONS = [
-  'ኦሮሚያ', 'አማራ', 'ሶማሌ', 'አፋር', 'ቤን-ጉሙዝ', 'ጋምቤላ', 'ሐረሪ', 'ሲዳማ', 
-  'ደ/ም/ኢ/ያ', 'ደቡብ ኢ/ያ', 'ማዕ/ኢ/ያ', 'አዲስ አበባ', 'ድሬዳዋ', 'ፌዴራል ተቋማት'
-];
+const REGIONS = AKAKI_KALITY_WOREDAS;
 
 export function AggregatedDataTab({ reports, schemas, year, period }: AggregatedDataTabProps) {
   const [openForms, setOpenForms] = useState<Record<string, boolean>>(
@@ -105,7 +103,7 @@ export function AggregatedDataTab({ reports, schemas, year, period }: Aggregated
                   <table className="w-full text-left min-w-[750px] mt-4 border-collapse">
                     <thead className="bg-surface-secondary text-xs font-semibold text-text-secondary uppercase tracking-wider">
                       <tr>
-                        <th className="px-4 py-3 border border-border-light text-center align-middle" rowSpan={2}>ክልል (Region)</th>
+                        <th className="px-4 py-3 border border-border-light text-center align-middle" rowSpan={2}>ወረዳ (Woreda)</th>
                         {schema.columns.map((col, idx) => (
                           <th 
                             key={idx} 

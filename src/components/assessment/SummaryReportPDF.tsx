@@ -92,7 +92,7 @@ export function SummaryReportPDF({ periodName, members = [] }: SummaryReportPDFP
   const rows = Array.from({ length: minRows }, (_, i) => members[i] || null);
 
   return (
-    <Document title={`${periodName || 'Evaluation'} Summary`} author="Federal Inspection">
+    <Document title={`${periodName || 'Evaluation'} Summary`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="landscape" style={styles.page}>
         <Text style={styles.title}>{'የተመዛኞች ውጤት ማጠቃለያ'}</Text>
         {periodName && <Text style={styles.subtitle}>{`(${periodName})`}</Text>}

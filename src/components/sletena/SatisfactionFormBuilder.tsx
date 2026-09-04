@@ -30,13 +30,13 @@ export const SatisfactionFormBuilder: React.FC<SatisfactionFormBuilderProps> = (
 
   // Form Banner Headers
   const [formTitle, setFormTitle] = useState(
-    category?.title || 'የብልፅግና የኢንስፔክሽንና የሥነ-ምግባር ኮሚሽን ዋና ጽ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ'
+    category?.title || 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ'
   );
   const [formSubtitle, setFormSubtitle] = useState(
     category?.description || 'በቅርቡ በወሰዱት ስልጠና ላይ ያሎትን ዕርካታ፣ የአሰልጣኞች ብቃት እና የመስተንግዶ ሁኔታ ይገምግሙ::'
   );
   const [isActive, setIsActive] = useState(category?.isActive ?? true);
-  const [maxWoredas, setMaxWoredas] = useState<number>(category?.maxWoredas || 14);
+  const [maxWoredas, setMaxWoredas] = useState<number>(category?.maxWoredas || 17);
 
   // Custom Questions List
   const [questions, setQuestions] = useState<FormQuestion[]>(
@@ -318,7 +318,7 @@ export const SatisfactionFormBuilder: React.FC<SatisfactionFormBuilderProps> = (
                   1. ጥሬ ሃቅ (የተሳታፊዎች ስነ-ህዝብ መረጃ መቼት)
                 </h3>
                 <p className="text-[11px] text-text-muted mt-0.5">
-                  ለዚህ ቅጽ የክፍለ ከተማ/ዞን ወረዳዎች መምረጫ ብዛት ይወስኑ::
+                  ለዚህ ቅጽ የወረዳዎች መምረጫ ብዛት ይወስኑ::
                 </p>
               </div>
               <div className="flex items-center gap-2">

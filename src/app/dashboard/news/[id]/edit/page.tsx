@@ -186,7 +186,7 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
               <select value={category} onChange={e => setCategory(e.target.value)} className="w-full bg-surface-primary border border-border/50 rounded-xl p-4 text-sm text-text-primary focus:outline-none focus:border-brand-yellow/50 transition-colors appearance-none cursor-pointer">
                 <option value="ዓበይት ዜናዎች">ዓበይት ዜናዎች</option>
                 <option value="ሳምንታዊ ዜናዎች">ሳምንታዊ ዜናዎች</option>
-                <option value="የክልል ዜናዎች">የክልል ዜናዎች</option>
+                <option value="የክፍለ ከተማ ዜናዎች">የክፍለ ከተማ ዜናዎች</option>
                 <option value="መልዕክቶች">መልዕክቶች</option>
               </select>
             </div>

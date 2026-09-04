@@ -101,7 +101,7 @@ export default async function RepHistoryPage() {
         <div className="bg-surface-primary rounded-2xl p-6 border border-border-light shadow-sm">
           <h1 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
             <IconHistory className="text-brand-blue" size={28} />
-            የ{profile.region} ክልል ያለፉ ሪፖርቶች
+            የ{profile.region} ያለፉ ሪፖርቶች
           </h1>
           <p className="text-text-muted mt-2">ቀደም ሲል የቀረቡ እና የጸደቁ ሪፖርቶችን ይመልከቱ</p>
         </div>
