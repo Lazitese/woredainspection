@@ -1,5 +1,7 @@
 /**
- * run-seed.js — Applies seed SQL by using supabase-js admin client
+ * run-seed.js — Reseeds realistic dummy report data for all 17 woredas
+ * based on the REAL 24 Woreda report schemas from 2018  2ኛ  ሩብ አሀዛዊ Report (2) (1).md.
+ * 
  * node scripts/run-seed.js
  */
 const { createClient } = require('@supabase/supabase-js');
@@ -19,12 +21,13 @@ const SUPABASE_URL = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const SERVICE_KEY = getEnv('SUPABASE_SERVICE_ROLE_KEY');
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
-  console.error('Missing env vars'); process.exit(1);
+  console.error('Missing env vars in .env.local');
+  process.exit(1);
 }
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
-// Woreda users
+// Woreda users mapping
 const WOREDA_USERS = {
   'ወረዳ 1':    '9ffe5632-7f29-4024-a2f4-9fd604da7576',
   'ወረዳ 2':    '20d37dbd-3167-4759-9d3f-79c888f5e17e',
@@ -58,65 +61,207 @@ function gen(woredaIndex) {
   const w = woredaIndex + 1;
   const b = (base) => Math.max(0, base + rnd(-Math.floor(base * 0.15), Math.floor(base * 0.15)));
 
-  const k_t = b(12+w), k_d = b(Math.floor(k_t*0.85));
-  const h_t = b(8+w),  h_d = b(Math.floor(h_t*0.80));
-  const t_t = 1+k_t+h_t, t_d = 1+k_d+h_d;
+  const unionsCount = b(32 + w);
+  const unionsEstablished = b(Math.floor(unionsCount * 0.95));
+  const totCount = 1 + unionsCount;
+  const totEstablished = 1 + unionsEstablished;
 
-  const mW=b(5+w), mF=b(2+Math.floor(w/2));
-  const kW=b(3*k_t), kF=b(Math.floor(kW*0.35));
-  const hW=b(2*h_t), hF=b(Math.floor(hW*0.30));
+  const w_m = b(4 + (w % 3)), w_f = b(3 + (w % 2)), w_tot = w_m + w_f;
+  const u_m = b(100 + w * 2), u_f = b(60 + w), u_tot = u_m + u_f;
+  const tot_m = w_m + u_m, tot_f = w_f + u_f, tot_d = w_tot + u_tot;
 
-  const s_exp=b(3+w), s_sec=b(1), s_drv=b(1), s_tot=s_exp+s_sec+s_drv;
-  const dp=b(4), da=b(Math.floor(dp*0.88));
-  const tpM=b(20+w), tpF=b(8+w), taM=b(Math.floor(tpM*0.85)), taF=b(Math.floor(tpF*0.85));
-  const bg=b(150000+w*15000), bgA=b(Math.floor(bg*0.82));
-  const phP=b(90+w), phA=b(Math.floor(phP*0.88));
-  const mrP=b(70+w), mrA=b(Math.floor(mrP*0.85));
-  const paP=b(50+w), paA=b(Math.floor(paP*0.90));
-  const icP=b(40+w), icA=b(Math.floor(icP*0.87));
-  const cR=b(15+w), cRes=b(Math.floor(cR*0.80)), cP=cR-cRes;
-  const pa=(base)=>{const p=b(base+w*2);const a=b(Math.floor(p*(0.75+Math.random()*0.20)));return{"እቅድ":String(p),"ክንውን":String(a),"%":String(pct(a,p))};};
+  const exp = b(1 + (w % 2));
+  const staffTot = 1 + exp + 1; // head + exp + secretary
+
+  const bgt = b(50000 + w * 5000);
+
+  const trainPlan = b(1500 + w * 40), trainDone = b(Math.floor(trainPlan * 0.92));
+
+  const partyM = b(1500 + w * 25), partyF = b(900 + w * 20), partyTot = partyM + partyF;
+  const famCount = b(200 + w * 5);
+  const dbM = b(2800 + w * 30), dbF = b(4200 + w * 40), dbTot = dbM + dbF;
+
+  const revPlan = b(800000 + w * 15000), revDone = b(Math.floor(revPlan * 0.88));
+  const miscPlan = b(1500000 + w * 25000), miscDone = b(Math.floor(miscPlan * 0.82));
 
   return {
-    form_01:{"ክ/ከተማ ተጠሪ የሆኑ ወረዳዎች":{"ብዛት":"1","ያዋቀሩ":"1","ያላዋቀሩ":"0"},"ለወረዳ ተጠሪ የሆኑ ቀበሌዎች":{"ብዛት":String(k_t),"ያዋቀሩ":String(k_d),"ያላዋቀሩ":String(k_t-k_d)},"በብልፅግና ህብረት ደረጃ":{"ብዛት":String(h_t),"ያዋቀሩ":String(h_d),"ያላዋቀሩ":String(h_t-h_d)},"ጠቅላላ ድምር":{"ብዛት":String(t_t),"ያዋቀሩ":String(t_d),"ያላዋቀሩ":String(t_t-t_d)},"ያዋቀሩ %":String(pct(t_d,t_t))},
-    form_02:{"የክፍለ-ክ/ከተማ ኮሚሽን":{"ወ":"0","ሴ":"0","ድ":"0"},"የወረዳ ኮሚሽን":{"ወ":String(mW),"ሴ":String(mF),"ድ":String(mW+mF)},"የቀበሌ ኮሚሽን":{"ወ":String(kW),"ሴ":String(kF),"ድ":String(kW+kF)},"የብልፅግና ህብረት ኮሚሽን":{"ወ":String(hW),"ሴ":String(hF),"ድ":String(hW+hF)},"ጠቅላላ ድምር":{"ወ":String(mW+kW+hW),"ሴ":String(mF+kF+hF),"ድ":String(mW+kW+hW+mF+kF+hF)}},
-    form_03:{"የወረዳ/ክ/ከተማ ኮሚሽን ጽ/ቤት":{"ጽ/ኃ":"1","ም/ክ":"1","ባለሙ":String(s_exp),"ጸሐ":String(s_sec),"ሹፌ":String(s_drv),"ድም":String(s_tot+2)},"ጠቅላላ ድምር":{"ጽ/ኃ":"1","ም/ክ":"1","ባለሙ":String(s_exp),"ጸሐ":String(s_sec),"ሹፌ":String(s_drv),"ድም":String(s_tot+2)}},
-    form_04:{"የወረዳ/ክ/ከተማ ቅርንጫፍ ጽ/ቤት":{"እቅድ":String(dp),"ክንውን":String(da),"%":String(pct(da,dp))},"ጠቅላላ ድምር":{"እቅድ":String(dp),"ክንውን":String(da),"%":String(pct(da,dp))}},
-    form_05:{"ስልጠናዎች":{"እቅድ":String(rnd(2,4)),"ክንውን":String(rnd(1,3)),"%":String(rnd(65,95))},"ስልጠና ተሳታፊዎች ወ":{"እቅድ":String(tpM),"ክንውን":String(taM),"%":String(pct(taM,tpM))},"ስልጠና ተሳታፊዎች ሴ":{"እቅድ":String(tpF),"ክንውን":String(taF),"%":String(pct(taF,tpF))},"ስልጠና ተሳታፊዎች ድ":{"እቅድ":String(tpM+tpF),"ክንውን":String(taM+taF),"%":String(pct(taM+taF,tpM+tpF))}},
-    form_06_1:{"ዓ/አቀፍ በጀት":{"እቅድ":String(bg),"ክንውን":String(bgA),"%":String(pct(bgA,bg))},"ከፌደራል":{"እቅድ":String(Math.floor(bg*0.6)),"ክንውን":String(Math.floor(bgA*0.6)),"%":String(pct(bgA,bg))},"ከክ/ከተማ":{"እቅድ":String(Math.floor(bg*0.4)),"ክንውን":String(Math.floor(bgA*0.4)),"%":String(pct(bgA,bg))}},
-    form_06_2:{"ደሞዝ":{"እቅድ":String(Math.floor(bg*0.55)),"ክንውን":String(Math.floor(bgA*0.55)),"%":String(pct(bgA,bg))},"ካፒታል":{"እቅድ":String(Math.floor(bg*0.20)),"ክንውን":String(Math.floor(bgA*0.20)),"%":String(pct(bgA,bg))},"አገልግሎት":{"እቅድ":String(Math.floor(bg*0.25)),"ክንውን":String(Math.floor(bgA*0.25)),"%":String(pct(bgA,bg))},"ጠቅላላ":{"እቅድ":String(bg),"ክንውን":String(bgA),"%":String(pct(bgA,bg))}},
-    form_07:{"ዋና ትኩረቶች":{"እቅድ":String(phP),"ክንውን":String(phA),"%":String(pct(phA,phP))},"ያጠናቀቁ":{"ብዛት":String(phA),"ወ":String(Math.floor(phA*0.65)),"ሴ":String(Math.floor(phA*0.35))},"ያልጠናቀቁ":{"ብዛት":String(phP-phA)},"ያጠናቀቁ %":String(pct(phA,phP))},
-    form_08:{"ዋና ትኩረቶች":{"እቅድ":String(mrP),"ክንውን":String(mrA),"%":String(pct(mrA,mrP))},"ያጠናቀቁ":{"ብዛት":String(mrA)},"ያልጠናቀቁ":{"ብዛት":String(mrP-mrA)},"ያጠናቀቁ %":String(pct(mrA,mrP))},
-    form_09:{"ዋና ትኩረቶች":{"እቅድ":String(paP),"ክንውን":String(paA),"%":String(pct(paA,paP))},"ያጠናቀቁ":{"ብዛት":String(paA)},"ያልጠናቀቁ":{"ብዛት":String(paP-paA)},"ያጠናቀቁ %":String(pct(paA,paP))},
-    form_10:{"ዋና ትኩረቶች":{"እቅድ":String(icP),"ክንውን":String(icA),"%":String(pct(icA,icP))},"ያጠናቀቁ":{"ብዛት":String(icA)},"ያልጠናቀቁ":{"ብዛት":String(icP-icA)},"ያጠናቀቁ %":String(pct(icA,icP))},
-    form_11:{"የተቀበሉ":{"ወ":String(Math.floor(cR*0.6)),"ሴ":String(Math.floor(cR*0.4)),"ድ":String(cR)},"የተፈቱ":{"ወ":String(Math.floor(cRes*0.6)),"ሴ":String(Math.floor(cRes*0.4)),"ድ":String(cRes)},"ያልተፈቱ":{"ወ":String(Math.floor(cP*0.6)),"ሴ":String(Math.floor(cP*0.4)),"ድ":String(cP)},"የተፈቱ %":String(pct(cRes,cR))},
-    form_12:{"ዋና ትኩረቶች":pa(60),"ያጠናቀቁ":{"ብዛት":String(b(50+w))},"ያልጠናቀቁ":{"ብዛት":String(b(10))},"ያጠናቀቁ %":String(rnd(72,95))},
-    form_13:{"ዋና ትኩረቶች":pa(55),"ያጠናቀቁ":{"ብዛት":String(b(45+w))},"ያልጠናቀቁ":{"ብዛት":String(b(8))},"ያጠናቀቁ %":String(rnd(75,95))},
-    form_14:{"ዋና ትኩረቶች":pa(30),"ያጠናቀቁ":{"ብዛት":String(b(25+w))},"ያልጠናቀቁ":{"ብዛት":String(b(5))},"ያጠናቀቁ %":String(rnd(78,96))},
-    form_15:{"ዋና ትኩረቶች":pa(45),"ያጠናቀቁ":{"ብዛት":String(b(38+w))},"ያልጠናቀቁ":{"ብዛት":String(b(7))},"ያጠናቀቁ %":String(rnd(80,97))},
-    form_16:{"ዋና ትኩረቶች":pa(35),"ያጠናቀቁ":{"ብዛት":String(b(30+w))},"ያልጠናቀቁ":{"ብዛት":String(b(5))},"ያጠናቀቁ %":String(rnd(82,95))},
-    form_17:{"ዋና ትኩረቶች":pa(25),"ያጠናቀቁ":{"ብዛት":String(b(22+w))},"ያልጠናቀቁ":{"ብዛት":String(b(3))},"ያጠናቀቁ %":String(rnd(83,97))},
-    form_18:{"ዋና ትኩረቶች":pa(20),"ያጠናቀቁ":{"ብዛት":String(b(18+w))},"ያልጠናቀቁ":{"ብዛት":String(b(3))},"ያጠናቀቁ %":String(rnd(85,97))},
-    form_19:{"ዋና ትኩረቶች":pa(18),"ያጠናቀቁ":{"ብዛት":String(b(15+w))},"ያልጠናቀቁ":{"ብዛት":String(b(3))},"ያጠናቀቁ %":String(rnd(80,95))},
-    form_20:{"ዋና ትኩረቶች":pa(22),"ያጠናቀቁ":{"ብዛት":String(b(19+w))},"ያልጠናቀቁ":{"ብዛት":String(b(3))},"ያጠናቀቁ %":String(rnd(82,96))},
-    form_21:{"ዋና ትኩረቶች":pa(28),"ያጠናቀቁ":{"ብዛት":String(b(24+w))},"ያልጠናቀቁ":{"ብዛት":String(b(4))},"ያጠናቀቁ %":String(rnd(80,95))},
-    form_22:{"ዋና ትኩረቶች":pa(32),"ያጠናቀቁ":{"ብዛት":String(b(28+w))},"ያልጠናቀቁ":{"ብዛት":String(b(4))},"ያጠናቀቁ %":String(rnd(83,97))},
-    form_23:{"ዋና ትኩረቶች":pa(40),"ያጠናቀቁ":{"ብዛት":String(b(35+w))},"ያልጠናቀቁ":{"ብዛት":String(b(5))},"ያጠናቀቁ %":String(rnd(82,96))},
-    form_24:{"ዋና ትኩረቶች":pa(15),"ያጠናቀቁ":{"ብዛት":String(b(13+w))},"ያልጠናቀቁ":{"ብዛት":String(b(2))},"ያጠናቀቁ %":String(rnd(85,97))},
-    form_25:{"ዋና ትኩረቶች":pa(12),"ያጠናቀቁ":{"ብዛት":String(b(10+w))},"ያልጠናቀቁ":{"ብዛት":String(b(2))},"ያጠናቀቁ %":String(rnd(83,97))},
-    narration_report:{summary:`${YEAR} በጀት ዓመት ሪፖርት`,challenges:'የሰው ሀይል ክፍተት እና የበጀት ውስንነት ዋና ተግዳሮቶች ናቸው።',recommendations:'ከፍተኛ ስልጠናና የሀብት ማሰባሰብ ያስፈልጋል።'}
+    form_01: {
+      "ወረዳ": { "ብዛት": "1", "ያዋቀሩ": "1", "ያላዋቀሩ": "0" },
+      "በብልፅግና ህብረት ደረጃ": { "ብዛት": String(unionsCount), "ያዋቀሩ": String(unionsEstablished), "ያላዋቀሩ": String(unionsCount - unionsEstablished) },
+      "ጠቅላላ ድምር": { "ብዛት": String(totCount), "ያዋቀሩ": String(totEstablished), "ያላዋቀሩ": String(totCount - totEstablished) },
+      "ያዋቀሩ %": String(pct(totEstablished, totCount))
+    },
+    form_02: {
+      "የወረዳ ኮሚሽን": { "ወ": String(w_m), "ሴ": String(w_f), "ድ": String(w_tot) },
+      "የብልፅግና ህብረት ኮሚሽን": { "ወ": String(u_m), "ሴ": String(u_f), "ድ": String(u_tot) },
+      "ጠቅላላ ድምር": { "ወ": String(tot_m), "ሴ": String(tot_f), "ድ": String(tot_d) }
+    },
+    form_03: {
+      "የወረዳ ኮሚሽን ጽ/ቤት": { "ጽ/ኃ": "1", "ም/ክ": "0", "ባለሙ": String(exp), "ጸሐ": "1", "ሹፌ": "0", "ድም": String(staffTot) },
+      "ጠቅላላ ድምር": { "ጽ/ኃ": "1", "ም/ክ": "0", "ባለሙ": String(exp), "ጸሐ": "1", "ሹፌ": "0", "ድም": String(staffTot) }
+    },
+    form_04: {
+      "የወረዳ ቅ/ጽ/ቤት": { "እቅድ": "1", "ክንውን": "1", "%": "100" },
+      "ጠቅላላ ድምር": { "እቅድ": "1", "ክንውን": "1", "%": "100" }
+    },
+    form_04_1: {
+      "ለወረዳ": { "ብር": String(bgt), "ሣ": "0" },
+      "ጠቅላላ ድምር": { "ብር": String(bgt), "ሣ": "0" }
+    },
+    form_05: {
+      "ወረዳ ኮሚሽን": { "እቅድ": "1", "ክንውን": "1", "%": "100" },
+      "በብልጽግና ህብረት ኮሚሽን": { "እቅድ": String(unionsCount), "ክንውን": String(unionsCount), "%": "100" },
+      "አጠቃላይ ድምር": { "እቅድ": String(totCount), "ክንውን": String(totCount), "%": "100" }
+    },
+    form_06: {
+      "ወረዳ": { "እቅድ": "1", "ክንውን": "1", "%": "100" },
+      "በብልጽግና ህብረት ኮሚሽን": { "እቅድ": String(unionsCount), "ክንውን": String(unionsCount), "%": "100" },
+      "ጠቅላላ ድምር": { "እቅድ": String(totCount), "ክንውን": String(totCount), "%": "100" }
+    },
+    form_06_1: {
+      "በወረዳ ደረጃ": { "ወ": String(w_m), "ሴ": String(w_f), "ድ": String(w_tot) },
+      "በብልጽግና ህብረት ኮሚሽን": { "ወ": String(u_m - 5), "ሴ": String(u_f - 2), "ድ": String(u_tot - 7) },
+      "ጠቅላላ ድምር": { "ወ": String(tot_m - 5), "ሴ": String(tot_f - 2), "ድ": String(tot_d - 7) },
+      "ምርመራ": ""
+    },
+    form_07: {
+      "በወረዳ ደረጃ": { "ወ": String(w_m), "ሴ": String(w_f), "ድ": String(w_tot) },
+      "በብልጽግና ህብረት ኮሚሽን": { "ወ": String(b(70 + w)), "ሴ": String(b(95 + w)), "ድ": String(b(165 + w * 2)) },
+      "አጠቃላይ ድምር": { "ወ": String(b(74 + w)), "ሴ": String(b(98 + w)), "ድ": String(b(172 + w * 2)) }
+    },
+    form_08: {
+      "ለወረዳ የላኩ የብልጽግና ህብረት": { "ዕቅድ": String(unionsCount), "ክንውን": String(unionsCount), "%": "100" },
+      "ለአባላት ኮንፈረንስ ሪፖርት ያቀረቡ የኮሚሽን መዋቅር ብዛት": {
+        "ከተማ": "0",
+        "በክፍለ ከተማ ወረዳ 1 ጊዜ": "1",
+        "ወረዳ 1 ጊዜ": "1",
+        "ህብረት 1 ጊዜ": String(unionsCount),
+        "ጠቅላላ ድምር": String(totCount)
+      }
+    },
+    form_09: {
+      "በወረዳ": { "ዕቅድ": "1", "ክንውን": "1", "%": "100" },
+      "በብልጽግና ህብረት": { "ዕቅድ": String(unionsCount), "ክንውን": String(unionsEstablished), "%": String(pct(unionsEstablished, unionsCount)) },
+      "አጠቃላይ ድምር": { "ዕቅድ": String(totCount), "ክንውን": String(totEstablished), "%": String(pct(totEstablished, totCount)) }
+    },
+    form_10: {
+      "በወረዳ ደረጃ": { "ዕቅድ": "1", "ክንውን": "1", "%": "100" },
+      "በብልጽግና ህብረት ደረጃ": { "ዕቅድ": String(unionsCount), "ክንውን": String(unionsCount), "%": "100" },
+      "አጠቃላይ ድምር": { "ዕቅድ": String(totCount), "ክንውን": String(totCount), "%": "100" }
+    },
+    form_11: {
+      "በወረዳ ደረጃ": { "ዕቅድ": "1", "ክንውን": "1", "%": "100" },
+      "በብልጽግና ህብረት ደረጃ": { "ዕቅድ": String(unionsCount), "ክንውን": String(unionsCount), "%": "100" },
+      "አጠቃላይ ድምር": { "ዕቅድ": String(totCount), "ክንውን": String(totCount), "%": "100" }
+    },
+    form_12: {
+      "በወረዳ ደረጃ": { "ዕቅድ": String(trainPlan), "ክንውን": String(trainDone), "%": String(pct(trainDone, trainPlan)) },
+      "በብልጽግና ህብረት ደረጃ": { "ዕቅድ": "0", "ክንውን": "0", "%": "0" },
+      "አጠቃላይ ድምር": { "ዕቅድ": String(trainPlan), "ክንውን": String(trainDone), "%": String(pct(trainDone, trainPlan)) }
+    },
+    form_13: {
+      "የፓርቲ አባላት ብዛት": { "ወንድ": String(partyM), "ሴት": String(partyF), "ድምር": String(partyTot) },
+      "አባላት የተደራጁበት አሃድ ብዛት": { "የብልፅግና ቤተሰብ ብዛት": String(famCount), "የብልፅግና ህብረት ብዛት": String(unionsCount) },
+      "ከአጠቃላይ የአባላት ብዛት ወደ ዳታ ቤዝ የገባ መረጃ ብዛት": { "ወ": String(dbM), "ሴ": String(dbF), "ድ": String(dbTot), "%": "100" }
+    },
+    form_14: {
+      "በ2ኛ ሩብ ዓመት የተወሰዱ እርምጃዎች": {
+        "ተግሣጽ": String(1 + (w % 2)),
+        "የቃል ማስጠንቀቂያ": String(1 + (w % 3)),
+        "የጽሐፍ ማስጠንቀቂያ": "1",
+        "ከሃላፊነት ዝቅ ማድረግ": "0",
+        "ከሃላፊነት ማንሳት": "0",
+        "ከሃላፊነት ማገድ": "0",
+        "ከአባልነት መሠረዝ": String(w % 2),
+        "ጠቅላላ ድምር": String(3 + (w % 2) + (w % 3) + (w % 2))
+      },
+      "ከአባልነት ከተሰረዙ ውስጥ በኮንፈረንስ ቀርቦ የጸደቀ": { "ብዛት": String(w % 2), "%": "100" }
+    },
+    form_15: {
+      "የቀረቡ ቅሬታዎችና አፈጻጸም": {
+        "የቀረቡ": String(4 + (w % 3)),
+        "የተፈቱ": String(3 + (w % 3)),
+        "በሂደት ያሉ": "1",
+        "ሌላ": "0",
+        "ድምር": String(4 + (w % 3))
+      },
+      "ምርመራ": ""
+    },
+    form_15_1: {
+      "የቀረቡ አቤቱታዎችና አፈጻጸማቸው": {
+        "የቀረቡ": String(2 + (w % 3)),
+        "ውሳኔ ያገኙ": String(1 + (w % 3)),
+        "በሂደት ያሉ": "1",
+        "የተመለሱ": "0",
+        "ኮሚሽን የማይመለከት": "0"
+      },
+      "በኮሚሽኑ የተሰጡ ውሳኔዎች": {
+        "የጸነ": String(1 + (w % 2)),
+        "የተሻረ": "0",
+        "የተሻሻለ": "0",
+        "ድምር": String(1 + (w % 2))
+      },
+      "በኮሚሽኑ ከተሰጡ ውሳኔዎች በፓርቲ መዋቅር": {
+        "የተፈጸመ": String(1 + (w % 2)),
+        "ያልተፈጸመ": "0",
+        "በሂደት ያለ": "0",
+        "ድምር": String(1 + (w % 2))
+      }
+    },
+    form_16: {
+      "ቋሚ ንብረት": { "በክፍለ ከተማ": "0", "ወረዳ": String(10 + (w % 5)), "ድምር": String(10 + (w % 5)) },
+      "ልዩ ተንቀሳቃሽ ንብረት": { "በክፍለ ከተማ": "0", "ወረዳ": "0", "ድምር": "0" },
+      "ጠቅላላ የተመዘገበ ንብረት ብዛት": { "በክፍለ ከተማ": "0", "ወረዳ": String(10 + (w % 5)), "ድምር": String(10 + (w % 5)) }
+    },
+    form_17: {
+      "በወረዳ ደረጃ": { "2015": "0", "2016": "0", "2017": "0" },
+      "ጠቅላላ ድምር": { "2015": "0", "2016": "0", "2017": "0" },
+      "በሶስቱ ዓመት የኦዲት ግኝቶችና የማስተካከያ ርምጃዎች": { "ጉድለት[በብር]": "0", "የተመለሰ": "0", "ያልተመለሰ": "0" }
+    },
+    form_17_1: {
+      "በወረዳ ደረጃ": { "እቅድ": "1", "ክንውን": "1", "በ%": "100" },
+      "ጠቅላላ ድምር": { "እቅድ": "1", "ክንውን": "1", "በ%": "100" },
+      "ጠቅላላ የኦዲት ግኝቶች በብር": { "ጉድለት": "0", "የተመለሰ": "0", "ያልተመለሰ": "0" }
+    },
+    form_18: {
+      "የአባልነት መዋጮ ገቢ": { "እቅድ": String(revPlan), "ክንውን": String(revDone), "%": String(pct(revDone, revPlan)) },
+      "ልዩ ልዩ ገቢ(ድጋፍ፣ የመደመር መንግስት፤የመጽሄት ሽያጭ፣ ውዝፍ)": { "እቅድ": String(miscPlan), "ክንውን": String(miscDone), "%": String(pct(miscDone, miscPlan)) },
+      "ለዋና ጽ/ቤት ፈሰስ %20 የተደረገ": { "እቅድ": "0", "ክንውን": "0", "%": "0" }
+    },
+    form_19: {
+      "የኮሚሽን መድረክ": { "እቅድ": "6", "ክንውን": "6" },
+      "የኮሚሽን ሥራ አመራር ኮሚቴ መድረክ": { "እቅድ": "18", "ክንውን": String(12 + (w % 5)) },
+      "የኮሚሽኑ ቅ/ጽ/ቤት ማኔጅመንት ኮሚቴ መድረክ": { "እቅድ": "0", "ክንውን": "0" },
+      "ለክልል ተጠሪ ከሆኑ ከዞን/ከተማ/ልዩ ወረዳ ኮሚሽን ጋር የተደረገ መድረክ": { "እቅድ": "0", "ክንውን": "0" },
+      "ለክልል ተጠሪ ከሆኑ የዞን/ከተማ/ልዩ ወረዳ የኮሚሽን ቅ/ጽ/ቤት ኃላፊዎች ጋር የተደረገ መድረክ": { "እቅድ": "0", "ክንውን": "0" },
+      "ከክልል/ከተማ ፓርቲ ቅ/ጽ/ቤት ሥራ አመራር ኮሚቴ ጋር የተደረገ": { "እቅድ": "0", "ክንውን": "0" }
+    },
+    form_20: {
+      "ለፓርቲ ቅ/ጽ/ቤት እንዲያርሙ ግብረ-መልስ የተሰጠ የተጣሱ የአሰራር ሥርዓቶች ብዛት": String(4 + (w % 4)),
+      "ከአባልነት ተባረው የተመለሱ ብዛት": "0",
+      "ከኃላፊነት ተነስተው የተመለሱ አመራሮች ብዛት": "0",
+      "በኢንስፔክሽን የተገኘ የፓርቲ መዋጮ የማይከፍሉ አባላት": { "ብዛት": "0", "ብር": "0" },
+      "ለሌላ ዓላማ ውሎ የነበረ የተመለሰ የፓርቲ ገንዘብ ብዛት በብር": "0",
+      "ኦዲት እንዲያስደርጉ የተደረገ የፓርቲ ቅ/ጽ/ቤት ብዛት": "1",
+      "እንዲመለስ የተደረገ የኦዲት ግኝቶች በብር": "0",
+      "የፓርቲ ንብረት እንዲመዘግቡ የተደረገ የፓርቲ ቅ/ጽ/ቤቶች": { "ብዛት": "1", "ንብረት": "-" },
+      "ሌላ ካለ ይጨመር": ""
+    },
+    narration_report: {
+      summary: `${YEAR} በጀት ዓመት የወረዳ የሥራ አፈጻጸም ሪፖርት`,
+      challenges: 'የሰው ሀይል ክፍተት እና የተወሰነ የበጀት ውስንነት ያጋጠሙ ዋና ዋና ተግዳሮቶች ናቸው።',
+      recommendations: 'ቀጣይነት ያለው የክህሎት ማሳደጊያ ስልጠናና የቁጥጥር ስራዎች እንዲጠናከሩ ይመከራል።'
+    }
   };
 }
 
 async function main() {
-  // Delete old dummy data
-  console.log('🗑️  Removing old dummy data...');
+  console.log('🗑️  Removing old dummy reports for 2018...');
   const { error: delErr } = await supabase
     .from('reports')
     .delete()
     .eq('year', YEAR)
-    .eq('submitter_level', 'woreda')
-    .eq('status', 'submitted');
+    .eq('submitter_level', 'region');
   if (delErr) console.warn('Delete warning:', delErr.message);
 
   let ok = 0, failed = 0;
@@ -129,31 +274,44 @@ async function main() {
       const title = `${woreda} — ${YEAR} ${period} ሪፖርት`;
       const row = {
         title,
-        report_type: 'numerical',
-        period_category: periodCode,
-        budget_year: String(YEAR),
-        submitter_id: userId,
-        submitter_level: 'region',
+        region: woreda,
         region_name: woreda,
-        status: 'submitted',
-        forms_data: formsData,
         year: YEAR,
+        budget_year: String(YEAR),
         period,
-        submitted_at: new Date().toISOString(),
+        period_category: periodCode,
+        status: 'submitted',
+        report_type: 'numerical',
+        submitter_level: 'region',
+        submitter_id: userId,
+        user_id: userId,
+        forms_data: formsData,
+        submitted_at: new Date(Date.now() - rnd(1, 30) * 86400000).toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from('reports').insert(row);
+      const { error } = await supabase.from('reports').upsert(row, {
+        onConflict: 'region,year,period',
+        ignoreDuplicates: false,
+      });
+
       if (error) {
-        failed++;
-        console.error(`❌ ${woreda} | ${period}: ${error.message}`);
+        // Fallback insert without onConflict
+        const { error: insErr } = await supabase.from('reports').insert(row);
+        if (insErr) {
+          console.error(`  ❌ ${woreda} (${period}):`, insErr.message);
+          failed++;
+        } else {
+          ok++;
+        }
       } else {
         ok++;
-        process.stdout.write(`✅ ${ok}/${entries.length * PERIODS.length} ${woreda} ${period}\r`);
       }
     }
+    process.stdout.write(`  [${i+1}/${entries.length}] ${woreda} ✓\n`);
   }
 
-  console.log(`\n\n📊 Done: ${ok} inserted, ${failed} failed`);
+  console.log(`\n🎉 Done! Seeded ${ok} reports successfully. (${failed} failed)`);
 }
 
 main().catch(console.error);

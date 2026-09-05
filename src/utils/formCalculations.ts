@@ -19,14 +19,15 @@ export function isCalculatedField(
     "ድምር",
     "ጠቅላላ የተመዘገበ ንብረት ብዛት",
     "በጠቅላላው የተሰበሰበው ገቢ በብር",
-    "ያዋቀሩ%"
+    "ያዋቀሩ%",
+    "ያዋቀሩ %"
   ];
   if (summaryKeywords.some(k => trimmedCol === k || trimmedCol.endsWith("ድምር"))) {
     return true;
   }
 
-  // 2. Horizontal Sums (Row totals like "ድምር", "ድ", "ድም")
-  if (trimmedSub === "ድምር" || trimmedSub === "ድ" || trimmedSub === "ድም") {
+  // 2. Horizontal Sums (Row totals like "ድምር", "ድ", "ድም", "ጠቅላላ ድምር")
+  if (trimmedSub === "ድምር" || trimmedSub === "ድ" || trimmedSub === "ድም" || trimmedSub === "ጠቅላላ ድምር") {
     return true;
   }
 
@@ -39,7 +40,7 @@ export function isCalculatedField(
   }
 
   // 4. Horizontal Percentages & Ratios (only when automated numerator & denominator exist)
-  if (trimmedSub === "%" || trimmedSub === "ውሳኔ ያገኙ %" || trimmedSub === "የተፈጸመ %" || trimmedSub === "በመቶኛ") {
+  if (trimmedSub === "%" || trimmedSub === "ውሳኔ ያገኙ %" || trimmedSub === "የተፈጸመ %" || trimmedSub === "በመቶኛ" || trimmedSub === "በ%") {
     // Plan vs Performance ("እቅድ" / "ዕቅድ" vs "ክንውን")
     if (subKeys.some(k => k === "እቅድ" || k === "ዕቅድ") && subKeys.includes("ክንውን")) return true;
     // Deficit vs Recovered
@@ -50,13 +51,13 @@ export function isCalculatedField(
     if (subKeys.includes("የቀረቡ") && subKeys.includes("ውሳኔ ያገኙ ብዛት")) return true;
     // Executed vs Total ("የተፈጸመ ብዛት" vs "ድምር")
     if (subKeys.includes("የተፈጸመ ብዛት") && subKeys.includes("ድምር")) return true;
-    // Cross-row automations in Forms 14 & 15
+    // Cross-row automations in Forms 13 & 14
     if (trimmedCol.includes("ወደ ዳታ ቤዝ የገባ መረጃ ብዛት") && subKeys.includes("ድ")) return true;
     if (trimmedCol.includes("በኮንፈረንስ ቀርቦ የጸደቀ") && subKeys.includes("ብዛት")) return true;
     if (trimmedCol.includes("የአሠራር ሥርዓት መጠበቁ በኮሚሽን የተረጋገጠ") && subKeys.includes("ብዛት")) return true;
   }
 
-  if (trimmedCol === "ያዋቀሩ%") {
+  if (trimmedCol === "ያዋቀሩ%" || trimmedCol === "ያዋቀሩ %") {
     return true;
   }
 
@@ -128,8 +129,8 @@ export function computeFormCalculations(schema: FormSchema, initialData: any = {
         }
       }
 
-      // 1B. Horizontal row sums ("ድምር", "ድ", "ድም")
-      const totalKey = subKeys.find(k => k === "ድምር" || k === "ድ" || k === "ድም");
+      // 1B. Horizontal row sums ("ድምር", "ድ", "ድም", "ጠቅላላ ድምር")
+      const totalKey = subKeys.find(k => k === "ድምር" || k === "ድ" || k === "ድም" || k === "ጠቅላላ ድምር");
       if (totalKey) {
         const addKeys = subKeys.filter(k => k !== totalKey && !k.includes("%") && k !== "ውሳኔ ያገኙ %" && k !== "የተፈጸመ %");
         let sum = 0;
@@ -146,7 +147,7 @@ export function computeFormCalculations(schema: FormSchema, initialData: any = {
       }
 
       // 1C. Horizontal percentages
-      const percKey = subKeys.find(k => k === "%" || k.includes("%") || k === "በመቶኛ");
+      const percKey = subKeys.find(k => k === "%" || k.includes("%") || k === "በመቶኛ" || k === "በ%");
       if (percKey) {
         const planKey = subKeys.find(k => k === "እቅድ" || k === "ዕቅድ");
         if (planKey && subKeys.includes("ክንውን")) {
@@ -186,9 +187,9 @@ export function computeFormCalculations(schema: FormSchema, initialData: any = {
             rowData[percKey] = formatPerc(dbMembers, totalPartyMembers);
           }
         } else if (rowKey.includes("በኮንፈረንስ ቀርቦ የጸደቀ") && subKeys.includes("ብዛት")) {
-          const totalRemoved = parseNum(data["ከዚህ ውስጥ ከአባልነት የተሰረዙ ብዛት"]);
+          const totalRemoved = parseNum(data["በ2ኛ ሩብ ዓመት የተወሰዱ እርምጃዎች"]?.["ከአባልነት መሠረዝ"] || data["ከዚህ ውስጥ ከአባልነት የተሰረዙ ብዛት"]);
           const approved = parseNum(rowData["ብዛት"]);
-          if (data["ከዚህ ውስጥ ከአባልነት የተሰረዙ ብዛት"] !== undefined || rowData["ብዛት"] !== undefined) {
+          if (totalRemoved > 0 || rowData["ብዛት"] !== undefined) {
             rowData[percKey] = formatPerc(approved, totalRemoved);
           }
         } else if (rowKey.includes("የአሠራር ሥርዓት መጠበቁ በኮሚሽን የተረጋገጠ") && subKeys.includes("ብዛት")) {
@@ -212,8 +213,8 @@ export function computeFormCalculations(schema: FormSchema, initialData: any = {
     const rowData = data[rowKey];
     const subKeys = col.subKeys || [];
 
-    // Special Form 01 row: "ያዋቀሩ%"
-    if (rowKey === "ያዋቀሩ%") {
+    // Special Form 01 row: "ያዋቀሩ%" or "ያዋቀሩ %"
+    if (rowKey === "ያዋቀሩ%" || rowKey === "ያዋቀሩ %") {
       const totEstablished = parseNum(data["ጠቅላላ ድምር"]?.["ያዋቀሩ"]);
       const totCount = parseNum(data["ጠቅላላ ድምር"]?.["ብዛት"]);
       data[rowKey] = formatPerc(totEstablished, totCount);
