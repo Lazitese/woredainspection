@@ -159,7 +159,7 @@ export default function PublicCodeDocumentsPage() {
               {subs.map((sub) => {
                 const docCount = docsInOffice.filter(d => d.mainCategory === selectedMain && d.subCategory === sub.code).length;
                 return (
-                  <button key={sub.code} onClick={() => navigateTo('docs', selectedOffice || undefined, selectedMain || undefined, sub.code)} className="group bg-surface-primary rounded-2xl border border-border/50 p-5 hover:border-brand-blue/50 transition-all text-left flex items-center gap-4 shadow-sm hover:shadow-md">
+                  <button key={`${sub.code}-${sub.name}`} onClick={() => navigateTo('docs', selectedOffice || undefined, selectedMain || undefined, sub.code)} className="group bg-surface-primary rounded-2xl border border-border/50 p-5 hover:border-brand-blue/50 transition-all text-left flex items-center gap-4 shadow-sm hover:shadow-md">
                     <div className="w-10 h-10 rounded-xl bg-surface-secondary border border-border/40 flex items-center justify-center shrink-0">
                       <span className="text-xs font-bold text-text-secondary group-hover:text-brand-blue transition-colors">{sub.code}</span>
                     </div>

@@ -343,7 +343,7 @@ export default function DocumentsPage() {
             {!loading && viewLevel === 'sub' && selectedMain && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {subs.map((sub) => (
-                  <button key={sub.code} onClick={() => navigateTo('docs', selectedOffice || undefined, selectedRegion || undefined, selectedMain || undefined, sub.code)} className="group bg-surface-primary rounded-lg border border-border/50 p-4 hover:border-brand-blue/50 transition-all text-left flex items-center gap-3">
+                  <button key={`${sub.code}-${sub.name}`} onClick={() => navigateTo('docs', selectedOffice || undefined, selectedRegion || undefined, selectedMain || undefined, sub.code)} className="group bg-surface-primary rounded-lg border border-border/50 p-4 hover:border-brand-blue/50 transition-all text-left flex items-center gap-3">
                     <div className="w-8 h-8 rounded-md bg-surface-secondary border border-border flex items-center justify-center shrink-0">
                       <span className="text-[11px] font-bold text-text-secondary group-hover:text-brand-blue transition-colors">{sub.code}</span>
                     </div>
@@ -542,7 +542,7 @@ export default function DocumentsPage() {
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-text-secondary">ንኡስ ምድብ</label>
                 <select value={uploadSubCat} onChange={(e) => setUploadSubCat(e.target.value)} className="w-full bg-surface-primary border border-border/50 rounded-md p-2 text-sm text-text-primary focus:outline-none focus:border-brand-blue">
-                  {(SUB_CATEGORIES[uploadMainCat] || []).map(sub => <option key={sub.code} value={sub.code}>{sub.code} - {sub.name}</option>)}
+                  {(SUB_CATEGORIES[uploadMainCat] || []).map(sub => <option key={`${sub.code}-${sub.name}`} value={sub.code}>{sub.code} - {sub.name}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 mt-2">
