@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const summaryCards = [
-  { amharic: "አጠቃላይ ድምር", value: "546,064", sub: "ጠቅላላ የኮሚሽን አባላት" },
+  { amharic: "አጠቃላይ ድምር", value: "2346", sub: "ጠቅላላ የኮሚሽን አባላት" },
   { amharic: "የቀበሌ ኮሚሽን", value: "86,507", sub: "በሁሉም ክልሎች" },
-  { amharic: "የብልፅግና ህብረት ኮሚሽን", value: "448,342", sub: "ንቁ አባላት" },
+  { amharic: "የብልፅግና ህብረት ኮሚሽን", value: "466", sub: "ንቁ አባላት" },
 ];
 
 export function AnalyticsSection() {
