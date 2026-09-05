@@ -224,6 +224,24 @@ export async function resolveLoginEmail(identifier: string, portalRole?: 'repres
       const code = 20 + num;
       return { email: `2519110000${code}@federal.local` };
     }
+    const evaluatorMatch = rawEmail.match(/^evaluator(\d+)@/);
+    if (evaluatorMatch) {
+      const num = parseInt(evaluatorMatch[1], 10);
+      const code = 80 + num;
+      return { email: `2519110000${code}@federal.local` };
+    }
+    const approverMatch = rawEmail.match(/^approver(\d+)@/);
+    if (approverMatch) {
+      const num = parseInt(approverMatch[1], 10);
+      const code = 84 + num;
+      return { email: `2519110000${code}@federal.local` };
+    }
+    const selfMatch = rawEmail.match(/^(?:self|assessment)(\d+)@/);
+    if (selfMatch) {
+      const num = parseInt(selfMatch[1], 10);
+      const code = 70 + num;
+      return { email: `2519110000${code}@federal.local` };
+    }
     return { email: identifier.trim() };
   }
   

@@ -14,6 +14,7 @@
 | **የዋና አስተዳዳሪ ፖርታል (Admin Portal)** | [`/auth/login`](http://localhost:3000/auth/login) | አጠቃላይ ዳሽቦርድ፣ ስታትስቲክስ፣ የቅጾች ማስተካከያ፣ የተጠቃሚዎች አስተዳደር |
 | **የወረዳ ተወካዮች ፖርታል (Representative Portal)** | [`/representative/login`](http://localhost:3000/representative/login) | የወረዳ የኢንስፔክሽን ሪፖርቶች ማቅረቢያና ታሪክ መመልከቻ |
 | **የአቤቱታና ስነ-ምግባር ኮሚቴ ፖርታል (Complaints Portal)** | [`/complaint/login`](http://localhost:3000/complaint/login) | የህዝብና የሰራተኛ አቤቱታዎች ክትትልና ውሳኔ ማጽደቂያ |
+| **የአመራርና አባላት ምዘና ፖርታል (Assessment Portal)** | [`/assessment/login`](http://localhost:3000/assessment/login) | የ10% የራስ ምዘና፣ የ20% መዛኞች ምዘና፣ የ70% እና የውጤት ማጽደቂያ |
 
 ---
 
@@ -52,6 +53,31 @@
 | **15** | **ልዩ ወረዳ 3** | `0911000023` | `specialworeda3@akakikality.gov.et` | `SpecialWoreda03@2026!` | `ልዩ ወረዳ 3` | [`/representative/login`](http://localhost:3000/representative/login) |
 | **16** | **ልዩ ወረዳ 4** | `0911000024` | `specialworeda4@akakikality.gov.et` | `SpecialWoreda04@2026!` | `ልዩ ወረዳ 4` | [`/representative/login`](http://localhost:3000/representative/login) |
 | **17** | **ልዩ ወረዳ 5** | `0911000025` | `specialworeda5@akakikality.gov.et` | `SpecialWoreda05@2026!` | `ልዩ ወረዳ 5` | [`/representative/login`](http://localhost:3000/representative/login) |
+
+---
+
+## ⚖️ 3. የምዘና ሥርዓት ተጠቃሚዎች (Assessment Portal Users - 10%, Evaluators & Approvers)
+
+> 💡 **የምዘና ፖርታል መግቢያ አድራሻ (Assessment Login):** [`/assessment/login`](http://localhost:3000/assessment/login)  
+> የምዘና ሂደቱ በሶስት ዋና ዋና ደረጃዎች የተከፈለ ነው፡
+> 1. **የ10% የራስ ምዘና (Self Assessment / `regular`):** ተመዛኙ አባል ራሱን በቅፅ-1 መስፈርቶች መዝኖ ውጤቱን የሚያስገባበት።
+> 2. **የ20% የመዛኞች ምዘና (Peer Evaluation / `evaluator`):** የተመደቡ መዛኞች የቡድን አባላትን በአመራርና አፈጻጸም መስፈርቶች (ቅፅ-2) የሚመዝኑበት።
+> 3. **የ70% እና የውሳኔ አጽዳቂ (Approver / `approver`):** የአመራር 70% ምዘና የሚሞላበት፣ የ10% እና 20% ውጤቶችን መርምሮ የመጨረሻ 100% ውጤት የሚያጸድቅበት።
+
+### ሀ. ራሳቸውን የቻሉ የምዘና መለያዎች (Dedicated Assessment Accounts)
+
+| ተ.ቁ | የስራ ሃላፊነትና ስም | የምዘና ሚና (Role) | የመግቢያ ስልክ (Phone) | ይፋዊ ኢሜይል (Official Email) | የይለፍ ቃል (Password) | የተሰጠው ፍቃድ (Access Scope) |
+| :---: | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1** | **የ10% የራስ ምዘና ተጠቃሚ 1** | `regular` *(ተመዛኝ)* | `0911000071` | `self1@akakikality.gov.et` | `Assessment10@2026!` | የ10% የራስ ምዘና መሙላትና ሪፖርት ማውረድ *(ቅድመ-ውጤት ተሞልቷል)* |
+| **2** | **የ10% የራስ ምዘና ተጠቃሚ 2** | `regular` *(ተመዛኝ)* | `0911000072` | `self2@akakikality.gov.et` | `Assessment10@2026!` | የ10% የራስ ምዘና መሙላትና ሪፖርት ማውረድ *(ለሙከራ ክፍት ሆኖ የቀረበ)* |
+| **3** | **የምዘና መዛኝ 1 (Evaluator 1)** | `evaluator` *(መዛኝ)* | `0911000081` | `evaluator1@akakikality.gov.et` | `Evaluator01@2026!` | 10% የራስ ምዘና + የቡድን አባላት 20% ምዘና (Assess Team) |
+| **4** | **የምዘና መዛኝ 2 (Evaluator 2)** | `evaluator` *(መዛኝ)* | `0911000082` | `evaluator2@akakikality.gov.et` | `Evaluator02@2026!` | 10% የራስ ምዘና + የቡድን አባላት 20% ምዘና (Assess Team) |
+| **5** | **የምዘና መዛኝ 3 (Evaluator 3)** | `evaluator` *(መዛኝ)* | `0911000083` | `evaluator3@akakikality.gov.et` | `Evaluator03@2026!` | 10% የራስ ምዘና + የቡድን አባላት 20% ምዘና (Assess Team) |
+| **6** | **የምዘና አጽዳቂ 1 (Approver 1)** | `approver` *(አጽዳቂ)* | `0911000085` | `approver1@akakikality.gov.et` | `Approver01@2026!` | 10% የራስ + 20% የመዛኝ + **70% የአመራር ምዘና እና አጠቃላይ ማጽደቂያ (Approve Dashboard)** |
+| **7** | **ዋና የምዘና አጽዳቂ (Chief Approver)** | `approver` *(አጽዳቂ)* | `0911000086` | `approver2@akakikality.gov.et` | `Approver02@2026!` | 10% የራስ + 20% የመዛኝ + **70% የአመራር ምዘና እና አጠቃላይ ማጽደቂያ (Approve Dashboard)** |
+
+### ለ. የ17ቱ ወረዳዎች ተወካዮች በምዘና ሥርዓት ውስጥ ያላቸው ተሳትፎ
+> 📌 **ማስታወሻ:** ሁሉም **17ቱ የወረዳ ተወካዮች** በንቁ የምዘና ወቅት (`2019 ዓ.ም - 1ኛ መንፈቀ አመት`) ውስጥ እንደ **10% የራስ ምዘና ተመዛኝ (`regular`)** የተመዘገቡ ሲሆን፣ በራሳቸው ስልክ ቁጥር (ምሳሌ፡ `0911000001` - `0911000025`) እና በነባር የወረዳ የይለፍ ቃላቸው ወደ [`/assessment/login`](http://localhost:3000/assessment/login) በመግባት የ10% የራስ ምዘናቸውን ማከናወን ይችላሉ።
 
 ---
 
