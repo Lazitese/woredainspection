@@ -24,7 +24,11 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  serverExternalPackages: ["abushakir", "@js-temporal/polyfill"],
+  serverExternalPackages: [
+    "abushakir",
+    "@js-temporal/polyfill",
+    "@sentry/profiling-node",
+  ],
   images: {
     remotePatterns: [
       {
