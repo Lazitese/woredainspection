@@ -50,8 +50,10 @@ export const publicFilesService = {
         'ሌላ': 'other'
       };
       
+      const { getBrowserActiveWoreda } = await import('@/utils/supabase/woreda-fetch');
+      const activeWoreda = getBrowserActiveWoreda();
       const safeFolder = folderMap[category] || 'other';
-      const filePath = `${safeFolder}/${fileName}`;
+      const filePath = `${activeWoreda}/${safeFolder}/${fileName}`;
       const isConfidential = category === 'የኮሚሽኑ ሚስጥራዊ ሰነዶች';
       const bucketName = isConfidential ? 'confidential_documents' : 'public_documents';
 

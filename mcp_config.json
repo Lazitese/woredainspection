@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "supabase-woredas": {
+      "serverUrl": "http://db.akkinspection.com.et/mcp"
+    }
+  }
+}

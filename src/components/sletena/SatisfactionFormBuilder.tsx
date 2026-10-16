@@ -30,7 +30,7 @@ export const SatisfactionFormBuilder: React.FC<SatisfactionFormBuilderProps> = (
 
   // Form Banner Headers
   const [formTitle, setFormTitle] = useState(
-    category?.title || 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ'
+    category?.title || 'የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ'
   );
   const [formSubtitle, setFormSubtitle] = useState(
     category?.description || 'በቅርቡ በወሰዱት ስልጠና ላይ ያሎትን ዕርካታ፣ የአሰልጣኞች ብቃት እና የመስተንግዶ ሁኔታ ይገምግሙ::'

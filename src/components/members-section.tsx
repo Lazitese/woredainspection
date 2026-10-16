@@ -7,6 +7,8 @@ import { personnelService } from "@/services/personnel";
 import { Personnel } from "@/types";
 import { IconBrandFacebook, IconBrandX, IconBrandLinkedin, IconBrandWhatsapp } from "@tabler/icons-react";
 
+import { useWoreda } from "@/providers/woreda-provider";
+
 // @BACKEND: This section reads from the personnel service.
 // Members are grouped by office tab in a 1-row slidable carousel.
 
@@ -15,7 +17,6 @@ const OFFICE_TABS = [
   { id: 'chairperson-secretary', label: 'ሰብሳቢና ፀሀፊ', labelEn: 'Chairperson & Secretary' },
   { id: 'leadership-members', label: 'አመራር አባላት', labelEn: 'Leadership Members' },
   { id: 'committee-members', label: 'ኮሚቴ አባላት', labelEn: 'Committee Members' },
-  { id: 'branch', label: 'ቅ/ጽ/ቤት ሀላፊ', labelEn: 'Woreda Branch Heads' },
 ];
 
 function MemberCard({ member, activeTab }: { member: Personnel; activeTab: string }) {
@@ -189,6 +190,7 @@ function getPositionRank(pos?: string): number {
 }
 
 export function MembersSection() {
+  const { activeWoreda } = useWoreda();
   const [activeTab, setActiveTab] = useState(OFFICE_TABS[0].id);
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -198,11 +200,12 @@ export function MembersSection() {
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     personnelService.getPersonnel().then(data => {
       setPersonnel(data);
       setLoading(false);
     });
-  }, []);
+  }, [activeWoreda.id]);
 
   const activePersonnel = personnel.filter(p => p.status === 'Active');
 

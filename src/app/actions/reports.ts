@@ -7,6 +7,8 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { createClient } from '@/utils/supabase/server';
 import { sortFormSchemas } from '@/utils/schemaSort';
 import { normalizePhoneToE164 } from '@/lib/phone';
+import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
+import { WOREDAS_LIST } from '@/config/woredas';
 
 export async function createRepresentativeAction(formData: FormData) {
   try {
@@ -209,10 +211,13 @@ export async function saveReportFormAction(
 
     // Fetch current form schemas to snapshot
     const { data: schemas } = await supabaseAdmin.from('form_schemas').select('*');
+    const activeWoreda = await getServerActiveWoreda();
+    const matchedWoreda = WOREDAS_LIST.find(w => w.name === region)?.id || activeWoreda;
 
     const payload = {
       user_id: userId,
       submitter_id: userId,
+      woreda_id: matchedWoreda,
       title: `የ${region} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),
@@ -273,10 +278,13 @@ export async function submitReportAction(
 
     // Fetch current form schemas to snapshot
     const { data: schemas } = await supabaseAdmin.from('form_schemas').select('*');
+    const activeWoreda = await getServerActiveWoreda();
+    const matchedWoreda = WOREDAS_LIST.find(w => w.name === region)?.id || activeWoreda;
 
     const payload = {
       user_id: userId,
       submitter_id: userId,
+      woreda_id: matchedWoreda,
       title: `የ${region} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),

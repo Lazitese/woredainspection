@@ -87,8 +87,8 @@ export { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
 export type { AkakiKalityWoreda } from '@/lib/regions-data';
 
 export const OFFICES: { code: OfficeType; name: string }[] = [
-  { code: 'main', name: 'የአቃቂ ቃሊቲ ክ/ከተማ ኮሚሽን ፅ/ቤት' },
-  { code: 'branch', name: 'የወረዳ ቅርንጫፍ ጽ/ቤቶች' },
+  { code: 'main', name: 'የወረዳው ኮሚሽን ፅ/ቤት' },
+  { code: 'branch', name: 'የቅርንጫፍ ጽ/ቤቶች' },
 ];
 
 export interface Document {

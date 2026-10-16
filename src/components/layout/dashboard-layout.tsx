@@ -12,12 +12,13 @@ import { supabase } from '@/lib/supabaseClient';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 
 import { SletenaNavGroup } from '@/components/layout/SletenaNavGroup';
-import { ReportNavGroup } from '@/components/layout/ReportNavGroup';
 import { formatECDateTime } from '@/lib/date-formatter';
+import { useWoreda } from '@/providers/woreda-provider';
 
 export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { t, language, setLanguage } = useI18n();
   const pathname = usePathname();
+  const { activeWoreda, createWoredaUrl } = useWoreda();
   const [isDark, setIsDark] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const router = useRouter();
@@ -26,7 +27,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/auth/login');
+    router.push(createWoredaUrl('/auth/login'));
   };
 
   // Persist theme
@@ -71,7 +72,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
   // Auto-collapse sidebar on the forms and assessment pages for better viewing
   useEffect(() => {
-    if (pathname === '/dashboard/forms' || pathname.startsWith('/dashboard/assessment') || pathname === '/dashboard/map') {
+    if (pathname.endsWith('/dashboard/forms') || pathname.includes('/dashboard/assessment') || pathname.endsWith('/dashboard/map')) {
       setIsCollapsed(true);
     } else {
       setIsCollapsed(false);
@@ -86,7 +87,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
     icon?: any;
   }> = [
     { label: 'ዳሽቦርድ', icon: IconDashboard, href: '/dashboard', id: 'dashboard' },
-    { label: 'ሪፖርት', type: 'report_group', id: 'report_group' },
+    { label: 'ሪፖርት', icon: IconFileDescription, href: '/dashboard/forms', id: 'forms' },
     { label: 'ምዘና', icon: IconClipboardCheck, href: '/dashboard/assessment', id: 'assessment' },
     { label: 'ሥልጠና', type: 'sletena_group', id: 'sletena' },
     { label: 'ጥቆማ እና አቤቱታ', icon: IconMessage2, href: '/dashboard/complaints', id: 'complaints' },
@@ -163,8 +164,8 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </div>
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="text-sm leading-tight">መቆጣጠርያ</span>
-                <span className="text-xs text-text-muted leading-tight">ፖርታል</span>
+                <span className="text-sm font-bold leading-tight">{activeWoreda.nameAm}</span>
+                <span className="text-xs text-text-muted leading-tight">መቆጣጠርያ ፖርታል</span>
               </div>
             )}
           </div>
@@ -178,16 +179,6 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
           )}
 
           {allowedNavItems.map((item) => {
-            if (item.type === 'report_group') {
-              return (
-                <ReportNavGroup
-                  key="report_group"
-                  isCollapsed={isCollapsed}
-                  onItemClick={() => setMobileMenuOpen(false)}
-                  allowedModuleIds={profile?.access_level === 'all' || profile?.role === 'super_admin' ? ['all'] : (profile?.modules || [])}
-                />
-              );
-            }
             if (item.type === 'sletena_group' || item.id === 'sletena') {
               return (
                 <SletenaNavGroup
@@ -197,11 +188,12 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 />
               );
             }
-            const isActive = pathname === item.href || (item.href && pathname.startsWith(`${item.href}/`));
+            const itemUrl = item.href ? createWoredaUrl(item.href) : '';
+            const isActive = pathname === item.href || pathname === itemUrl || (item.href && pathname.startsWith(`${item.href}/`)) || (itemUrl && pathname.startsWith(`${itemUrl}/`));
             return (
               <Link
                 key={item.href || item.id}
-                href={item.href!}
+                href={itemUrl}
                 title={isCollapsed ? item.label : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center rounded-xl transition-all duration-200 group relative ${isActive
@@ -251,13 +243,13 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
               <div className="relative w-8 h-8 min-w-[32px] rounded-full overflow-hidden border border-border/50">
                 <Image src="/logo.jpg" alt="Commission Logo" fill sizes="32px" className="object-cover" priority={true} />
               </div>
-              <span className="text-sm font-bold text-text-primary">ፖርታል</span>
+              <span className="text-sm font-bold text-text-primary">{activeWoreda.nameAm} ፖርታል</span>
             </div>
           </div>
           <div className="flex items-center gap-1 bg-surface-primary/60 backdrop-blur-md p-1.5 rounded-full border border-border/30 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
 
             <Link
-              href="/dashboard/map"
+              href={createWoredaUrl('/dashboard/map')}
               className="w-8 h-8 md:w-10 md:h-10 flex justify-center items-center rounded-full hover:bg-surface-secondary/80 hover:text-text-primary text-text-secondary transition-all"
               title="ካርታ"
             >
@@ -265,7 +257,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </Link>
             <div className="w-[1px] h-4 bg-border/50"></div>
             <Link
-              href="/dashboard/analytics"
+              href={createWoredaUrl('/dashboard/analytics')}
               className="w-8 h-8 md:w-10 md:h-10 flex justify-center items-center rounded-full hover:bg-surface-secondary/80 hover:text-text-primary text-text-secondary transition-all"
               title={t('analytics')}
             >
@@ -300,19 +292,19 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-primary/95 backdrop-blur-md border-t border-border/50 z-40 px-2 py-2 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe w-full">
         {allowedNavItems.find(i => i.id === 'news') && (
-          <Link href="/dashboard/news" className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/news') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
+          <Link href={createWoredaUrl('/dashboard/news')} className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/news') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
             <IconNews size={22} stroke={pathname.includes('/news') ? 2 : 1.5} />
             <span className="text-[10px] font-medium">ዜና</span>
           </Link>
         )}
         {allowedNavItems.find(i => i.id === 'documents') && (
-          <Link href="/dashboard/documents" className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/documents') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
+          <Link href={createWoredaUrl('/dashboard/documents')} className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/documents') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
             <IconFileText size={22} stroke={pathname.includes('/documents') ? 2 : 1.5} />
             <span className="text-[10px] font-medium">ሰነዶች</span>
           </Link>
         )}
         {allowedNavItems.find(i => i.id === 'assessment') && (
-          <Link href="/dashboard/assessment" className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/assessment') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
+          <Link href={createWoredaUrl('/dashboard/assessment')} className={`flex-1 flex flex-col items-center justify-center gap-1 p-2 ${pathname.includes('/assessment') ? 'text-brand-blue' : 'text-text-muted hover:text-text-primary'}`}>
             <IconClipboardCheck size={22} stroke={pathname.includes('/assessment') ? 2 : 1.5} />
             <span className="text-[10px] font-medium">ምዘና</span>
           </Link>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { IconHistory, IconCalendar, IconMapPin, IconCheck, IconChecks, IconAlertCircle, IconEye, IconFilter } from "@tabler/icons-react";
+import Link from "next/link";
+import { IconHistory, IconCalendar, IconMapPin, IconCheck, IconChecks, IconAlertCircle, IconEye, IconFilter, IconEdit } from "@tabler/icons-react";
 import { FormSchema } from "@/components/dashboard/forms/FormTableRenderer";
 import { formatECDate } from "@/lib/date-formatter";
 import { RegionReportTab } from "../reports/RegionReportTab";
@@ -157,13 +158,24 @@ export function AdminHistoryView({ initialReports, initialSchemas }: { initialRe
                     </div>
                   </div>
 
-                  <button 
-                    onClick={() => setSelectedReportId(report.id)}
-                    className="w-full flex items-center justify-center gap-2 py-2 bg-surface-secondary hover:bg-brand-blue hover:text-white text-text-primary font-medium rounded-lg transition-all text-sm"
-                  >
-                    <IconEye size={18} />
-                    ሪፖርቱን ክፈት (Open Report)
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setSelectedReportId(report.id)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-surface-secondary hover:bg-brand-blue hover:text-white text-text-primary font-medium rounded-lg transition-all text-xs"
+                    >
+                      <IconEye size={16} />
+                      ክፈት (Open)
+                    </button>
+                    {report.status !== 'approved' && (
+                      <Link 
+                        href={`/dashboard/forms?year=${report.year}&period=${encodeURIComponent(report.period)}`}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition-all text-xs shadow-sm"
+                      >
+                        <IconEdit size={16} />
+                        አስተካክል (Edit)
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -14,21 +14,25 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { verifyAdminUser } from "@/lib/adminAuth";
+import { getServerActiveWoreda } from "@/utils/supabase/server-woreda";
+import { getWoredaConfig } from "@/config/woredas";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const woredaId = await getServerActiveWoreda();
+  const woredaConfig = getWoredaConfig(woredaId);
 
   if (!user) {
-    redirect('/auth/login');
+    redirect(`/${woredaId}/auth/login`);
   }
 
   // Verify admin access server-side
   const isAdminAuthorized = await verifyAdminUser(user.id, user.email);
   if (!isAdminAuthorized) {
-    redirect('/auth/login?error=unauthorized');
+    redirect(`/${woredaId}/auth/login?error=unauthorized`);
   }
 
   // Fetch real analytics data from Supabase
@@ -37,27 +41,24 @@ export default async function DashboardPage() {
     { count: resolvedComplaintsCount },
     { count: newComplaintsCount },
     { count: totalPersonnelCount },
-    { count: branchCount },
-    { count: commissionMembersCount },
+    { count: committeeMembersCount },
     { count: totalPeriodsCount },
-    { data: branchLeaders }
+    { data: woredaLeaders }
   ] = await Promise.all([
     supabase.from('complaints').select('*', { count: 'exact', head: true }),
     supabase.from('complaints').select('*', { count: 'exact', head: true }).ilike('status', 'resolved'),
     supabase.from('complaints').select('*', { count: 'exact', head: true }).or('status.ilike.new,status.ilike.processing,status.is.null'),
     supabase.from('personnel').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
-    supabase.from('personnel').select('*', { count: 'exact', head: true }).eq('office_category', 'branch'),
-    supabase.from('personnel').select('*', { count: 'exact', head: true }).eq('office_category', 'commission-members'),
+    supabase.from('personnel').select('*', { count: 'exact', head: true }).eq('office_category', 'committee-members'),
     supabase.from('assessment_periods').select('*', { count: 'exact', head: true }),
-    supabase.from('personnel').select('region, name_am, position_am, status').eq('office_category', 'branch').order('created_at', { ascending: true })
+    supabase.from('personnel').select('name_am, name, position_am, position, status').eq('status', 'Active').order('created_at', { ascending: true })
   ]);
 
   const totalComplaints = totalComplaintsCount ?? 0;
   const resolvedComplaints = resolvedComplaintsCount ?? 0;
   const newComplaints = newComplaintsCount ?? 0;
   const totalPersonnel = totalPersonnelCount ?? 0;
-  const totalBranches = branchCount ?? 0;
-  const totalCommissionMembers = commissionMembersCount ?? 0;
+  const totalCommitteeMembers = committeeMembersCount ?? 0;
   const totalPeriods = totalPeriodsCount ?? 0;
 
   // Resolution Rate %
@@ -94,7 +95,7 @@ export default async function DashboardPage() {
         <StatCard
           label="የአመራር አካላት"
           value={totalPersonnel.toLocaleString()}
-          description={`${totalBranches} ቅርንጫፍ ኃላፊዎች • ${totalCommissionMembers} ኮሚሽን አባላት`}
+          description={`${totalPersonnel} አጠቃላይ • ${totalCommitteeMembers} ኮሚቴ አባላት`}
           accentColor="blue"
           icon={IconUsers}
         />
@@ -119,7 +120,7 @@ export default async function DashboardPage() {
               </h2>
               <p className="text-xs text-text-secondary mt-0.5">የቀረቡ አቤቱታዎችና ጥቆማዎች የሂደት ሁኔታ ክፍፍል</p>
             </div>
-            <Link href="/dashboard/complaints" className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
+            <Link href={`/${woredaId}/dashboard/complaints`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
               ዝርዝር ይመልከቱ <IconArrowUpRight size={14} />
             </Link>
           </div>
@@ -192,34 +193,34 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Regional Offices Breakdown Panel */}
+        {/* Woreda Commission Leadership Panel */}
         <div className="premium-card p-6 bg-surface-primary/60 border-border/40 rounded-3xl w-full">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
                 <IconBuilding size={18} className="text-brand-blue" />
-                የኮሚሽኑ የወረዳ ጽሕፈት ቤቶች አወቃቀር
+                የ{woredaConfig.nameAm} ኮሚሽን አመራሮችና አባላት
               </h2>
-              <p className="text-xs text-text-secondary mt-0.5">በ 17 ቱም ወረዳዎችና ልዩ ወረዳዎች ያሉ የወረዳ ጽ/ቤት ኃላፊዎች</p>
+              <p className="text-xs text-text-secondary mt-0.5">በ{woredaConfig.nameAm} ኮሚሽን ውስጥ የሚገኙ ንቁ አመራሮችና አባላት</p>
             </div>
-            <Link href="/dashboard/personnel" className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
+            <Link href={`/${woredaId}/dashboard/personnel`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
               አመራሮችን ማስተዳደር <IconArrowUpRight size={14} />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {branchLeaders && branchLeaders.length > 0 ? (
-              branchLeaders.map((leader, idx) => (
+            {woredaLeaders && woredaLeaders.length > 0 ? (
+              woredaLeaders.map((leader, idx) => (
                 <div key={idx} className="p-3.5 rounded-xl bg-surface-secondary/30 border border-border/20 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-text-primary">{leader.region}</p>
-                    <p className="text-[11px] text-text-muted truncate max-w-[150px]" title={leader.name_am}>{leader.name_am}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-text-primary truncate" title={leader.name_am || leader.name}>{leader.name_am || leader.name}</p>
+                    <p className="text-[11px] text-text-muted truncate max-w-[150px]" title={leader.position_am || leader.position}>{leader.position_am || leader.position}</p>
                   </div>
-                  <span className="size-2.5 rounded-full bg-emerald-500 shadow-sm shrink-0" title="Active Head" />
+                  <span className="size-2.5 rounded-full bg-emerald-500 shadow-sm shrink-0 ml-2" title="Active" />
                 </div>
               ))
             ) : (
-              <div className="col-span-full py-8 text-center text-xs text-text-muted">ምንም ቅርንጫፍ ኃላፊዎች አልተገኙም።</div>
+              <div className="col-span-full py-8 text-center text-xs text-text-muted">ምንም አመራሮች አልተመዘገቡም።</div>
             )}
           </div>
         </div>

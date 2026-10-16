@@ -273,7 +273,7 @@ export const INITIAL_TRAINING_CATEGORIES: TrainingCategory[] = [
   },
   {
     id: 'cat-003',
-    title: 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ',
+    title: 'የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ',
     description: 'በአመራር ምደባ፣ በዲስፕሊን እና የቁጥጥር መመሪያዎች ላይ ያተኮረ::',
     dateCreated: '2017-11-15',
     submittersCount: 65,
@@ -512,7 +512,7 @@ export const MOCK_SUBMISSIONS: SletenaSubmission[] = [
 export const INITIAL_SATISFACTION_CATEGORIES: TrainingCategory[] = [
   {
     id: 'sat-cat-001',
-    title: 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ',
+    title: 'የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ',
     description: 'በተካሄደው የመመሪያዎች ስልጠና አሰጣጥ፣ አሰልጣኞች እና የመስተንግዶ ጥራት ላይ የተሳታፊዎች ዕርካታ ማረጋገጫ::',
     dateCreated: '2017-11-05',
     submittersCount: 115,
@@ -536,7 +536,7 @@ export const MOCK_SATISFACTION_SUBMISSIONS = [
   {
     id: 'sat-sub-001',
     categoryId: 'sat-cat-001',
-    categoryTitle: 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ',
+    categoryTitle: 'የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የድህረ-ስልጠና ዕርካታ ምዘና ቅጽ',
     participantName: 'መለሰ ካሳ',
     participantEmail: 'melese.k@inspection.gov.et',
     organizationUnit: 'የኢንስፔክሽንና ቁጥጥር ክፍለ',

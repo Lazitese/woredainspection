@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FileText, Send, UploadCloud, CheckCircle2, Copy, ArrowRight, ArrowLeft, X, FileIcon, Search, PlusCircle, MinusCircle, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { complaintService } from "@/services/complaints";
-import { regionsData } from "@/lib/regions-data";
+import { useWoreda } from "@/providers/woreda-provider";
 import Link from "next/link";
 
 type Step = 'personal' | 'details' | 'submitting' | 'success';
@@ -12,6 +12,8 @@ type Step = 'personal' | 'details' | 'submitting' | 'success';
 export function TikomaForm() {
   // Step state
   const [step, setStep] = useState<Step>('personal');
+
+  const { woreda } = useWoreda();
 
   // Form data
   const [fullName, setFullName] = useState('');
@@ -24,12 +26,16 @@ export function TikomaForm() {
   const [groupMembers, setGroupMembers] = useState<string[]>(['', '']); // Default 2 fields for group
   const [serviceName, setServiceName] = useState('');
   const [institution, setInstitution] = useState('');
-  const [targetRegion, setTargetRegion] = useState('');
+  const [targetRegion, setTargetRegion] = useState(woreda.name);
   const [targetZone, setTargetZone] = useState('');
   const [mainSubject, setMainSubject] = useState('');
   const [requestedResolution, setRequestedResolution] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTargetRegion(woreda.name);
+  }, [woreda.name]);
 
   // Submission state
   const [error, setError] = useState('');
@@ -433,25 +439,16 @@ export function TikomaForm() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="targetRegion" className="text-sm font-medium text-slate-700">የወረዳ ቅርንጫፍ ጽ/ቤት <span className="text-red-500">*</span></label>
-              <select
-                id="targetRegion"
-                value={targetRegion}
-                onChange={(e) => {
-                  setTargetRegion(e.target.value);
-                  setDetailErrors(p => ({ ...p, targetRegion: '' }));
-                }}
-                className={cn(
-                  "block w-full rounded-xl border bg-slate-50 px-4 py-3.5 text-sm focus:bg-white transition-colors",
-                  detailErrors.targetRegion ? "border-red-300 focus:border-red-400 focus:ring-red-400" : "border-slate-200 focus:border-[#014BAA] focus:ring-[#014BAA]"
-                )}
-              >
-                <option value="">ወረዳ ይምረጡ</option>
-                {Object.keys(regionsData).map(region => (
-                  <option key={region} value={region}>{region}</option>
-                ))}
-              </select>
-              {detailErrors.targetRegion && <p className="text-xs text-red-500">{detailErrors.targetRegion}</p>}
+              <label className="text-sm font-medium text-slate-700">ጥቆማው የሚቀርብበት ወረዳ</label>
+              <div className="flex items-center justify-between p-3.5 rounded-xl border border-blue-200 bg-blue-50/70 text-slate-900 text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-[#014BAA] animate-pulse" />
+                  <span>{woreda.organizationName}</span>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-lg bg-blue-100 text-[#014BAA] font-bold border border-blue-300">
+                  {woreda.name}
+                </span>
+              </div>
             </div>
 
             {/* Submission Type */}

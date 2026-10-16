@@ -12,17 +12,12 @@ import {
   Scale,
   ChevronRight,
 } from "lucide-react";
+import { useWoreda } from "@/providers/woreda-provider";
 
 const LINE_1 = "የተቀናጀ የኮሚሽን ሥራዎች";
 const LINE_2 = "ዲጂታል ሥርዓት (ICODiS)";
 const FULL_TEXT = LINE_1 + "\n" + LINE_2;
 const TYPING_SPEED = 80;
-
-const heroStats = [
-  { value: 546064, label: "የኮሚሽን አባላት", icon: Users },
-  { value: 448342, label: "የህብረት ኮሚሽን", icon: Scale },
-  { value: 17, label: "ወረዳ/ ክ/ከተማ ልዩ ወረዳ", icon: MapPin },
-];
 
 function AnimatedNumber({ target, duration = 2000 }: { target: number; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -108,6 +103,14 @@ function TypewriterText() {
 }
 
 export function HeroSection() {
+  const { woreda, createWoredaUrl } = useWoreda();
+
+  const heroStats = [
+    { value: woreda.stats?.members ?? 3993, label: "የአባል ብዛት", icon: Users },
+    { value: woreda.stats?.families ?? 142, label: "የቤተሰብ ብዛት", icon: Scale },
+    { value: woreda.stats?.unions ?? 28, label: "የህብረት ብዛት", icon: MapPin },
+  ];
+
   return (
     <section
       id="home"
@@ -168,7 +171,7 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
 
           {/* Logo with pulse ring */}
-          <div className="relative mb-10">
+          <div className="relative mb-6">
             <div
               className="hero-pulse-ring absolute -inset-3 rounded-full border-2 border-[#FFB800]/40"
               aria-hidden="true"
@@ -177,7 +180,7 @@ export function HeroSection() {
               <div className="absolute inset-2">
                 <Image
                   src="/logo.jpg"
-                  alt="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት"
+                  alt={`${woreda.name} ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት`}
                   fill
                   sizes="(max-width: 640px) 112px, 128px"
                   className="object-contain"
@@ -186,6 +189,12 @@ export function HeroSection() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Dynamic Woreda Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#014BAA]/10 border border-[#014BAA]/20 text-[#014BAA] text-xs font-bold mb-4">
+            <span className="size-2 rounded-full bg-[#014BAA]" />
+            <span>{woreda.organizationName}</span>
           </div>
 
           {/* Typing title */}
@@ -209,7 +218,7 @@ export function HeroSection() {
             className="mt-10 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
           >
             <Link
-              href="/abetuta"
+              href={createWoredaUrl('/abetuta')}
               className="group flex h-14 items-center justify-center gap-3 rounded-2xl bg-white/90 px-10 text-base font-bold shadow-sm ring-1 ring-slate-200/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-md"
               style={{ color: "#014BAA" }}
             >
@@ -217,7 +226,7 @@ export function HeroSection() {
               አቤቱታ
             </Link>
             <Link
-              href="/tikoma"
+              href={createWoredaUrl('/tikoma')}
               className="group flex h-14 items-center justify-center gap-3 rounded-2xl px-10 text-base font-bold text-white shadow-[0_8px_24px_-6px_rgba(1,75,170,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(1,75,170,0.55)]"
               style={{ backgroundColor: "#014BAA" }}
             >
@@ -269,7 +278,7 @@ export function HeroSection() {
 
             {/* CTA */}
             <Link
-              href="/statistics"
+              href={createWoredaUrl('/statistics')}
               className="mt-6 flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:opacity-90"
               style={{ backgroundColor: "#014BAA" }}
             >

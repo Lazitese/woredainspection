@@ -81,7 +81,8 @@ export async function GET(request: Request) {
   // 2. Structural path verification (decision-ideas/{id}/..., resolutions/{id}/..., submissions/{trackingCode}/...)
   if (!isAuthorized) {
     try {
-      const pathParts = cleanFilePath.split('/');
+      const rawParts = cleanFilePath.split('/');
+      const pathParts = /^woreda\d+$/i.test(rawParts[0] || '') ? rawParts.slice(1) : rawParts;
       if (pathParts.length >= 2) {
         const folder = pathParts[0]; // e.g. 'decision-ideas', 'resolutions', 'submissions'
         const identifier = pathParts[1]; // complaint UUID id or trackingCode

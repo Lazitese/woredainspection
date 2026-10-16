@@ -7,10 +7,12 @@ import { useState, useEffect } from "react";
 import { publicFilesService, PublicFile, PublicFileCategory } from "@/services/publicFiles";
 import { IconLoader2 } from "@tabler/icons-react";
 import { formatECDate } from "@/lib/date-formatter";
+import { useWoreda } from "@/providers/woreda-provider";
 
 const CATEGORIES: PublicFileCategory[] = ['መተዳደርያ ደንብ', 'የኮሚሽኑ መመሪያዎች', 'የፓርቲ መመሪያዎች', 'ሌላ'];
 
 export default function FilesPage() {
+  const { activeWoreda } = useWoreda();
   const [files, setFiles] = useState<PublicFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<PublicFileCategory | 'ሁሉም'>('ሁሉም');
@@ -18,7 +20,7 @@ export default function FilesPage() {
 
   useEffect(() => {
     loadFiles();
-  }, [activeTab]);
+  }, [activeTab, activeWoreda.id]);
 
   const loadFiles = async () => {
     setLoading(true);

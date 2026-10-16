@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FileText, Send, UploadCloud, CheckCircle2, Copy, ArrowRight, ArrowLeft, X, FileIcon, Search, ShieldCheck, PlusCircle, MinusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { complaintService } from "@/services/complaints";
-import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
+import { useWoreda } from "@/providers/woreda-provider";
 import Link from "next/link";
 
 const TOS_ABETUTA = `የአቤቱታ አቀራረብ ስርአት
@@ -42,6 +42,8 @@ export function AbetutaForm() {
   const [step, setStep] = useState<Step>('tos');
   const [tosAgreed, setTosAgreed] = useState(false);
 
+  const { woreda } = useWoreda();
+
   // Form data
   const [fullName, setFullName] = useState('');
   const [age, setAge] = useState('');
@@ -53,11 +55,15 @@ export function AbetutaForm() {
   const [groupMembers, setGroupMembers] = useState<string[]>(['', '']);
   const [memberCount, setMemberCount] = useState('');
   const [institution, setInstitution] = useState('');
-  const [targetRegion, setTargetRegion] = useState('');
+  const [targetRegion, setTargetRegion] = useState(woreda.name);
   const [targetZone, setTargetZone] = useState('');
   const [mainSubject, setMainSubject] = useState('');
   const [requestedResolution, setRequestedResolution] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+
+  useEffect(() => {
+    setTargetRegion(woreda.name);
+  }, [woreda.name]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Submission state
@@ -544,25 +550,16 @@ export function AbetutaForm() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="targetRegion" className="text-sm font-medium text-slate-700">ወረዳ <span className="text-red-500">*</span></label>
-              <select
-                id="targetRegion"
-                value={targetRegion}
-                onChange={(e) => {
-                  setTargetRegion(e.target.value);
-                  setDetailErrors(p => ({ ...p, targetRegion: '' }));
-                }}
-                className={cn(
-                  "block w-full rounded-xl border bg-slate-50 px-4 py-3.5 text-sm focus:bg-white transition-colors",
-                  detailErrors.targetRegion ? "border-red-300 focus:border-red-400 focus:ring-red-400" : "border-slate-200 focus:border-[#B45309] focus:ring-[#B45309]"
-                )}
-              >
-                <option value="">ወረዳ ይምረጡ</option>
-                {AKAKI_KALITY_WOREDAS.map(woreda => (
-                  <option key={woreda} value={woreda}>{woreda}</option>
-                ))}
-              </select>
-              {detailErrors.targetRegion && <p className="text-xs text-red-500">{detailErrors.targetRegion}</p>}
+              <label className="text-sm font-medium text-slate-700">አቤቱታው የሚቀርብበት ወረዳ</label>
+              <div className="flex items-center justify-between p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 text-slate-900 text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span>{woreda.organizationName}</span>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-bold border border-amber-300">
+                  {woreda.name}
+                </span>
+              </div>
             </div>
 
             {/* Submission Type */}

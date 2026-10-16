@@ -189,7 +189,7 @@ export function SelfAssessmentReportPDF({
   const today = new Date().toLocaleDateString('en-GB');
 
   return (
-    <Document title={`${user?.full_name || 'Self_Assessment'}_10Percent_Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
+    <Document title={`${user?.full_name || 'Self_Assessment'}_10Percent_Report`} author="የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="portrait" style={styles.page}>
         <Text style={styles.title}>{'የ 10% የራስ አፈጻጸም ምዘና ሪፖርት'}</Text>
         <Text style={styles.subtitle}>{'ቅፅ-1: የራስ ምዘና ዝርዝር ውጤት'}</Text>

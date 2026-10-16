@@ -39,7 +39,7 @@ export const SletenaFormBuilder: React.FC<SletenaFormBuilderProps> = ({
 }) => {
   // Form Header Banner Titles
   const [formTitle, setFormTitle] = useState(
-    category?.title || 'የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ'
+    category?.title || 'የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት የስልጠና ፍላጎት ማሰበሰቢያ ቅጽ'
   );
   const [formSubtitle, setFormSubtitle] = useState(
     category?.description || 'ጊዜዎን ሰተው ስለሚሞሉ እናመሰግናለን'

@@ -19,6 +19,7 @@ import { personnelService } from "@/services/personnel";
 import { Personnel } from "@/types";
 import Image from "next/image";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useWoreda } from "@/providers/woreda-provider";
 
 function getRegionRank(regionStr?: string): number {
   if (!regionStr) return 999;
@@ -64,9 +65,10 @@ function getCommissionMemberRank(nameStr?: string): number {
   return 999;
 }
 
-type CategoryTab = 'all' | 'deputy-chairperson' | 'chairperson-secretary' | 'leadership-members' | 'committee-members' | 'branch';
+type CategoryTab = 'all' | 'deputy-chairperson' | 'chairperson-secretary' | 'leadership-members' | 'committee-members';
 
 export default function PersonnelPage() {
+  const { activeWoreda, createWoredaUrl } = useWoreda();
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
@@ -155,30 +157,18 @@ export default function PersonnelPage() {
     )
     .sort((a, b) => getCommissionMemberRank(a.nameAm || a.name) - getCommissionMemberRank(b.nameAm || b.name));
 
-  // 5. የወረዳ ኮሚሽን ቅ/ጽ/ቤት ኃላፊዎች (Woreda Branch Heads)
-  const branchOffices = activePersonnel
-    .filter(p =>
-      p.officeCategory?.includes('branch') || 
-      p.officeCategoryAm?.includes('ቅርንጫፍ') || 
-      p.officeCategoryAm?.includes('ቅ/ጽ/ቤት') || 
-      p.officeCategoryAm?.includes('ወረዳ') || 
-      Boolean(p.region)
-    )
-    .sort((a, b) => getRegionRank(a.region) - getRegionRank(b.region));
-
   const CATEGORY_TABS: { id: CategoryTab; label: string; count: number }[] = [
     { id: 'all', label: 'ሁሉም', count: activePersonnel.length },
     { id: 'deputy-chairperson', label: 'ም/ሰብሳቢ', count: deputyChairperson.length },
     { id: 'chairperson-secretary', label: 'ሰብሳቢና ፀሀፊ', count: chairpersonSecretary.length },
     { id: 'leadership-members', label: 'አመራር አባላት', count: leadershipMembers.length },
     { id: 'committee-members', label: 'ኮሚቴ አባላት', count: committeeMembers.length },
-    { id: 'branch', label: 'የወረዳ ቅ/ጽ/ቤት', count: branchOffices.length },
   ];
 
   const PersonnelCard = ({ person }: { person: Personnel }) => (
     <div className="bg-surface-primary/50 border border-border/30 rounded-2xl p-6 flex flex-col gap-4 hover:border-brand-blue/30 transition-colors shadow-sm relative group">
       <div className="absolute top-4 right-4 flex items-center gap-2 opacity-100 transition-opacity">
-        <Link href={`/dashboard/personnel/${person.id}`} className="p-2 bg-surface-primary text-text-muted hover:text-brand-blue border border-border/50 rounded-lg shadow-sm transition-colors" title="አስተካክል">
+        <Link href={createWoredaUrl(`/dashboard/personnel/${person.id}`)} className="p-2 bg-surface-primary text-text-muted hover:text-brand-blue border border-border/50 rounded-lg shadow-sm transition-colors" title="አስተካክል">
           <IconEdit size={16} />
         </Link>
         <button onClick={() => handleDelete(person.id)} className="p-2 bg-surface-primary text-text-muted hover:text-danger border border-border/50 rounded-lg shadow-sm transition-colors" title="አጥፋ">
@@ -266,7 +256,7 @@ export default function PersonnelPage() {
                 ተመለስ
               </button>
             )}
-            <Link href="/dashboard/personnel/create" className="flex items-center gap-2 bg-brand-blue hover:bg-brand-blue/90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm shrink-0">
+            <Link href={createWoredaUrl('/dashboard/personnel/create')} className="flex items-center gap-2 bg-brand-blue hover:bg-brand-blue/90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm shrink-0">
               <IconUserPlus size={18} />
               አዲስ አባል
             </Link>
@@ -389,29 +379,6 @@ export default function PersonnelPage() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {committeeMembers.map(p => <PersonnelCard key={p.id} person={p} />)}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 5. የወረዳ ኮሚሽን ቅ/ጽ/ቤቶች */}
-            {(selectedCategory === 'all' || selectedCategory === 'branch') && (
-              <div className="bg-surface-primary/30 rounded-[2rem] border border-border/20 p-8 backdrop-blur-md flex flex-col gap-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                    <IconBuilding size={18} className="text-brand-blue" />
-                    የወረዳ ቅ/ጽ/ቤት ኃላፊዎች (Woreda Branch Heads)
-                  </h2>
-                  <span className="text-xs font-semibold text-text-muted bg-surface-secondary px-3 py-1 rounded-full">
-                    {branchOffices.length} ቅርንጫፎች
-                  </span>
-                </div>
-                <div className="w-full h-[1px] bg-border/20"></div>
-                {branchOffices.length === 0 ? (
-                  <div className="text-sm text-text-muted py-6 text-center">ምንም መረጃ አልተገኘም</div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {branchOffices.map(p => <PersonnelCard key={p.id} person={p} />)}
                   </div>
                 )}
               </div>

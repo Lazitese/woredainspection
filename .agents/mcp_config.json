@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "supabase": {
-      "serverUrl": "https://akdb.raey.work/mcp"
+    "supabase-woredas": {
+      "serverUrl": "http://db.akkinspection.com.et/mcp"
     }
   }
 }

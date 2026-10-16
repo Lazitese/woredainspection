@@ -1,5 +1,7 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { createWoredaFetch } from './woreda-fetch'
+import { getServerActiveWoreda } from './server-woreda'
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -8,6 +10,9 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        fetch: createWoredaFetch(getServerActiveWoreda),
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()

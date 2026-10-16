@@ -378,7 +378,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
             <div className="space-y-1.5">
               <div className="text-[11px] font-black text-blue-950 tracking-widest uppercase flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full bg-blue-950 inline-block shadow-xs" />
-                የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት
+                የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት
               </div>
               <h1 className="text-3xl font-black text-slate-950 tracking-tight leading-tight">
                 {category ? category.title : reportTitle}
@@ -509,7 +509,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-black text-slate-950">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 1 ከ 6</span>
         </div>
@@ -558,7 +558,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-black text-slate-950">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 2 ከ 6</span>
         </div>
@@ -679,7 +679,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-black text-slate-950">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 3 ከ 6</span>
         </div>
@@ -729,7 +729,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-black text-slate-950">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 4 ከ 6</span>
         </div>
@@ -781,7 +781,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-black text-slate-950">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-black text-slate-950">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <span className="font-mono font-black text-blue-950">ገጽ 5 ከ 6</span>
         </div>
@@ -843,7 +843,7 @@ export const SletenaReportPdfTemplate: React.FC<SletenaReportPdfTemplateProps> =
         <div className="pt-4 border-t-2 border-slate-900 flex justify-between items-center text-[10px] text-slate-600 font-medium tracking-wide">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-950 inline-block" />
-            <span className="font-extrabold text-slate-900">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
+            <span className="font-extrabold text-slate-900">የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</span>
           </div>
           <div className="text-right">
             <strong className="font-mono text-blue-950">ገጽ 6 ከ 6</strong>

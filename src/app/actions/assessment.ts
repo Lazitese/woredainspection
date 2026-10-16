@@ -3,12 +3,15 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyNewPeriodEnrollment, notifyFinalScoreApproved } from '@/lib/notify';
 import { normalizePhoneToE164 } from '@/lib/phone';
+import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
 
 export async function createAssessmentPeriodAction(periodName: string, year: string, periodHalf: string) {
   try {
+    const activeWoreda = await getServerActiveWoreda();
+
     const { data, error } = await supabaseAdmin
       .from('assessment_periods')
-      .insert({ name: periodName, year, period_half: periodHalf })
+      .insert({ name: periodName, year, period_half: periodHalf, woreda_id: activeWoreda })
       .select()
       .single();
 
@@ -25,10 +28,13 @@ export async function createAssessmentPeriodAction(periodName: string, year: str
 /** Fetch all unique users in the system for assessment assignment */
 export async function getExistingAssessmentUsersAction() {
   try {
-    // 1. Fetch all users from public.users
+    const activeWoreda = await getServerActiveWoreda();
+
+    // 1. Fetch all users from public.users scoped to the active woreda
     const { data: usersData, error: usersErr } = await supabaseAdmin
       .from('users')
-      .select('id, full_name, phone_number')
+      .select('id, full_name, phone_number, woreda_id')
+      .or(`woreda_id.eq.${activeWoreda},woreda_id.is.null`)
       .order('full_name', { ascending: true });
 
     if (usersErr) throw usersErr;
@@ -77,6 +83,7 @@ export async function addExistingUsersToNewPeriodAction(opts: {
   periodName: string;
   users: { user_id: string; full_name: string; phone_number: string; email?: string; role: string }[];
 }) {
+  const activeWoreda = await getServerActiveWoreda();
   const results: { user_id: string; success: boolean; notified: boolean }[] = [];
 
   for (const user of opts.users) {
@@ -88,6 +95,7 @@ export async function addExistingUsersToNewPeriodAction(opts: {
           period_id: opts.periodId,
           user_id: user.user_id,
           role: user.role,
+          woreda_id: activeWoreda,
         }, { onConflict: 'period_id, user_id' });
 
       if (error) {

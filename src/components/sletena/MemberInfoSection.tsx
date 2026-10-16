@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MembershipLevel } from '@/types/sletena';
-import { AKAKI_KALITY_WOREDAS } from '@/lib/regions-data';
+import { useWoreda } from '@/providers/woreda-provider';
 import { IconUserCheck, IconId, IconPhone, IconUser, IconBuildingStore, IconMapPin } from '@tabler/icons-react';
 
 interface MemberInfoSectionProps {
@@ -44,6 +44,13 @@ export const MemberInfoSection: React.FC<MemberInfoSectionProps> = ({
   woreda = '',
   onChange,
 }) => {
+  const { woreda: activeWoreda } = useWoreda();
+
+  useEffect(() => {
+    if (!region || region !== activeWoreda.name) {
+      onChange({ region: activeWoreda.name });
+    }
+  }, [activeWoreda.name, region, onChange]);
 
   return (
     <div className="bg-surface-primary border border-border/50 rounded-2xl p-6 shadow-sm space-y-4">
@@ -115,26 +122,20 @@ export const MemberInfoSection: React.FC<MemberInfoSectionProps> = ({
           </select>
         </div>
 
-        {/* Woreda */}
-        <div>
+        {/* Locked Woreda */}
+        <div className="md:col-span-2">
           <label className="block text-xs font-semibold text-text-secondary mb-1 flex items-center gap-1.5">
             <IconBuildingStore size={15} className="text-text-muted" /> ወረዳ
           </label>
-          <select
-            value={region}
-            onChange={(e) => {
-              const newRegion = e.target.value;
-              onChange({ region: newRegion, zone: '', woreda: '' });
-            }}
-            className="w-full px-3 py-2 text-xs bg-surface-secondary/50 border border-border/50 rounded-xl text-text-primary focus:outline-none focus:border-brand-blue"
-          >
-            <option value="">-- ወረዳ ይምረጡ --</option>
-            {AKAKI_KALITY_WOREDAS.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center justify-between px-3.5 py-2 text-xs bg-amber-50/70 border border-amber-200/80 rounded-xl text-slate-900 font-semibold">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-amber-500" />
+              <span>{activeWoreda.organizationName}</span>
+            </div>
+            <span className="text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold border border-amber-300">
+              {activeWoreda.name}
+            </span>
+          </div>
         </div>
       </div>
     </div>

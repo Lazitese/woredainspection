@@ -24,11 +24,13 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { useWoreda } from "@/providers/woreda-provider";
 
 type NewsFormValues = z.infer<typeof newsSchema>;
 
 export default function CreateNewsPage() {
   const router = useRouter();
+  const { activeWoreda, createWoredaUrl } = useWoreda();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [featuredImage, setFeaturedImage] = useState<string>('');
@@ -117,7 +119,7 @@ export default function CreateNewsPage() {
       };
       
       await newsService.createArticle(payload);
-      router.push('/dashboard/news');
+      router.push(createWoredaUrl('/dashboard/news'));
     } catch (error: any) {
       console.error('Error creating article:', JSON.stringify(error, null, 2), error);
     }
@@ -128,7 +130,7 @@ export default function CreateNewsPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 h-full max-w-4xl mx-auto pb-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
-            <Link href="/dashboard/news" className="text-xs font-semibold text-brand-blue uppercase tracking-widest hover:underline flex items-center gap-1 mb-2">
+            <Link href={createWoredaUrl('/dashboard/news')} className="text-xs font-semibold text-brand-blue uppercase tracking-widest hover:underline flex items-center gap-1 mb-2">
               <IconArrowLeft size={14} stroke={2} /> {watch("article_type") === 'Message' ? 'ወደ መልዕክቶች ይመለሱ' : 'ወደ ዜና ይመለሱ'}
             </Link>
             <h1 className="text-3xl font-light text-text-primary tracking-tight">

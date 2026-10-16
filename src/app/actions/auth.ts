@@ -4,6 +4,7 @@ import { normalizePhoneToE164 } from '@/lib/phone';
 import { headers } from "next/headers";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
 import { sendSMS } from '@/lib/textbee';
 import { notifyRegistration, notifyPasswordReset } from '@/lib/notify';
 import crypto from 'crypto';
@@ -137,9 +138,11 @@ export async function registerUserAction(formData: FormData) {
     }
 
     // 2. Upsert into public.users
+    const activeWoreda = await getServerActiveWoreda();
+
     const { error: usersError } = await supabaseAdmin
       .from('users')
-      .upsert({ id: userId, phone_number: phone, full_name: fullName });
+      .upsert({ id: userId, phone_number: phone, full_name: fullName, woreda_id: activeWoreda });
 
     if (usersError) {
       console.error('Failed to update public.users:', usersError);
@@ -152,7 +155,8 @@ export async function registerUserAction(formData: FormData) {
       .upsert({ 
         period_id: periodId, 
         user_id: userId, 
-        role: role 
+        role: role,
+        woreda_id: activeWoreda,
       }, { onConflict: 'period_id, user_id' });
 
     if (memberError) {
@@ -167,6 +171,7 @@ export async function registerUserAction(formData: FormData) {
     // Upsert user profile
     const profileData = {
       user_id: userId,
+      woreda_id: activeWoreda,
       gender: formData.get('gender') || null,
       age: formData.get('age') ? parseInt(formData.get('age') as string) : null,
       education_level: formData.get('educationLevel') || null,
@@ -200,23 +205,45 @@ export async function registerUserAction(formData: FormData) {
   }
 }
 
+import { getWoredaConfig, WOREDAS_LIST } from '@/config/woredas';
+
 export async function resolveLoginEmail(identifier: string, portalRole?: 'representative' | 'admin' | 'assessment') {
   const lowerId = identifier.trim().toLowerCase();
+  const compactEmailCandidate = lowerId.replace(/\s+/g, '');
+  const activeWoreda = await getServerActiveWoreda();
+  const activeWoredaConfig = getWoredaConfig(activeWoreda);
 
   if (lowerId === 'superadmin' || lowerId === 'admin') {
-    return { email: 'admin@akakikality.gov.et' };
+    return { email: activeWoredaConfig.email || `${activeWoreda}@akakikality.gov.et` };
   }
 
-  if (identifier.includes('@')) {
-    const rawEmail = identifier.trim().toLowerCase();
-    if (rawEmail === 'superadmin@commission.gov' || rawEmail === 'admin@commission.gov') {
-      return { email: 'admin@akakikality.gov.et' };
+  const directWoredaMatch = lowerId.match(/^woreda(\d+)$/);
+  if (directWoredaMatch) {
+    const num = parseInt(directWoredaMatch[1], 10);
+    const wConfig = getWoredaConfig(`woreda${num}`);
+    return { email: wConfig.email || `woreda${num}@akakikality.gov.et` };
+  }
+
+  if (compactEmailCandidate.includes('@')) {
+    const rawEmail = compactEmailCandidate;
+    if (
+      rawEmail === 'superadmin@commission.gov' ||
+      rawEmail === 'admin@commission.gov' ||
+      rawEmail === 'admin@akakikality.gov.et'
+    ) {
+      return { email: activeWoredaConfig.email || `${activeWoreda}@akakikality.gov.et` };
     }
     const woredaMatch = rawEmail.match(/^woreda(\d+)@/);
     if (woredaMatch) {
       const num = parseInt(woredaMatch[1], 10);
-      const padded = num.toString().padStart(2, '0');
-      return { email: `2519110000${padded}@federal.local` };
+      const wConfig = getWoredaConfig(`woreda${num}`);
+      return { email: wConfig.email || `woreda${num}@akakikality.gov.et` };
+    }
+    const adminWoredaMatch = rawEmail.match(/^(?:admin|superadmin)@woreda(\d+)\./);
+    if (adminWoredaMatch) {
+      const num = parseInt(adminWoredaMatch[1], 10);
+      const wConfig = getWoredaConfig(`woreda${num}`);
+      return { email: wConfig.email || `woreda${num}@akakikality.gov.et` };
     }
     const specialMatch = rawEmail.match(/^specialworeda(\d+)@/);
     if (specialMatch) {
@@ -242,7 +269,7 @@ export async function resolveLoginEmail(identifier: string, portalRole?: 'repres
       const code = 70 + num;
       return { email: `2519110000${code}@federal.local` };
     }
-    return { email: identifier.trim() };
+    return { email: rawEmail };
   }
   
   const rawPhone = identifier.trim();

@@ -127,7 +127,7 @@ export function AggregatedReportPDF({ year, period, reports, schemas }: Aggregat
   const PRINTABLE_WIDTH = 801.89; // A4 Landscape width (841.89) minus 40pt padding
 
   return (
-    <Document title={`Aggregated Report ${year} ${period}`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
+    <Document title={`Aggregated Report ${year} ${period}`} author="የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       {schemas.map((schema) => {
         const totalSubCols = schema.columns.reduce(
           (acc, col) => acc + (col.subKeys.length > 0 ? col.subKeys.length : 1),
@@ -315,7 +315,7 @@ export function RegionReportPDF({ regionName, year, period, formsData, schemas }
   const PRINTABLE_WIDTH = 801.89;
 
   return (
-    <Document title={`${regionName} Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
+    <Document title={`${regionName} Report`} author="የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       {schemas.map((schema) => {
         const data = formsData?.[schema.id] || {};
         const totalSubCols = schema.columns.reduce(
@@ -452,7 +452,7 @@ export function NarrationReportPDF({ regionName, year, period, narrationData }: 
     (typeof narrationData === 'string' ? narrationData : 'ምንም የጽሁፍ ሪፖርት አልቀረበም (No narration report provided)');
 
   return (
-    <Document title={`${regionName} Narration Report`} author="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
+    <Document title={`${regionName} Narration Report`} author="የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት">
       <Page size="A4" orientation="portrait" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>{`የ ${regionName} የጽሁፍ ሪፖርት`}</Text>

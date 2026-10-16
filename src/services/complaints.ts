@@ -223,12 +223,14 @@ export const complaintService = {
     // Upload files if any
     let attachments: any[] = [];
     if (formData.files && formData.files.length > 0) {
+      const { getBrowserActiveWoreda } = await import('@/utils/supabase/woreda-fetch');
+      const activeWoreda = getBrowserActiveWoreda();
       for (const file of formData.files) {
         const fileExt = file.name.includes('.') ? file.name.split('.').pop() || '' : '';
         const cleanExt = fileExt.replace(/[^a-zA-Z0-9]/g, '');
         const safeExt = cleanExt ? `.${cleanExt}` : '';
         const safeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}${safeExt}`;
-        const filePath = `submissions/${trackingCode}/${safeFileName}`;
+        const filePath = `${activeWoreda}/submissions/${trackingCode}/${safeFileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('complaints')

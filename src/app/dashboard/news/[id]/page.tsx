@@ -8,6 +8,7 @@ import { newsService } from "@/services/news";
 import { NewsArticle } from "@/types";
 import { useRouter } from "next/navigation";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useWoreda } from "@/providers/woreda-provider";
 
 function getYouTubeEmbedUrl(url?: string): string | null {
   if (!url) return null;
@@ -24,6 +25,7 @@ function getYouTubeEmbedUrl(url?: string): string | null {
 
 export default function ViewNewsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { createWoredaUrl } = useWoreda();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -43,7 +45,7 @@ export default function ViewNewsPage({ params }: { params: Promise<{ id: string 
   const confirmDelete = async () => {
     try {
       await newsService.deleteArticle(id);
-      router.push('/dashboard/news');
+      router.push(createWoredaUrl('/dashboard/news'));
     } catch (error) {
       console.error('Failed to delete article', error);
       alert('Failed to delete article');
@@ -60,7 +62,7 @@ export default function ViewNewsPage({ params }: { params: Promise<{ id: string 
       <div className="flex flex-col gap-8 h-full max-w-4xl mx-auto pb-10">
         <div className="flex justify-between items-end">
           <div>
-            <Link href="/dashboard/news" className="text-xs font-semibold text-brand-blue uppercase tracking-widest hover:underline flex items-center gap-1 mb-2">
+            <Link href={createWoredaUrl('/dashboard/news')} className="text-xs font-semibold text-brand-blue uppercase tracking-widest hover:underline flex items-center gap-1 mb-2">
               <IconArrowLeft size={14} stroke={2} /> Back to News
             </Link>
             <h1 className="text-3xl font-light text-text-primary tracking-tight">{article.title}</h1>
@@ -76,7 +78,7 @@ export default function ViewNewsPage({ params }: { params: Promise<{ id: string 
               <IconTrash size={18} />
               Delete
             </button>
-            <Link href={`/dashboard/news/${id}/edit`} className="flex items-center gap-2 bg-brand-yellow hover:bg-brand-yellow/90 text-[#3D352E] px-5 py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm">
+            <Link href={createWoredaUrl(`/dashboard/news/${id}/edit`)} className="flex items-center gap-2 bg-brand-yellow hover:bg-brand-yellow/90 text-[#3D352E] px-5 py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm">
               <IconEdit size={18} />
               Edit Article
             </Link>

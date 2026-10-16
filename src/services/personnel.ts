@@ -165,9 +165,11 @@ export const personnelService = {
   },
   
   uploadPhoto: async (file: File): Promise<string> => {
+    const { getBrowserActiveWoreda } = await import('@/utils/supabase/woreda-fetch');
+    const activeWoreda = getBrowserActiveWoreda();
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const filePath = `${activeWoreda}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('personnel_photos')

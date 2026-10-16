@@ -9,6 +9,7 @@ import { publicFilesService, PublicFile, PublicFileCategory } from "@/services/p
 import { Document, OFFICES } from "@/types";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
+import { useWoreda } from "@/providers/woreda-provider";
 
 const fileTypeMeta: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
   PDF: { icon: <IconFileText size={18} stroke={1.8} />, color: 'text-danger', bg: 'bg-danger/10' },
@@ -24,6 +25,7 @@ const WEBSITE_CATEGORIES: PublicFileCategory[] = ['መተዳደርያ ደንብ'
 const CONFIDENTIAL_CATEGORIES: PublicFileCategory[] = ['የኮሚሽኑ ሚስጥራዊ ሰነዶች'];
 
 export default function DocumentsPage() {
+  const { activeWoreda } = useWoreda();
   const [mainTab, setMainTab] = useState<'code' | 'website' | 'confidential'>('code');
 
   // --- Code File Management State ---
@@ -84,7 +86,7 @@ export default function DocumentsPage() {
   useEffect(() => {
     if (mainTab === 'code') fetchDocuments();
     else loadPublicFiles();
-  }, [mainTab, activePublicTab]);
+  }, [mainTab, activePublicTab, activeWoreda.id]);
 
   const filtered = documents.filter(d => {
     if (!searchQuery) return true;

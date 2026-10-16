@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import { getFeedbacks } from "@/app/actions/feedback";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts';
 import { formatECDateTime } from "@/lib/date-formatter";
+import { useWoreda } from "@/providers/woreda-provider";
 
 type RatingId = "very-good" | "good" | "needs-improvement" | "excellent" | "bad" | "very-bad";
 
@@ -74,12 +75,14 @@ function RatingStars({ rating }: { rating: string }) {
 }
 
 export default function FeedbackPage() {
+  const { activeWoreda } = useWoreda();
   const [activeFilter, setActiveFilter] = useState<RatingId | "all">("all");
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
       try {
         const data = await getFeedbacks();
         setFeedbacks(data as FeedbackItem[]);
@@ -90,7 +93,7 @@ export default function FeedbackPage() {
       }
     }
     loadData();
-  }, []);
+  }, [activeWoreda.id]);
 
   const filtered =
     activeFilter === "all"

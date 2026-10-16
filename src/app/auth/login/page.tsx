@@ -6,7 +6,10 @@ import { maskSupabaseError } from '@/lib/errorMasking';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { verifyLoginAttempt, resolveLoginEmail } from '@/app/actions/auth';
+import { useWoreda } from '@/providers/woreda-provider';
+
 export default function LoginPage() {
+  const { woredaSlug, woreda } = useWoreda();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -23,7 +26,7 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('error') === 'unauthorized') {
-        setErrorMsg("አካውንትዎ የአድሚን ፈቃድ የለውም ወይም ገቢር (Active) አይደለም።");
+        setErrorMsg("አካውንትዎ ለዚህ ወረዳ የአድሚን ፈቃድ የለውም ወይም ገቢር (Active) አይደለም።");
       }
     }
   }, []);
@@ -48,15 +51,22 @@ export default function LoginPage() {
       if (error) throw error;
       
       if (authData.user) {
-        // Check if user requires password change or has committee leader role
+        // Check if user belongs to this woreda and check role / password change
         const { data: profile } = await supabase
           .from('admin_profiles')
-          .select('requires_password_change, role')
+          .select('requires_password_change, role, woreda_id')
           .eq('id', authData.user.id)
-          .single();
+          .maybeSingle();
+
+        if (!profile || (profile.woreda_id && profile.woreda_id !== woredaSlug && profile.woreda_id !== 'all')) {
+          await supabase.auth.signOut();
+          setErrorMsg(`ይህ አካውንት ለ${woreda.nameAm} የተፈቀደ አይደለም። እባክዎ የ${woreda.nameAm} አድሚን መለያ ይጠቀሙ።`);
+          setLoading(false);
+          return;
+        }
           
         if (profile?.requires_password_change) {
-          window.location.href = '/auth/change-password';
+          window.location.href = `/${woredaSlug}/auth/change-password`;
           return;
         }
 
@@ -68,7 +78,7 @@ export default function LoginPage() {
         }
       }
 
-      window.location.href = '/dashboard';
+      window.location.href = `/${woredaSlug}/dashboard`;
     } catch (error: any) {
       setErrorMsg(maskSupabaseError(error));
       setLoading(false);
@@ -100,7 +110,7 @@ export default function LoginPage() {
       if (updateError) throw updateError;
 
       const { data: { user } } = await supabase.auth.getUser();
-      let targetUrl = '/dashboard';
+      let targetUrl = `/${woredaSlug}/dashboard`;
       if (user) {
         const { data: profile } = await supabase
           .from('admin_profiles')
@@ -108,7 +118,7 @@ export default function LoginPage() {
           .eq('id', user.id)
           .single();
         if (profile?.role === 'committee_leader') {
-          targetUrl = '/complaint/dashboard';
+          targetUrl = `/${woredaSlug}/complaint/dashboard`;
         }
         await supabase
           .from('admin_profiles')

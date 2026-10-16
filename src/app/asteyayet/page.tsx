@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menubar } from "@/components/menubar";
 import { Footer } from "@/components/footer";
 import { submitFeedback } from "@/app/actions/feedback";
 import { IconStar, IconStarFilled, IconMessageCircle, IconCheck, IconLoader2, IconAlertCircle } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { regionsData, AKAKI_KALITY_WOREDAS } from "@/lib/regions-data";
+import { useWoreda } from "@/providers/woreda-provider";
 
 type RatingId = "excellent" | "very-good" | "good" | "needs-improvement";
 
@@ -26,25 +26,24 @@ const CATEGORIES = [
   "የአቤቱታ/ጥቆማ አፈታት ሂደት"
 ];
 
-const REGIONS = AKAKI_KALITY_WOREDAS.map((w) => ({ label: w, value: w }));
-
 export default function AsteyayetPage() {
+  const { woreda } = useWoreda();
   const [rating, setRating] = useState<RatingId | null>(null);
   const [category, setCategory] = useState<string>("");
-  const [region, setRegion] = useState<string>("");
+  const [region, setRegion] = useState<string>(woreda.name);
   const [review, setReview] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setRegion(woreda.name);
+  }, [woreda.name]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!category) {
       setError("እባክዎ አስተያየትዎ የሚያተኩርበትን ጉዳይ ይምረጡ");
-      return;
-    }
-    if (!region) {
-      setError("እባክዎ ወረዳ ይምረጡ");
       return;
     }
     if (!rating) {
@@ -137,23 +136,18 @@ export default function AsteyayetPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <label htmlFor="region" className="block text-sm font-semibold text-slate-900">
-                      የወረዳ ቅርንጫፍ ጽ/ቤት <span className="text-red-500">*</span>
+                    <label className="block text-sm font-semibold text-slate-900">
+                      አስተያየቱ የሚሰጥበት ወረዳ
                     </label>
-                    <select
-                      id="region"
-                      value={region}
-                      onChange={(e) => setRegion(e.target.value)}
-                      className="block w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-4 text-sm focus:border-[#014BAA] focus:ring-[#014BAA] focus:bg-white transition-colors appearance-none cursor-pointer"
-                      style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem top 50%', backgroundSize: '0.65em auto' }}
-                    >
-                      <option value="" disabled>ወረዳ ይምረጡ</option>
-                      {REGIONS.map((reg, idx) => (
-                        <option key={idx} value={reg.value}>
-                          {reg.label}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 text-sm font-semibold">
+                      <div className="flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-[#014BAA]" />
+                        <span>{woreda.organizationName}</span>
+                      </div>
+                      <span className="text-xs px-2.5 py-1 rounded-lg bg-blue-50 text-[#014BAA] font-bold border border-blue-200">
+                        {woreda.name}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-4">

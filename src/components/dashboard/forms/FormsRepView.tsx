@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FormTableRenderer, FormSchema } from "./FormTableRenderer";
 import { NarrationReportForm } from "../NarrationReportForm";
-import { IconSend, IconDeviceFloppy, IconLoader2, IconAlertCircle, IconDownload, IconFileText } from "@tabler/icons-react";
+import { IconSend, IconDeviceFloppy, IconLoader2, IconAlertCircle, IconDownload, IconFileText, IconEdit, IconCheck, IconX } from "@tabler/icons-react";
 import { saveReportFormAction, submitReportAction } from "@/app/actions/reports";
 import { ReportPeriod, canSubmitReport, getCurrentFiscalYear } from "@/lib/et-calendar";
 
@@ -34,21 +34,41 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
   // Initialize form data from active report or empty
   const [formData, setFormData] = useState<any>(activeReport?.forms_data || {});
   
-  // Determine schemas: Use snapshot if available, otherwise current latest schemas - always sorted 1 to 25
-  const rawActiveSchemas = (activeReport?.schema_snapshot && Array.isArray(activeReport.schema_snapshot) && activeReport.schema_snapshot.length > 0) 
-    ? activeReport.schema_snapshot 
-    : initialSchemas;
+  const resolveActiveSchemas = (
+    snapshot: any[] | undefined,
+    latestSchemas: FormSchema[],
+    isEditing: boolean
+  ): FormSchema[] => {
+    if (!snapshot || !Array.isArray(snapshot) || snapshot.length === 0) {
+      return sortFormSchemas(latestSchemas || []);
+    }
 
-  const [schemas, setSchemas] = useState<FormSchema[]>(sortFormSchemas(rawActiveSchemas));
+    const snapIds = new Set(snapshot.map((s: any) => s.id));
+    const latestIds = new Set((latestSchemas || []).map(s => s.id));
+    const newlyAdded = (latestSchemas || []).filter(s => !snapIds.has(s.id));
+
+    // When editing (draft or resubmitting), prioritize latest schemas so new forms & columns display immediately
+    if (isEditing) {
+      const historicalOnly = snapshot.filter((s: any) => !latestIds.has(s.id));
+      return sortFormSchemas([...(latestSchemas || []), ...historicalOnly]);
+    }
+
+    // Historical locked view: preserve snapshot and append any newly introduced schemas
+    return sortFormSchemas([...snapshot, ...newlyAdded]);
+  };
+
+  const [isResubmitting, setIsResubmitting] = useState(false);
+  const isInitialEditing = !activeReport || !activeReport.status || activeReport.status === 'draft' || isResubmitting;
+  const [schemas, setSchemas] = useState<FormSchema[]>(
+    resolveActiveSchemas(activeReport?.schema_snapshot, initialSchemas, isInitialEditing)
+  );
   
-  // Reset form data and schemas when selection changes
+  // Reset form data, schemas, and resubmitting mode when selection changes
   useEffect(() => {
     setFormData(activeReport?.forms_data || {});
-    const raw = (activeReport?.schema_snapshot && Array.isArray(activeReport.schema_snapshot) && activeReport.schema_snapshot.length > 0) 
-      ? activeReport.schema_snapshot 
-      : initialSchemas;
-    setSchemas(sortFormSchemas(raw));
-  }, [currentYear, currentPeriod, activeReport, initialSchemas]);
+    const editing = !activeReport || !activeReport.status || activeReport.status === 'draft' || isResubmitting;
+    setSchemas(resolveActiveSchemas(activeReport?.schema_snapshot, initialSchemas, editing));
+  }, [currentYear, currentPeriod, activeReport, initialSchemas, isResubmitting]);
 
   const parsedFeedback = (() => {
     if (!activeReport?.admin_feedback) return null;
@@ -123,9 +143,11 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
   const progress = calculateCompletion();
   const isWindowOpen = canSubmitReport(currentPeriod);
   
-  // They can only view if it's submitted/reviewed. 
-  // If window is closed and it's not submitted, they can't edit either.
-  const isReadOnly = ['submitted', 'submitted_to_federal', 'reviewed', 'approved'].includes(activeReport?.status);
+  // Status flags
+  const isApproved = activeReport?.status === 'approved';
+  const isSubmittedOrReviewed = ['submitted', 'submitted_to_federal', 'reviewed'].includes(activeReport?.status);
+  // Can edit if it's draft, new, or user explicitly entered resubmission mode
+  const isReadOnly = isApproved || (isSubmittedOrReviewed && !isResubmitting);
 
   const handleSaveDraft = async () => {
     setIsSaving(true);
@@ -150,10 +172,13 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
 
   const handleSubmit = async () => {
     if (!isWindowOpen) {
-      setError("ማቅረቢያ ጊዜ አይደለም (Window Closed). ማቅረብ የሚቻለው ከ20 እስከ 25 ብቻ ነው።");
+      setError("ማቅረቢያ ጊዜ አይደለም (Window Closed).");
       return;
     }
-    if (!window.confirm("እርግጠኛ ነዎት ይህን ሪፖርት መላክ ይፈልጋሉ? አንዴ ከተላከ ማስተካከል አይቻልም።")) return;
+    const confirmPrompt = isSubmittedOrReviewed
+      ? "የተስተካከለውን ሪፖርት ወደ ክፍለ ከተማ እንደገና መላክ ይፈልጋሉ? (Resubmit updated report to subcity?)"
+      : "እርግጠኛ ነዎት ይህን ሪፖርት መላክ ይፈልጋሉ?";
+    if (!window.confirm(confirmPrompt)) return;
     
     setIsSubmitting(true);
     setError(null);
@@ -170,7 +195,11 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
     if (result.error) {
       setError(result.error);
     } else {
-      setSuccess("ሪፖርቱ በተሳካ ሁኔታ ተልኳል! (Report Submitted)");
+      setSuccess(isSubmittedOrReviewed 
+        ? "የተስተካከለው ሪፖርት በተሳካ ሁኔታ እንደገና ተልኳል! (Report Resubmitted Successfully)"
+        : "ሪፖርቱ በተሳካ ሁኔታ ተልኳል! (Report Submitted Successfully)"
+      );
+      setIsResubmitting(false);
       window.location.reload();
     }
     setIsSubmitting(false);
@@ -239,13 +268,61 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
         </div>
       )}
 
-      {['submitted', 'submitted_to_federal', 'reviewed', 'approved'].includes(activeReport?.status) && (
-        <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-xl p-4 flex items-start gap-3">
-          <IconAlertCircle className="text-brand-blue shrink-0 mt-0.5" />
+      {activeReport?.status === 'approved' && (
+        <div className="bg-status-success/10 border border-status-success/20 rounded-xl p-4 flex items-start gap-3">
+          <IconCheck className="text-status-success shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-brand-blue">ይህ ሪፖርት ተልኳል (Submitted)</h3>
-            <p className="text-sm text-text-secondary mt-1">የተላከ ሪፖርት ላይ ማስተካከያ ማድረግ አይቻልም።</p>
+            <h3 className="font-semibold text-status-success">ይህ ሪፖርት በክፍለ ከተማው ፀድቋል (Approved)</h3>
+            <p className="text-sm text-text-secondary mt-1">ይህ ሪፖርት በይፋ ፀድቆ ተመዝግቧል። ማስተካከል አይቻልም።</p>
           </div>
+        </div>
+      )}
+
+      {activeReport?.status === 'reviewed' && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <IconAlertCircle className="text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-amber-800 dark:text-amber-300">ከክፍለ ከተማ ግብረ መልስ ተሰጥቷል (Feedback Received)</h3>
+              <p className="text-sm text-text-secondary mt-1">የተሰጠውን ግብረ መልስ መሠረት በማድረግ ሪፖርትዎን አስተካክለው እንደገና መላክ ይችላሉ።</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsResubmitting(!isResubmitting)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shrink-0 ${
+              isResubmitting 
+                ? 'bg-surface-secondary text-text-primary border border-border-medium hover:bg-surface-secondary/80' 
+                : 'bg-amber-500 hover:bg-amber-600 text-white'
+            }`}
+          >
+            {isResubmitting ? <IconX size={15} /> : <IconEdit size={15} />}
+            {isResubmitting ? 'አርትዖትን አቁም (Cancel)' : 'አስተካክለው እንደገና ላክ (Edit & Resubmit)'}
+          </button>
+        </div>
+      )}
+
+      {activeReport?.status === 'submitted' && (
+        <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <IconAlertCircle className="text-brand-blue shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-brand-blue">ይህ ሪፖርት ተልኳል (Submitted)</h3>
+              <p className="text-sm text-text-secondary mt-1">ሪፖርቱ ለክፍለ ከተማው ኮሚሽን ቀርቧል። ማሻሻያ ማድረግ ከፈለጉ ከዚህ በታች ያለውን ቁልፍ በመጫን ማስተካከል ይችላሉ።</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsResubmitting(!isResubmitting)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shrink-0 ${
+              isResubmitting 
+                ? 'bg-surface-secondary text-text-primary border border-border-medium hover:bg-surface-secondary/80' 
+                : 'bg-brand-blue hover:bg-brand-blue/90 text-white'
+            }`}
+          >
+            {isResubmitting ? <IconX size={15} /> : <IconEdit size={15} />}
+            {isResubmitting ? 'አርትዖትን አቁም (Cancel)' : 'ሪፖርቱን አስተካክል (Edit & Resubmit)'}
+          </button>
         </div>
       )}
 
@@ -370,7 +447,7 @@ export function FormsRepView({ userProfile, initialReports, initialSchemas, defa
             className="px-6 py-3 bg-brand-blue hover:bg-brand-blue/90 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? <IconLoader2 size={20} className="animate-spin" /> : <IconSend size={20} />}
-            ሪፖርት ላክ (Send Report)
+            {isSubmittedOrReviewed ? "አሻሽለህ እንደገና ላክ (Resubmit Report)" : "ሪፖርት ላክ (Send Report)"}
           </button>
         </div>
       )}

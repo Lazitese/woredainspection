@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { navLinks } from "@/lib/site-data";
+import { useWoreda } from "@/providers/woreda-provider";
 
 const submissionLinks = [
   { label: "ጥቆማ", href: "/tikoma" },
@@ -70,6 +71,7 @@ const socialPlatforms = [
 
 export function Footer() {
   const year = "2018";
+  const { woreda, createWoredaUrl } = useWoreda();
 
   return (
     <footer className="relative bg-slate-950">
@@ -83,12 +85,12 @@ export function Footer() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
           {/* 1. Brand + Mission + Social Icons */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-3">
+            <Link href={createWoredaUrl('/')} className="inline-flex items-center gap-3">
               <div className="relative size-11 overflow-hidden rounded-full ring-2 ring-[#FFB800]/50">
-                <Image src="/logo.jpg" alt="የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት" fill className="object-cover" />
+                <Image src="/logo.jpg" alt={`${woreda.name} ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ምልክት`} fill className="object-cover" />
               </div>
               <div>
-                <p className="text-sm font-bold leading-tight text-white">የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና</p>
+                <p className="text-sm font-bold leading-tight text-white">{woreda.name} ብልጽግና</p>
                 <p className="text-xs font-medium leading-tight text-slate-400">የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት</p>
               </div>
             </Link>
@@ -124,7 +126,7 @@ export function Footer() {
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
+                      href={createWoredaUrl(link.href)}
                       className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
                     >
                       {link.label}
@@ -141,7 +143,7 @@ export function Footer() {
                 {submissionLinks.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
+                      href={createWoredaUrl(link.href)}
                       className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
                     >
                       {link.label}
@@ -160,23 +162,23 @@ export function Footer() {
             <ul className="space-y-3.5 text-sm text-slate-400" role="list">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0" style={{ color: "#FFB800" }} aria-hidden="true" />
-                <span>አዲስ አበባ፣ ኢትዮጵያ</span>
+                <span>አቃቂ ቃሊቲ {woreda.name}፣ አዲስ አበባ</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 size-4 shrink-0" style={{ color: "#FFB800" }} aria-hidden="true" />
                 <div>
-                  <p>+251 111 243 462</p>
-                  <p className="text-xs text-slate-500">ክ/ከተማ ፅ/ቤት</p>
+                  <p>{woreda.phone || "+251 111 243 462"}</p>
+                  <p className="text-xs text-slate-500">{woreda.shortTitle}</p>
                 </div>
               </li>
               <li className="flex items-start gap-2.5">
                 <Mail className="mt-0.5 size-4 shrink-0" style={{ color: "#FFB800" }} aria-hidden="true" />
                 <a
-                  href="mailto:ppinspectioncommission@gmail.com"
+                  href={`mailto:${woreda.email || "ppinspectioncommission@gmail.com"}`}
                   className="transition-colors hover:text-white truncate"
                   style={{ direction: "ltr" }}
                 >
-                  ppinspectioncommission@gmail.com
+                  {woreda.email || "ppinspectioncommission@gmail.com"}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
@@ -189,7 +191,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-slate-800 pt-8 gap-4">
           <p className="text-xs text-slate-500 text-center sm:text-left">
-            &copy; {year} የአቃቂ ቃሊቲ ክ/ከተማ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት። ሁሉም መብቱ የተጠበቀ ነው።
+            &copy; {year} {woreda.organizationName}። ሁሉም መብቱ የተጠበቀ ነው።
           </p>
           <div className="flex items-center gap-4 text-xs text-slate-500">
             <Link href="/privacy" className="hover:text-slate-400 transition-colors">የግላዊነት ፖሊሲ</Link>

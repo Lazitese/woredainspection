@@ -1,18 +1,35 @@
-import Link from "next/link";
+"use client";
 
-const summaryCards = [
-  { amharic: "አጠቃላይ ድምር", value: "2346", sub: "ጠቅላላ የኮሚሽን አባላት" },
-  { amharic: "የቀበሌ ኮሚሽን", value: "86,507", sub: "በሁሉም ክልሎች" },
-  { amharic: "የብልፅግና ህብረት ኮሚሽን", value: "466", sub: "ንቁ አባላት" },
-];
+import Link from "next/link";
+import { useWoreda } from "@/providers/woreda-provider";
 
 export function AnalyticsSection() {
+  const { woreda, createWoredaUrl } = useWoreda();
+
+  const summaryCards = [
+    {
+      amharic: "የአባል ብዛት",
+      value: (woreda.stats?.members ?? 3993).toLocaleString(),
+      sub: `በ${woreda.name} ጠቅላላ የአባል ብዛት`,
+    },
+    {
+      amharic: "የቤተሰብ ብዛት",
+      value: (woreda.stats?.families ?? 142).toLocaleString(),
+      sub: `በ${woreda.name} የብልፅግና ቤተሰብ ብዛት`,
+    },
+    {
+      amharic: "የህብረት ብዛት",
+      value: (woreda.stats?.unions ?? 28).toLocaleString(),
+      sub: `በ${woreda.name} የብልፅግና ህብረት ብዛት`,
+    },
+  ];
+
   return (
     <section id="analytics" className="relative overflow-hidden bg-white py-24 sm:py-28" aria-labelledby="analytics-heading">
       <div className="container-site flex flex-col gap-12">
         <div>
           <h2 id="analytics-heading" className="font-heading text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-            የኮሚሽኑ <span style={{ color: "#014BAA" }}>መዋቅር</span> <span style={{ color: "#FFB800" }}>መረጃዎች</span>
+            የ{woreda.name} ኮሚሽን <span style={{ color: "#014BAA" }}>መዋቅር</span> <span style={{ color: "#FFB800" }}>መረጃዎች</span>
           </h2>
           <div className="mt-5 h-1 w-12 rounded-full" style={{ backgroundColor: "#FFB800" }} />
         </div>
@@ -32,7 +49,7 @@ export function AnalyticsSection() {
 
         <div className="flex justify-start">
           <Link
-            href="/statistics"
+            href={createWoredaUrl("/statistics")}
             className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90"
             style={{ backgroundColor: "#014BAA" }}
           >

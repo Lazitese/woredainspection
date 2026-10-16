@@ -7,8 +7,10 @@ import { useEffect, useState } from "react";
 import { newsService } from "@/services/news";
 import { NewsArticle } from "@/types";
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { useWoreda } from "@/providers/woreda-provider";
 
 export default function NewsPage() {
+  const { activeWoreda, createWoredaUrl } = useWoreda();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,11 +19,12 @@ export default function NewsPage() {
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; article: NewsArticle | null }>({ open: false, article: null });
 
   useEffect(() => {
+    setLoading(true);
     newsService.getArticles().then(data => {
       setArticles(data);
       setLoading(false);
     });
-  }, []);
+  }, [activeWoreda.id]);
 
   const filteredArticles = articles.filter(article => {
     const matchesTab = (article.article_type || 'News') === activeTab;
@@ -82,7 +85,7 @@ export default function NewsPage() {
             </div>
             <div className="flex gap-2">
               <Link
-                href={`/dashboard/news/create?type=${activeTab}`}
+                href={createWoredaUrl(`/dashboard/news/create?type=${activeTab}`)}
                 className={`flex items-center gap-2 ${activeTab === 'News' ? 'bg-brand-blue hover:bg-brand-blue/90 text-white' : 'bg-brand-yellow hover:bg-brand-yellow/90 text-[#3D352E]'} px-5 py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm whitespace-nowrap`}
               >
                 <IconPlus size={18} />
@@ -222,14 +225,14 @@ export default function NewsPage() {
 
                   <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/20">
                     <Link
-                      href={`/dashboard/news/${article.id}`}
+                      href={createWoredaUrl(`/dashboard/news/${article.id}`)}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-brand-blue hover:bg-brand-blue/10 rounded-lg transition-colors"
                     >
                       <IconEye size={14} />
                       ይመልከቱ
                     </Link>
                     <Link
-                      href={`/dashboard/news/${article.id}/edit`}
+                      href={createWoredaUrl(`/dashboard/news/${article.id}/edit`)}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-brand-yellow hover:bg-brand-yellow/10 rounded-lg transition-colors"
                     >
                       <IconEdit size={14} />

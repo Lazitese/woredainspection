@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IconBooks, IconChevronDown, IconFileAnalytics, IconForms } from '@tabler/icons-react';
+import { useWoreda } from '@/providers/woreda-provider';
 
 interface SletenaNavGroupProps {
   isCollapsed?: boolean;
@@ -12,7 +13,8 @@ interface SletenaNavGroupProps {
 
 export const SletenaNavGroup: React.FC<SletenaNavGroupProps> = ({ isCollapsed = false, onItemClick }) => {
   const pathname = usePathname();
-  const isSletenaActive = pathname.startsWith('/dashboard/sletena');
+  const { createWoredaUrl } = useWoreda();
+  const isSletenaActive = pathname.includes('/dashboard/sletena');
   const [isOpen, setIsOpen] = useState(isSletenaActive);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export const SletenaNavGroup: React.FC<SletenaNavGroupProps> = ({ isCollapsed = 
     return (
       <div className="relative group">
         <Link
-          href="/dashboard/sletena/yesltena-flagot"
+          href={createWoredaUrl('/dashboard/sletena/yesltena-flagot')}
           title="ስልጠና"
           onClick={onItemClick}
           className={`flex items-center justify-center p-3 rounded-xl transition-all duration-200 ${isSletenaActive
@@ -80,11 +82,12 @@ export const SletenaNavGroup: React.FC<SletenaNavGroupProps> = ({ isCollapsed = 
       {isOpen && (
         <div className="pl-4 space-y-1 border-l-2 border-border/40 ml-4 py-1">
           {subItems.map((sub) => {
-            const isActive = pathname === sub.href;
+            const subUrl = createWoredaUrl(sub.href);
+            const isActive = pathname === sub.href || pathname === subUrl;
             return (
               <Link
                 key={sub.href}
-                href={sub.href}
+                href={subUrl}
                 onClick={onItemClick}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all duration-150 ${isActive
                   ? 'bg-brand-blue/10 text-brand-blue font-semibold border border-brand-blue/20'

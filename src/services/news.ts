@@ -130,9 +130,11 @@ export const newsService = {
   },
 
   uploadImage: async (file: File): Promise<string> => {
+    const { getBrowserActiveWoreda } = await import('@/utils/supabase/woreda-fetch');
+    const activeWoreda = getBrowserActiveWoreda();
     const fileExt = file.name.split('.').pop() || 'jpg';
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-    const filePath = `news/${fileName}`;
+    const filePath = `${activeWoreda}/news/${fileName}`;
 
     const buckets = ['personnel_photos', 'report_attachments', 'documents', 'public_files'];
     for (const bucket of buckets) {

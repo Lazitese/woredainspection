@@ -32,6 +32,7 @@ import { Complaint, ComplaintStatus } from "@/types";
 import { exportComplaintsToExcel, getResolutionTime } from "@/lib/exportExcel";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { formatECDateTime, convertToEthiopianTimeStr } from "@/lib/date-formatter";
+import { useWoreda } from "@/providers/woreda-provider";
 
 type TicketType = 'Complaint' | 'Suggestion';
 type StatusFilter = 'All' | 'NeedsAttention' | ComplaintStatus;
@@ -75,6 +76,7 @@ const STATUS_CONFIG: Record<ComplaintStatus, { label: string; color: string; bgC
 
 export default function ComplaintsPage() {
   const { profile } = useAdmin();
+  const { activeWoreda } = useWoreda();
   const [activeTab, setActiveTab] = useState<TicketType>('Suggestion');
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>('All');
   const [tickets, setTickets] = useState<Complaint[]>([]);
@@ -105,6 +107,7 @@ export default function ComplaintsPage() {
   const [exportEndDate, setExportEndDate] = useState('');
 
   const loadTickets = useCallback(async () => {
+    setLoading(true);
     const data = await complaintService.getComplaints();
     setTickets(data);
     setLoading(false);
@@ -112,7 +115,7 @@ export default function ComplaintsPage() {
 
   useEffect(() => {
     loadTickets();
-  }, [loadTickets]);
+  }, [loadTickets, activeWoreda.id]);
 
   // Filter logic
   const filteredTickets = tickets.filter(t => {

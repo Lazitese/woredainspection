@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { createWoredaFetch } from '@/utils/supabase/woreda-fetch';
+import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = 
@@ -16,5 +18,8 @@ export const supabaseAdmin = createClient<any>(supabaseUrl, supabaseServiceKey, 
   auth: {
     autoRefreshToken: false,
     persistSession: false,
+  },
+  global: {
+    fetch: createWoredaFetch(getServerActiveWoreda),
   },
 });

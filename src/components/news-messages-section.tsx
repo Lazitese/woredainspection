@@ -7,8 +7,10 @@ import { createNewsSlug } from "@/lib/slug";
 import Image from "next/image";
 
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { useWoreda } from "@/providers/woreda-provider";
 
 export function NewsMessagesSection() {
+  const { activeWoreda, createWoredaUrl } = useWoreda();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -19,6 +21,7 @@ export function NewsMessagesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     import("@/services/news").then(({ newsService }) => {
       newsService.getArticles().then(data => {
         const published = data.filter(a => a.status === 'Published');
@@ -41,7 +44,7 @@ export function NewsMessagesSection() {
         setLoading(false);
       });
     });
-  }, []);
+  }, [activeWoreda.id]);
 
   const activeArticles = activeTab === 'News' ? news : messages;
 
@@ -221,7 +224,7 @@ export function NewsMessagesSection() {
                     </p>
                   </div>
                   <Link
-                    href={activeTab === 'Message' ? `/messages/${item.id}` : `/news/${createNewsSlug(item.id, item.title)}`}
+                    href={createWoredaUrl(activeTab === 'Message' ? `/messages/${item.id}` : `/news/${createNewsSlug(item.id, item.title)}`)}
                     className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
                     style={{ color: "#014BAA" }}
                     aria-label={`${item.title} ሙሉ ይዘት`}

@@ -2,57 +2,38 @@
 
 import { Menubar } from "@/components/menubar";
 import { Footer } from "@/components/footer";
-import { ChevronRight, Users, Building2, MapPin, TrendingUp, BarChart3, Network } from "lucide-react";
+import { ChevronRight, Users, Building2, Network, BarChart3 } from "lucide-react";
 import { useState } from "react";
+import { useWoreda } from "@/providers/woreda-provider";
+import { WOREDAS_LIST } from "@/config/woredas";
 
-/* ─── Raw data from Section 5 ─── */
-
-const summaryCards = [
-  { label: "የኮሚሽን አባላት", labelEn: "Commission Members", value: 36740, icon: Users, color: "#014BAA" },
-  { label: "የወረዳ ኮሚሽን", labelEn: "Woreda Commissions", value: 17, icon: Building2, color: "#10B981" },
-  { label: "የቀበሌ ኮሚሽን", labelEn: "Kebele Commissions", value: 63, icon: MapPin, color: "#FFB800" },
-];
-
-const coverage = [
-  { label: "ወረዳዎች", labelEn: "Woredas", value: 17 },
-  { label: "የቀበሌ ኮሚሽን", labelEn: "Kebele Commissions", value: 63 },
-  { label: "የብልፅግና ህብረት", labelEn: "Prosperity Unions", value: 18680 },
-];
+/* ─── Woreda Data from Config ─── */
 
 interface RegionRow {
   id: number;
+  slug: string;
   name: string;
-  regions: number;
-  woredas: number;
-  kebeles: number;
-  union: number;
+  leaderName: string;
+  unions: number;
+  families: number;
   members: number;
-  officials: number;
 }
 
-const regionalData: RegionRow[] = [
-  { id: 1,  name: "ወረዳ 1",     regions: 1, woredas: 1, kebeles: 4,  union: 1240, members: 2450, officials: 9 },
-  { id: 2,  name: "ወረዳ 2",     regions: 1, woredas: 1, kebeles: 4,  union: 1180, members: 2320, officials: 9 },
-  { id: 3,  name: "ወረዳ 3",     regions: 1, woredas: 1, kebeles: 4,  union: 1350, members: 2680, officials: 9 },
-  { id: 4,  name: "ወረዳ 4",     regions: 1, woredas: 1, kebeles: 4,  union: 1120, members: 2190, officials: 9 },
-  { id: 5,  name: "ወረዳ 5",     regions: 1, woredas: 1, kebeles: 4,  union: 1290, members: 2510, officials: 9 },
-  { id: 6,  name: "ወረዳ 6",     regions: 1, woredas: 1, kebeles: 4,  union: 1050, members: 2040, officials: 9 },
-  { id: 7,  name: "ወረዳ 7",     regions: 1, woredas: 1, kebeles: 4,  union: 1410, members: 2750, officials: 9 },
-  { id: 8,  name: "ወረዳ 8",     regions: 1, woredas: 1, kebeles: 4,  union: 1160, members: 2280, officials: 9 },
-  { id: 9,  name: "ወረዳ 9",     regions: 1, woredas: 1, kebeles: 4,  union: 980,  members: 1950, officials: 9 },
-  { id: 10, name: "ወረዳ 10",    regions: 1, woredas: 1, kebeles: 4,  union: 1220, members: 2410, officials: 9 },
-  { id: 11, name: "ወረዳ 12",    regions: 1, woredas: 1, kebeles: 4,  union: 1140, members: 2230, officials: 9 },
-  { id: 12, name: "ወረዳ 13",    regions: 1, woredas: 1, kebeles: 4,  union: 1080, members: 2110, officials: 9 },
-  { id: 13, name: "ልዩ ወረዳ 1", regions: 1, woredas: 1, kebeles: 3,  union: 860,  members: 1680, officials: 7 },
-  { id: 14, name: "ልዩ ወረዳ 2", regions: 1, woredas: 1, kebeles: 3,  union: 790,  members: 1540, officials: 7 },
-  { id: 15, name: "ልዩ ወረዳ 3", regions: 1, woredas: 1, kebeles: 3,  union: 840,  members: 1620, officials: 7 },
-  { id: 16, name: "ልዩ ወረዳ 4", regions: 1, woredas: 1, kebeles: 3,  union: 760,  members: 1490, officials: 7 },
-  { id: 17, name: "ልዩ ወረዳ 5", regions: 1, woredas: 1, kebeles: 3,  union: 810,  members: 1580, officials: 7 },
-];
+const regionalData: RegionRow[] = WOREDAS_LIST.map((w) => ({
+  id: w.number,
+  slug: w.slug,
+  name: w.name,
+  leaderName: w.leaderName || `${w.name} ዋና አስተዳዳሪ`,
+  unions: w.stats.unions,
+  families: w.stats.families,
+  members: w.stats.members,
+}));
 
 const totals = {
-  regions: 17, woredas: 17, kebeles: 63,
-  union: 18680, members: 36740, officials: 143,
+  woredas: regionalData.length,
+  unions: regionalData.reduce((s, r) => s + r.unions, 0),
+  families: regionalData.reduce((s, r) => s + r.families, 0),
+  members: regionalData.reduce((s, r) => s + r.members, 0),
 };
 
 function formatNumber(n: number): string {
@@ -65,15 +46,15 @@ function AnimatedValue({ value }: { value: number }) {
 }
 
 /* ─── CSS-only horizontal bar ─── */
-function HorizontalBar({ value, max, color, label }: { value: number; max: number; color: string; label: string }) {
+function HorizontalBar({ value, max, color, label, isActive }: { value: number; max: number; color: string; label: string; isActive?: boolean }) {
   const pct = Math.max((value / max) * 100, 1);
   return (
-    <div className="group flex items-center gap-4">
-      <span className="w-24 shrink-0 text-right text-sm font-semibold text-slate-700">{label}</span>
+    <div className={`group flex items-center gap-4 rounded-xl px-2 py-1 transition-colors ${isActive ? "bg-blue-50/80 ring-1 ring-[#014BAA]/20" : ""}`}>
+      <span className={`w-24 shrink-0 text-right text-sm font-semibold ${isActive ? "text-[#014BAA] font-bold" : "text-slate-700"}`}>{label}</span>
       <div className="relative flex-1 h-8 rounded-xl bg-slate-100 overflow-hidden">
         <div
           className="absolute inset-y-0 left-0 rounded-xl transition-all duration-1000 ease-out"
-          style={{ width: `${pct}%`, backgroundColor: color }}
+          style={{ width: `${pct}%`, backgroundColor: isActive ? "#014BAA" : color }}
         />
         <span className={`absolute inset-y-0 right-3 flex items-center text-xs font-bold ${pct > 70 ? "text-white" : "text-slate-600"}`}>
           {formatNumber(value)}
@@ -125,16 +106,23 @@ function DonutChart({ data, colors }: { data: { label: string; value: number }[]
 
 /* ─── Main Page ─── */
 export default function StatisticsPage() {
-  const [activeMetric, setActiveMetric] = useState<"members" | "woredas" | "kebeles">("members");
+  const { woreda } = useWoreda();
+  const [activeMetric, setActiveMetric] = useState<"members" | "families" | "unions">("members");
+
+  const summaryCards = [
+    { label: "የአባል ብዛት", labelEn: `${woreda.name} — የአባል ብዛት`, value: woreda.stats.members, icon: Users, color: "#014BAA" },
+    { label: "የቤተሰብ ብዛት", labelEn: `${woreda.name} — የቤተሰብ ብዛት`, value: woreda.stats.families, icon: Building2, color: "#10B981" },
+    { label: "የህብረት ብዛት", labelEn: `${woreda.name} — የህብረት ብዛት`, value: woreda.stats.unions, icon: Network, color: "#FFB800" },
+  ];
 
   const maxMembers = Math.max(...regionalData.map((r) => r.members));
-  const maxWoredas = Math.max(...regionalData.map((r) => r.woredas));
-  const maxKebeles = Math.max(...regionalData.map((r) => r.kebeles));
+  const maxFamilies = Math.max(...regionalData.map((r) => r.families));
+  const maxUnions = Math.max(...regionalData.map((r) => r.unions));
 
   const metricConfig = {
-    members: { max: maxMembers, key: "members" as const, label: "የኮሚሽን አባላት", color: "#014BAA" },
-    woredas: { max: maxWoredas, key: "woredas" as const, label: "ወረዳ", color: "#FFB800" },
-    kebeles: { max: maxKebeles, key: "kebeles" as const, label: "ቀበሌ", color: "#10B981" },
+    members: { max: maxMembers, key: "members" as const, label: "የአባል ብዛት", color: "#014BAA" },
+    families: { max: maxFamilies, key: "families" as const, label: "የቤተሰብ ብዛት", color: "#10B981" },
+    unions: { max: maxUnions, key: "unions" as const, label: "የህብረት ብዛት", color: "#FFB800" },
   };
 
   const config = metricConfig[activeMetric];
@@ -164,12 +152,12 @@ export default function StatisticsPage() {
               <BarChart3 className="size-8" />
             </div>
             <h1 className="font-heading text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-              <span style={{ color: "#014BAA" }}>መረጃ</span>
+              <span style={{ color: "#014BAA" }}>የ{woreda.name} መረጃ</span>
             </h1>
             <div className="mt-5 flex items-center gap-2 text-sm font-medium text-slate-500">
               <span>መነሻ</span>
               <ChevronRight className="size-4" />
-              <span style={{ color: "#014BAA" }}>መረጃ</span>
+              <span style={{ color: "#014BAA" }}>መረጃ ({woreda.name})</span>
             </div>
 
           </div>
@@ -177,14 +165,14 @@ export default function StatisticsPage() {
 
 
 
-        {/* ═══ Summary Cards ═══ */}
+        {/* ═══ Summary Cards (1st Section for Active Woreda) ═══ */}
         <section className="container-site -mt-12 relative z-20">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {summaryCards.map((card) => {
               const Icon = card.icon;
               return (
                 <div
-                  key={card.labelEn}
+                  key={card.label}
                   className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.08)] ring-1 ring-slate-100 transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)]"
                 >
                   <div className="absolute -right-6 -top-6 size-24 rounded-full opacity-[0.06]" style={{ backgroundColor: card.color }} />
@@ -196,7 +184,7 @@ export default function StatisticsPage() {
                       <AnimatedValue value={card.value} />
                     </p>
                     <p className="mt-1 text-sm font-semibold text-slate-500">{card.label}</p>
-                    <p className="text-[0.65rem] font-bold uppercase tracking-widest text-slate-300">{card.label}</p>
+                    <p className="text-[0.65rem] font-bold uppercase tracking-widest text-slate-300">{card.labelEn}</p>
                   </div>
                 </div>
               );
@@ -212,9 +200,22 @@ export default function StatisticsPage() {
               <h2 className="font-heading text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 የወረዳ ንጽጽር
               </h2>
-              <p className="mt-1 text-sm text-slate-500">በመለኪያ የወረዳ ንጽጽር</p>
+              <p className="mt-1 text-sm text-slate-500">በመለኪያ የወረዳ ንጽጽር ({config.label})</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              {(["members", "families", "unions"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setActiveMetric(m)}
+                  className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                    activeMetric === m
+                      ? "bg-[#014BAA] text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {metricConfig[m].label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -227,6 +228,7 @@ export default function StatisticsPage() {
                   value={r[config.key]}
                   max={config.max}
                   color={config.color}
+                  isActive={r.slug === woreda.slug}
                 />
               ))}
             </div>
@@ -294,39 +296,48 @@ export default function StatisticsPage() {
           </div>
 
           <div className="overflow-x-auto rounded-3xl bg-white ring-1 ring-slate-200 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.06)]">
-            <table className="w-full min-w-[900px] text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <th className="px-4 py-4 text-left font-bold text-slate-500 text-xs tracking-wider uppercase">ተ.ቁ</th>
-                  <th className="px-4 py-4 text-left font-bold text-slate-500 text-xs tracking-wider uppercase">ቅ/ጽ/ቤት</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የወረዳ አመራር</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የወረዳ ኮሚሽን</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የቀበሌ ኮሚሽን</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የብልፅግና ህብረት</th>
-                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">ጠቅላላ ድምር</th>
+                  <th className="px-4 py-4 text-left font-bold text-slate-500 text-xs tracking-wider uppercase">ቅ/ጽ/ቤት (ወረዳ)</th>
+                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የህብረት ብዛት</th>
+                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የቤተሰብ ብዛት</th>
+                  <th className="px-4 py-4 text-right font-bold text-slate-500 text-xs tracking-wider uppercase">የአባል ብዛት</th>
                 </tr>
               </thead>
               <tbody>
-                {regionalData.map((r, i) => (
-                  <tr key={r.id} className={`border-b border-slate-50 transition-colors hover:bg-blue-50/40 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/40"}`}>
-                    <td className="px-4 py-3.5 font-bold text-slate-400 tabular-nums">{r.id}</td>
-                    <td className="px-4 py-3.5 font-semibold text-slate-900">{r.name}</td>
-                    <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.officials)}</td>
-                    <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.woredas)}</td>
-                    <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.kebeles)}</td>
-                    <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.union)}</td>
-                    <td className="px-4 py-3.5 text-right font-bold tabular-nums" style={{ color: "#014BAA" }}>{formatNumber(r.members)}</td>
-                  </tr>
-                ))}
+                {regionalData.map((r, i) => {
+                  const isCurrent = r.slug === woreda.slug;
+                  return (
+                    <tr
+                      key={r.id}
+                      className={`border-b border-slate-50 transition-colors hover:bg-blue-50/40 ${
+                        isCurrent ? "bg-blue-50/70 font-semibold" : i % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+                      }`}
+                    >
+                      <td className="px-4 py-3.5 font-bold text-slate-400 tabular-nums">{r.id}</td>
+                      <td className="px-4 py-3.5 font-semibold text-slate-900">
+                        {r.name}
+                        {isCurrent && (
+                          <span className="ml-2 rounded-full bg-[#014BAA]/10 px-2 py-0.5 text-[0.65rem] font-bold text-[#014BAA]">
+                            የአሁኑ ወረዳ
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.unions)}</td>
+                      <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">{formatNumber(r.families)}</td>
+                      <td className="px-4 py-3.5 text-right font-bold tabular-nums" style={{ color: "#014BAA" }}>{formatNumber(r.members)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-slate-200 bg-slate-50">
                   <td className="px-4 py-4" />
                   <td className="px-4 py-4 font-bold text-slate-900">ጠቅላላ ድምር</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.officials)}</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.woredas)}</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.kebeles)}</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.union)}</td>
+                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.unions)}</td>
+                  <td className="px-4 py-4 text-right font-bold text-slate-900 tabular-nums">{formatNumber(totals.families)}</td>
                   <td className="px-4 py-4 text-right font-bold tabular-nums" style={{ color: "#014BAA" }}>{formatNumber(totals.members)}</td>
                 </tr>
               </tfoot>

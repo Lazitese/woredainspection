@@ -5,9 +5,11 @@ import { Footer } from "@/components/footer";
 import { ChevronRight, CalendarDays, ArrowLeft, Share2, Clock, Bookmark } from "lucide-react";
 import { newsService } from "@/services/news";
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { resolveActiveWoreda } from "@/utils/supabase/woreda-fetch";
 
 export default async function MessageDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const activeWoreda = await resolveActiveWoreda();
   
   const item = await newsService.getArticle(id);
   if (!item || item.article_type !== 'Message') notFound();
@@ -35,16 +37,16 @@ export default async function MessageDetailPage({ params }: { params: Promise<{ 
           />
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
             <Link
-              href="/#news"
+              href={`/${activeWoreda}#news`}
               className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-400 transition-colors hover:text-[#014BAA]"
             >
               <ArrowLeft className="size-4" />
               ወደ መልዕክቶች ተመለስ
             </Link>
             <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
-              <span>መነሻ</span>
+              <Link href={`/${activeWoreda}`} className="transition-colors hover:text-[#014BAA]">መነሻ</Link>
               <ChevronRight className="size-4" />
-              <Link href="/#news" className="transition-colors hover:text-[#014BAA]">መልዕክት</Link>
+              <Link href={`/${activeWoreda}#news`} className="transition-colors hover:text-[#014BAA]">መልዕክት</Link>
               <ChevronRight className="size-4" />
               <span className="text-slate-400">{item.title.slice(0, 35)}...</span>
             </div>
@@ -133,7 +135,7 @@ export default async function MessageDetailPage({ params }: { params: Promise<{ 
                     return (
                       <Link
                         key={news.id}
-                        href={`/messages/${news.id}`}
+                        href={`/${activeWoreda}/messages/${news.id}`}
                         className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:ring-[#014BAA]/20"
                       >
                         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">

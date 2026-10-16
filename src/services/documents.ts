@@ -234,11 +234,13 @@ export const documentService = {
         .replace(/[^a-zA-Z0-9_-]/g, '_') || 'default';
     };
 
+    const { getBrowserActiveWoreda } = await import('@/utils/supabase/woreda-fetch');
+    const activeWoreda = getBrowserActiveWoreda();
     const fileExt = file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'bin';
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
     const safeOffice = sanitizeSegment(docData.office);
     const safeYear = sanitizeSegment(docData.year);
-    const storagePath = `${safeOffice}/${safeYear}/${fileName}`;
+    const storagePath = `${activeWoreda}/${safeOffice}/${safeYear}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('documents')
