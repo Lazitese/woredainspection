@@ -4,7 +4,12 @@ import Link from "next/link";
 import { Menubar } from "@/components/menubar";
 import { Footer } from "@/components/footer";
 import { ChevronRight, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { useWoreda } from "@/providers/woreda-provider";
+
 export default function ContactPage() {
+  const { woreda } = useWoreda();
+  const facebookUrl = woreda.social?.facebook || "https://www.facebook.com/61552173871647/posts/122315951738072462/?app=fbl";
+  const tiktokUrl = woreda.social?.tiktok || "https://www.tiktok.com";
   return (
     <>
       <Menubar />
@@ -181,8 +186,8 @@ export default function ContactPage() {
                   {
                     name: "Facebook",
                     nameAm: "ፌስቡክ",
-                    desc: "የኮሚሽኑ ይፋዊ ገጽ",
-                    href: "https://www.facebook.com/share/1Ejo7j8cf2/",
+                    desc: `${woreda.name} ይፋዊ ገጽ`,
+                    href: facebookUrl,
                     color: "#1877F2",
                     action: "ገጻችንን ይጎብኙ",
                     icon: (
@@ -195,7 +200,7 @@ export default function ContactPage() {
                     name: "TikTok",
                     nameAm: "ቲክቶክ",
                     desc: "አጫጭር ቪዲዮዎችና መልዕክቶች",
-                    href: "https://www.tiktok.com",
+                    href: tiktokUrl,
                     color: "#000000",
                     action: "ቪዲዮዎችን ይመልከቱ",
                     icon: (

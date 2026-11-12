@@ -4,6 +4,14 @@ export interface WoredaStats {
   members: number;  // የአባል ብዛት
 }
 
+export interface WoredaSocialLinks {
+  facebook?: string;
+  tiktok?: string;
+  telegram?: string;
+  whatsapp?: string;
+  twitter?: string;
+}
+
 export interface WoredaConfig {
   id: string;
   slug: string;
@@ -18,6 +26,7 @@ export interface WoredaConfig {
   leaderNameEn?: string;
   phone?: string;
   email?: string;
+  social?: WoredaSocialLinks;
   stats: WoredaStats;
 }
 
@@ -36,6 +45,10 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderNameEn: 'Awel Seid Yimer',
     phone: '0921175509',
     email: 'awelseid09@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/61569199321302/posts/122182681004639977/?app=fbl',
+      tiktok: 'https://tiktok.com/@akakikalityworeda1inspec',
+    },
     stats: {
       unions: 28,
       families: 142,
@@ -55,6 +68,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'የወረዳ 2 ዋና አስተዳዳሪ',
     phone: '0911000002',
     email: 'woreda2@akakikality.gov.et',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=100092268900197',
+    },
     stats: {
       unions: 30,
       families: 160,
@@ -74,6 +90,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ታዳገ ባንዳ',
     phone: '0982416533',
     email: 'tedegabanda@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/61552173871647/posts/122315951738072462/?app=fbl',
+    },
     stats: {
       unions: 51,
       families: 297,
@@ -93,6 +112,10 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ሳሮን አበበ',
     phone: '0926876069',
     email: 'saronabebelenjamoaju@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61581722951782',
+      tiktok: 'https://vm.tiktok.com/ZS9U83fQhSRs6-gJI52/',
+    },
     stats: {
       unions: 42,
       families: 240,
@@ -112,6 +135,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'አሜን ጉታዳቢ',
     phone: '0911693325',
     email: 'amareguta42@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/61552173871647/posts/122315951738072462/?app=fbl',
+    },
     stats: {
       unions: 40,
       families: 241,
@@ -131,6 +157,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ሁሴን አስፋው',
     phone: '0922827853',
     email: 'husenasfawa2026@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61573152395583',
+    },
     stats: {
       unions: 44,
       families: 250,
@@ -150,6 +179,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ፍሬህይወት አያል',
     phone: '0920711230',
     email: 'frehiwotayal@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61552508804362',
+    },
     stats: {
       unions: 50,
       families: 304,
@@ -169,6 +201,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ፅጌሬዳ ደበበ',
     phone: '0913024710',
     email: 'tsigeredadebebe2016@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61574665305639&mibextid=ZbWKwL',
+    },
     stats: {
       unions: 44,
       families: 273,
@@ -188,6 +223,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'የወረዳ 9 ዋና አስተዳዳሪ',
     phone: '0911000009',
     email: 'woreda9@akakikality.gov.et',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61578690980493',
+    },
     stats: {
       unions: 28,
       families: 150,
@@ -207,6 +245,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'ልንገርሽ ድረስ',
     phone: '0921578378',
     email: 'lingershdires21@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61569591686717',
+    },
     stats: {
       unions: 24,
       families: 124,
@@ -226,6 +267,9 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'የወረዳ 11 ዋና አስተዳዳሪ',
     phone: '0911000011',
     email: 'woreda11@akakikality.gov.et',
+    social: {
+      facebook: 'https://www.facebook.com/61552173871647/posts/122315951738072462/?app=fbl',
+    },
     stats: {
       unions: 32,
       families: 180,
@@ -246,6 +290,10 @@ export const WOREDAS_LIST: WoredaConfig[] = [
     leaderName: 'አዲሱ ይሁን',
     phone: '0953933884',
     email: 'addisuyihun92@gmail.com',
+    social: {
+      facebook: 'https://www.facebook.com/profile.php?id=61576399116750',
+      tiktok: 'https://tiktok.com/@akaki.woreda.13.et',
+    },
     stats: {
       unions: 22,
       families: 115,
