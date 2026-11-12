@@ -235,7 +235,7 @@ export const SletenaFormBuilder: React.FC<SletenaFormBuilderProps> = ({
       dateCreated: category?.dateCreated || new Date().toISOString().split('T')[0],
       submittersCount: category?.submittersCount || 0,
       isActive,
-      shareableLink: category?.shareableLink || `https://icods.raey.work/sletena/submit?cat=${Date.now()}`,
+      shareableLink: category?.shareableLink || `${typeof window !== 'undefined' && window.location?.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et')}/sletena/submit?cat=${Date.now()}`,
       selectedDirectiveIds,
       questions: activeQuestions,
       maxWoredas,

@@ -4,6 +4,8 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
 import { notifyAdminCreated } from '@/lib/notify';
 import { normalizePhoneToE164 } from '@/lib/phone';
+import { requireAuthenticatedWoredaAdmin } from '@/lib/adminAuth';
+import { getWoredaConfig } from '@/config/woredas';
 
 function generateTempPassword(length = 6) {
   const charset = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
@@ -16,6 +18,9 @@ function generateTempPassword(length = 6) {
 
 export async function provisionAdmin(data: any) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin({ requireSuperAdmin: true });
+    const woredaConfig = getWoredaConfig(activeWoreda);
+
     let role = data.accessLevel === 'all' ? 'super_admin' : 'admin';
     let modules = data.modules || [];
 
@@ -61,6 +66,8 @@ export async function provisionAdmin(data: any) {
         full_name: data.name,
         phone: data.phone,
         role: role,
+        woreda_id: activeWoreda,
+        region: woredaConfig.name,
         force_password_change: true,
         requires_password_change: true,
       },
@@ -80,7 +87,7 @@ export async function provisionAdmin(data: any) {
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ');
 
-    // 2. Insert into admin_profiles
+    // 2. Insert into admin_profiles scoped strictly to activeWoreda
     const { error: profileError } = await supabaseAdmin.from('admin_profiles').insert({
       id: userId,
       role: role,
@@ -94,22 +101,31 @@ export async function provisionAdmin(data: any) {
       modules: modules,
       status: data.status,
       requires_password_change: true,
+      woreda_id: activeWoreda,
     });
 
     if (profileError) {
       console.error('Error creating admin profile:', profileError);
+      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
       return { success: false, error: 'Profile creation failed: ' + profileError.message };
     }
 
-    // Upsert into users table for cross-table phone mapping
+    // Upsert into users table & user_profiles for cross-table woreda isolation
     if (data.phone) {
       const cleanPhone = normalizePhoneToE164(data.phone);
       await supabaseAdmin.from('users').upsert({
         id: userId,
         phone_number: cleanPhone,
         full_name: data.name,
+        woreda_id: activeWoreda,
       });
     }
+    await supabaseAdmin.from('user_profiles').upsert({
+      user_id: userId,
+      system_role: role,
+      region: woredaConfig.name,
+      woreda_id: activeWoreda,
+    }, { onConflict: 'user_id' });
 
     // 3. Send welcome notification (email first for admins, SMS as fallback)
     await notifyAdminCreated({
@@ -129,15 +145,32 @@ export async function provisionAdmin(data: any) {
 
 export async function deleteAdminUser(id: string) {
   try {
+    const { userId: callerId, activeWoreda } = await requireAuthenticatedWoredaAdmin({ requireSuperAdmin: true });
     if (!id) {
       return { success: false, error: 'Admin ID is required' };
+    }
+    if (id === callerId) {
+      return { success: false, error: 'Cannot delete your own active admin account.' };
+    }
+
+    // Verify target belongs strictly to the caller's activeWoreda before any deletion
+    const { data: targetAdmin } = await supabaseAdmin
+      .from('admin_profiles')
+      .select('id, woreda_id')
+      .eq('id', id)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!targetAdmin || targetAdmin.woreda_id !== activeWoreda) {
+      return { success: false, error: 'Admin not found in your woreda.' };
     }
 
     // 1. Delete profile record from admin_profiles table in DB
     const { error: dbError } = await supabaseAdmin
       .from('admin_profiles')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('woreda_id', activeWoreda);
 
     if (dbError) {
       console.error('Error deleting admin profile from database:', dbError);

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createClient } from '@/utils/supabase/server';
+import { verifyAdminUser } from '@/lib/adminAuth';
 
 function isFileInComplaint(item: any, targetPath: string): boolean {
   if (!item || !targetPath) return false;
@@ -60,7 +62,7 @@ export async function GET(request: Request) {
 
   let isAuthorized = false;
 
-  // 1. Check if user is an authenticated Admin / Leader via Session Header or Cookie
+  // 1. Check if user is an authenticated active Admin / Leader belonging to the active woreda
   const authHeader = request.headers.get('Authorization');
   const cookieHeader = request.headers.get('Cookie');
 
@@ -70,7 +72,13 @@ export async function GET(request: Request) {
       if (token) {
         const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
         if (!userErr && userData?.user) {
-          isAuthorized = true;
+          isAuthorized = await verifyAdminUser(userData.user.id, userData.user.email);
+        }
+      } else if (cookieHeader) {
+        const serverClient = await createClient();
+        const { data: userData } = await serverClient.auth.getUser();
+        if (userData?.user) {
+          isAuthorized = await verifyAdminUser(userData.user.id, userData.user.email);
         }
       }
     } catch (e) {

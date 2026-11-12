@@ -276,7 +276,25 @@ export const WOREDAS_LIST: WoredaConfig[] = [
       members: 4500,
     },
   },
-  // Woreda 12 is skipped as requested
+  {
+    id: 'woreda12',
+    slug: 'woreda12',
+    number: 12,
+    name: 'ወረዳ 12',
+    nameAm: 'ወረዳ 12',
+    nameEn: 'Woreda 12',
+    organizationName: 'የወረዳ 12 ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤት',
+    shortTitle: 'ወረዳ 12 ኮሚሽን ፅ/ቤት',
+    description: 'የአቃቂ ቃሊቲ ወረዳ 12 ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን የተቀናጀ የሥራዎች ዲጂታል ሥርዓት (ICODiS)።',
+    leaderName: 'የወረዳ 12 ዋና አስተዳዳሪ',
+    phone: '0911000012',
+    email: 'woreda12@akakikality.gov.et',
+    stats: {
+      unions: 32,
+      families: 180,
+      members: 4500,
+    },
+  },
   {
     id: 'woreda13',
     slug: 'woreda13',

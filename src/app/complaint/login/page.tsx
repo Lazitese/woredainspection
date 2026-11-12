@@ -6,8 +6,10 @@ import { maskSupabaseError } from '@/lib/errorMasking';
 import Link from 'next/link';
 import { Loader2, ShieldCheck, FileText } from 'lucide-react';
 import { verifyLoginAttempt, resolveLoginEmail } from '@/app/actions/auth';
+import { useWoreda } from '@/providers/woreda-provider';
 
 export default function ComplaintLoginPage() {
+  const { woredaSlug, woreda, createWoredaUrl } = useWoreda();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -51,23 +53,30 @@ export default function ComplaintLoginPage() {
       if (authData.user) {
         const { data: profile } = await supabase
           .from('admin_profiles')
-          .select('requires_password_change, role')
+          .select('requires_password_change, role, woreda_id, status')
           .eq('id', authData.user.id)
-          .single();
-          
-        if (profile?.requires_password_change) {
-          window.location.href = '/auth/change-password';
+          .maybeSingle();
+
+        if (!profile || profile.woreda_id !== woredaSlug || (profile.status && profile.status.toLowerCase() !== 'active')) {
+          await supabase.auth.signOut();
+          setErrorMsg(`ይህ አካውንት ለ${woreda.nameAm} የተፈቀደ አይደለም። እባክዎ የ${woreda.nameAm} መለያ ይጠቀሙ።`);
+          setLoading(false);
           return;
         }
 
-        if (profile?.role !== 'committee_leader') {
+        if (profile.requires_password_change) {
+          window.location.href = createWoredaUrl('/auth/change-password');
+          return;
+        }
+
+        if (profile.role !== 'committee_leader') {
           await supabase.auth.signOut();
           setErrorMsg("ይህ መግቢያ ለኮሚሽን ጽ/ቤት ሃላፊ (Head of Office) ብቻ የተዘጋጀ ነው። እባክዎ የአስተዳዳሪ መግቢያን ይጠቀሙ።");
           setLoading(false);
           return;
         }
 
-        window.location.href = '/complaint/dashboard';
+        window.location.href = createWoredaUrl('/complaint/dashboard');
       }
     } catch (error: any) {
       setErrorMsg(maskSupabaseError(error));

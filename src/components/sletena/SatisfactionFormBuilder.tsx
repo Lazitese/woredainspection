@@ -165,7 +165,7 @@ export const SatisfactionFormBuilder: React.FC<SatisfactionFormBuilderProps> = (
       submittersCount: category?.submittersCount || 0,
       isActive,
       categoryType: 'SATISFACTION',
-      shareableLink: category?.shareableLink || `https://icods.raey.work/sletena/erkata?cat=${category?.id || `sat-cat-${Date.now()}`}`,
+      shareableLink: category?.shareableLink || `${typeof window !== 'undefined' && window.location?.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et')}/sletena/erkata?cat=${category?.id || `sat-cat-${Date.now()}`}`,
       questions,
       maxWoredas,
     };

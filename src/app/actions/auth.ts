@@ -44,6 +44,20 @@ export async function registerUserAction(formData: FormData) {
       return { error: 'እባክዎ አስፈላጊ መረጃዎችን ያስገቡ (Missing required fields)' };
     }
 
+    const activeWoreda = await getServerActiveWoreda();
+
+    // Ensure the target assessment period belongs strictly to activeWoreda
+    const { data: periodRow } = await supabaseAdmin
+      .from('assessment_periods')
+      .select('id, woreda_id')
+      .eq('id', periodId)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!periodRow) {
+      return { error: 'የምዘና ጊዜው ለዚህ ወረዳ አልተገኘም (Assessment period not found in active woreda).' };
+    }
+
     // Format phone number to E.164 standard (e.g. +251...)
     const phone = normalizePhoneToE164(rawPhone);
 
@@ -59,13 +73,14 @@ export async function registerUserAction(formData: FormData) {
     
     let userId: string | null = null;
     
-    // First, check if user exists in public.users by any phone variation
+    // First, check if user exists in public.users in activeWoreda by any phone variation
     const phoneNoPlus = phone.replace('+', '');
     const phoneWith0 = `0${phone.replace(/^\+251/, '')}`;
 
     const { data: existingUsers } = await supabaseAdmin
       .from('users')
       .select('id')
+      .eq('woreda_id', activeWoreda)
       .in('phone_number', [phone, phoneNoPlus, phoneWith0, rawPhone.trim()]);
 
     if (existingUsers && existingUsers.length > 0) {
@@ -79,6 +94,18 @@ export async function registerUserAction(formData: FormData) {
         email: syntheticEmail,
       });
       if (linkData?.user) {
+        const metaWoreda = linkData.user.user_metadata?.woreda_id;
+        if (metaWoreda && metaWoreda !== activeWoreda) {
+          return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${metaWoreda}) የተመዘገበ ነው።` };
+        }
+        const { data: otherUser } = await supabaseAdmin
+          .from('users')
+          .select('woreda_id')
+          .eq('id', linkData.user.id)
+          .maybeSingle();
+        if (otherUser?.woreda_id && otherUser.woreda_id !== activeWoreda) {
+          return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${otherUser.woreda_id}) የተመዘገበ ነው።` };
+        }
         userId = linkData.user.id;
       } else if (rawEmail) {
         const { data: rawLinkData } = await supabaseAdmin.auth.admin.generateLink({
@@ -86,6 +113,10 @@ export async function registerUserAction(formData: FormData) {
           email: rawEmail,
         });
         if (rawLinkData?.user) {
+          const metaWoreda = rawLinkData.user.user_metadata?.woreda_id;
+          if (metaWoreda && metaWoreda !== activeWoreda) {
+            return { error: `ይህ ኢሜይል በሌላ ወረዳ (${metaWoreda}) የተመዘገበ ነው።` };
+          }
           userId = rawLinkData.user.id;
         }
       }
@@ -96,7 +127,7 @@ export async function registerUserAction(formData: FormData) {
       const updatePayload: any = { 
         email: syntheticEmail, 
         email_confirm: true,
-        user_metadata: { full_name: fullName, phone: phone, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
+        user_metadata: { full_name: fullName, phone: phone, woreda_id: activeWoreda, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
       };
       if (password) updatePayload.password = password;
       
@@ -110,7 +141,7 @@ export async function registerUserAction(formData: FormData) {
         email: syntheticEmail,
         email_confirm: true,
         password: password,
-        user_metadata: { full_name: fullName, phone: phone, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
+        user_metadata: { full_name: fullName, phone: phone, woreda_id: activeWoreda, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
       });
 
       if (authError) {
@@ -118,12 +149,16 @@ export async function registerUserAction(formData: FormData) {
         if (authError.message.includes('already') || authError.message.includes('registered') || authError.message.includes('exists')) {
           const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: syntheticEmail });
           if (linkData?.user) {
+            const metaWoreda = linkData.user.user_metadata?.woreda_id;
+            if (metaWoreda && metaWoreda !== activeWoreda) {
+              return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${metaWoreda}) የተመዘገበ ነው።` };
+            }
             userId = linkData.user.id;
             await supabaseAdmin.auth.admin.updateUserById(userId, {
               email: syntheticEmail,
               email_confirm: true,
               password: password,
-              user_metadata: { full_name: fullName, phone: phone, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
+              user_metadata: { full_name: fullName, phone: phone, woreda_id: activeWoreda, force_password_change: isAdminCreated, requires_password_change: isAdminCreated }
             });
           } else {
             return { error: `አዲስ ተጠቃሚ መፍጠር አልተቻለም፡ ${authError.message}` };
@@ -138,8 +173,6 @@ export async function registerUserAction(formData: FormData) {
     }
 
     // 2. Upsert into public.users
-    const activeWoreda = await getServerActiveWoreda();
-
     const { error: usersError } = await supabaseAdmin
       .from('users')
       .upsert({ id: userId, phone_number: phone, full_name: fullName, woreda_id: activeWoreda });
@@ -213,15 +246,31 @@ export async function resolveLoginEmail(identifier: string, portalRole?: 'repres
   const activeWoreda = await getServerActiveWoreda();
   const activeWoredaConfig = getWoredaConfig(activeWoreda);
 
+  const resolveSuperAdminForWoreda = async () => {
+    const { data: superAdminRow } = await supabaseAdmin
+      .from('admin_profiles')
+      .select('email')
+      .eq('woreda_id', activeWoreda)
+      .eq('role', 'super_admin')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return superAdminRow?.email || activeWoredaConfig.email || `${activeWoreda}@akakikality.gov.et`;
+  };
+
   if (lowerId === 'superadmin' || lowerId === 'admin') {
-    return { email: activeWoredaConfig.email || `${activeWoreda}@akakikality.gov.et` };
+    return { email: await resolveSuperAdminForWoreda() };
   }
 
   const directWoredaMatch = lowerId.match(/^woreda(\d+)$/);
   if (directWoredaMatch) {
     const num = parseInt(directWoredaMatch[1], 10);
-    const wConfig = getWoredaConfig(`woreda${num}`);
-    return { email: wConfig.email || `woreda${num}@akakikality.gov.et` };
+    const targetSlug = `woreda${num}`;
+    if (targetSlug === activeWoreda) {
+      return { email: await resolveSuperAdminForWoreda() };
+    }
+    const wConfig = getWoredaConfig(targetSlug);
+    return { email: wConfig.email || `${targetSlug}@akakikality.gov.et` };
   }
 
   if (compactEmailCandidate.includes('@')) {
@@ -231,7 +280,7 @@ export async function resolveLoginEmail(identifier: string, portalRole?: 'repres
       rawEmail === 'admin@commission.gov' ||
       rawEmail === 'admin@akakikality.gov.et'
     ) {
-      return { email: activeWoredaConfig.email || `${activeWoreda}@akakikality.gov.et` };
+      return { email: await resolveSuperAdminForWoreda() };
     }
     const woredaMatch = rawEmail.match(/^woreda(\d+)@/);
     if (woredaMatch) {

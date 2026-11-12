@@ -9,7 +9,7 @@ import { verifyLoginAttempt, resolveLoginEmail } from '@/app/actions/auth';
 import { useWoreda } from '@/providers/woreda-provider';
 
 export default function LoginPage() {
-  const { woredaSlug, woreda } = useWoreda();
+  const { woredaSlug, woreda, createWoredaUrl } = useWoreda();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -54,11 +54,11 @@ export default function LoginPage() {
         // Check if user belongs to this woreda and check role / password change
         const { data: profile } = await supabase
           .from('admin_profiles')
-          .select('requires_password_change, role, woreda_id')
+          .select('requires_password_change, role, woreda_id, status')
           .eq('id', authData.user.id)
           .maybeSingle();
 
-        if (!profile || (profile.woreda_id && profile.woreda_id !== woredaSlug && profile.woreda_id !== 'all')) {
+        if (!profile || profile.woreda_id !== woredaSlug || (profile.status && profile.status.toLowerCase() !== 'active')) {
           await supabase.auth.signOut();
           setErrorMsg(`ይህ አካውንት ለ${woreda.nameAm} የተፈቀደ አይደለም። እባክዎ የ${woreda.nameAm} አድሚን መለያ ይጠቀሙ።`);
           setLoading(false);
@@ -66,7 +66,7 @@ export default function LoginPage() {
         }
           
         if (profile?.requires_password_change) {
-          window.location.href = `/${woredaSlug}/auth/change-password`;
+          window.location.href = createWoredaUrl('/auth/change-password');
           return;
         }
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
         }
       }
 
-      window.location.href = `/${woredaSlug}/dashboard`;
+      window.location.href = createWoredaUrl('/dashboard');
     } catch (error: any) {
       setErrorMsg(maskSupabaseError(error));
       setLoading(false);
@@ -110,7 +110,7 @@ export default function LoginPage() {
       if (updateError) throw updateError;
 
       const { data: { user } } = await supabase.auth.getUser();
-      let targetUrl = `/${woredaSlug}/dashboard`;
+      let targetUrl = createWoredaUrl('/dashboard');
       if (user) {
         const { data: profile } = await supabase
           .from('admin_profiles')
@@ -118,7 +118,7 @@ export default function LoginPage() {
           .eq('id', user.id)
           .single();
         if (profile?.role === 'committee_leader') {
-          targetUrl = `/${woredaSlug}/complaint/dashboard`;
+          targetUrl = createWoredaUrl('/complaint/dashboard');
         }
         await supabase
           .from('admin_profiles')

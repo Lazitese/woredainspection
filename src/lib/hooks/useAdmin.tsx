@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useWoreda } from '@/providers/woreda-provider';
 
 type AdminProfile = {
   id: string;
@@ -12,6 +13,8 @@ type AdminProfile = {
   access_level?: string;
   modules?: string[];
   email?: string;
+  woreda_id?: string;
+  status?: string;
 };
 
 type AdminContextType = {
@@ -29,17 +32,22 @@ const AdminContext = createContext<AdminContextType>({
 });
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
+  const { woredaSlug } = useWoreda();
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
 
     async function loadProfile() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setProfile(null);
+          setLoading(false);
+        }
         return;
       }
 
@@ -47,14 +55,18 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         .from('admin_profiles')
         .select('*')
         .eq('id', session.user.id)
+        .eq('woreda_id', woredaSlug)
         .maybeSingle();
 
       if (error) {
         console.error('Error fetching admin profile:', error);
       }
 
+      const isActive = !data?.status || data.status.toLowerCase() === 'active';
+      const matchesWoreda = Boolean(data && data.woreda_id === woredaSlug);
+
       if (!error && mounted) {
-        setProfile(data);
+        setProfile(isActive && matchesWoreda ? data : null);
       }
       
       if (mounted) setLoading(false);
@@ -74,7 +86,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [woredaSlug]);
 
   const isSuperAdmin = profile?.role === 'super_admin';
   

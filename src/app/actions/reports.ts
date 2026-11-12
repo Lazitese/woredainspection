@@ -8,16 +8,19 @@ import { createClient } from '@/utils/supabase/server';
 import { sortFormSchemas } from '@/utils/schemaSort';
 import { normalizePhoneToE164 } from '@/lib/phone';
 import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
-import { WOREDAS_LIST } from '@/config/woredas';
+import { getWoredaConfig, WOREDAS_LIST } from '@/config/woredas';
+import { requireAuthenticatedWoredaAdmin, verifyAdminUser } from '@/lib/adminAuth';
 
 export async function createRepresentativeAction(formData: FormData) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+    const woredaConfig = getWoredaConfig(activeWoreda);
     const fullName = (formData.get('fullName') as string)?.trim();
     const rawPhone = (formData.get('phone') as string)?.trim();
     const rawEmail = (formData.get('email') as string)?.trim() || undefined;
-    const region = (formData.get('region') as string)?.trim();
+    const region = woredaConfig.name;
 
-    if (!fullName || !rawPhone || !region) {
+    if (!fullName || !rawPhone) {
       return { error: 'Missing required fields' };
     }
 
@@ -28,12 +31,13 @@ export async function createRepresentativeAction(formData: FormData) {
 
     let userId: string | null = null;
 
-    // 1. Check if user already exists in public.users by phone variations
+    // 1. Check if user already exists in public.users in this activeWoreda
     const phoneNoPlus = phone.replace('+', '');
     const phoneWith0 = `0${phone.replace(/^\+251/, '')}`;
     const { data: existingUsers } = await supabaseAdmin
       .from('users')
-      .select('id')
+      .select('id, woreda_id')
+      .eq('woreda_id', activeWoreda)
       .in('phone_number', [phone, phoneNoPlus, phoneWith0, rawPhone]);
 
     if (existingUsers && existingUsers.length > 0) {
@@ -47,12 +51,26 @@ export async function createRepresentativeAction(formData: FormData) {
         email: syntheticEmail,
       });
       if (linkData?.user) {
-        userId = linkData.user.id;
+        const candidateId = linkData.user.id;
+        // Guard against hijacking a user belonging to a different woreda
+        const metaWoreda = linkData.user.user_metadata?.woreda_id;
+        if (metaWoreda && metaWoreda !== activeWoreda) {
+          return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${metaWoreda}) የተመዘገበ ነው።` };
+        }
+        const { data: otherProf } = await supabaseAdmin
+          .from('user_profiles')
+          .select('woreda_id')
+          .eq('user_id', candidateId)
+          .maybeSingle();
+        if (otherProf?.woreda_id && otherProf.woreda_id !== activeWoreda) {
+          return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${otherProf.woreda_id}) የተመዘገበ ነው።` };
+        }
+        userId = candidateId;
       }
     }
 
     if (userId) {
-      // User exists — update password and user_metadata
+      // User exists in this woreda — update password and user_metadata
       const { error: updateErr } = await supabaseAdmin.auth.admin.updateUserById(userId, {
         email: syntheticEmail,
         email_confirm: true,
@@ -60,6 +78,10 @@ export async function createRepresentativeAction(formData: FormData) {
         user_metadata: {
           full_name: fullName,
           phone: phone,
+          woreda_id: activeWoreda,
+          region: region,
+          role: 'representative',
+          system_role: 'representative',
           requires_password_change: true,
           force_password_change: true
         }
@@ -77,6 +99,10 @@ export async function createRepresentativeAction(formData: FormData) {
         user_metadata: {
           full_name: fullName,
           phone: phone,
+          woreda_id: activeWoreda,
+          region: region,
+          role: 'representative',
+          system_role: 'representative',
           requires_password_change: true,
           force_password_change: true
         }
@@ -86,12 +112,16 @@ export async function createRepresentativeAction(formData: FormData) {
         if (authError.message.includes('already') || authError.message.includes('registered') || authError.message.includes('exists')) {
           const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: syntheticEmail });
           if (linkData?.user) {
+            const metaWoreda = linkData.user.user_metadata?.woreda_id;
+            if (metaWoreda && metaWoreda !== activeWoreda) {
+              return { error: `ይህ ስልክ ቁጥር በሌላ ወረዳ (${metaWoreda}) የተመዘገበ ነው።` };
+            }
             userId = linkData.user.id;
             await supabaseAdmin.auth.admin.updateUserById(userId, {
               email: syntheticEmail,
               email_confirm: true,
               password: password,
-              user_metadata: { full_name: fullName, phone: phone, requires_password_change: true, force_password_change: true }
+              user_metadata: { full_name: fullName, phone: phone, woreda_id: activeWoreda, region: region, role: 'representative', system_role: 'representative', requires_password_change: true, force_password_change: true }
             });
           } else {
             return { error: authError.message };
@@ -104,18 +134,19 @@ export async function createRepresentativeAction(formData: FormData) {
       }
     }
 
-    // 2. Upsert public.users table
+    // 2. Upsert public.users table strictly scoped to activeWoreda
     await supabaseAdmin
       .from('users')
-      .upsert({ id: userId, phone_number: phone, full_name: fullName });
+      .upsert({ id: userId, phone_number: phone, full_name: fullName, woreda_id: activeWoreda });
 
-    // 3. Upsert user_profiles table with role and region
+    // 3. Upsert user_profiles table with role, region, and woreda_id
     const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .upsert({
         user_id: userId,
         system_role: 'representative',
-        region: region
+        region: region,
+        woreda_id: activeWoreda,
       }, { onConflict: 'user_id' });
 
     if (profileError) {
@@ -143,6 +174,20 @@ export async function createRepresentativeAction(formData: FormData) {
 
 export async function deleteRepresentativeAction(userId: string) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
+    // Ensure the target representative belongs strictly to activeWoreda before deleting
+    const { data: targetProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('user_id, woreda_id, system_role')
+      .eq('user_id', userId)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!targetProfile || targetProfile.woreda_id !== activeWoreda) {
+      return { error: 'Representative not found in your woreda.' };
+    }
+
     // Delete from auth.admin (cascades to public.users and user_profiles)
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
     if (error) {
@@ -150,7 +195,7 @@ export async function deleteRepresentativeAction(userId: string) {
     }
 
     // Fallback: also try to delete from public.users manually just in case
-    await supabaseAdmin.from('users').delete().eq('id', userId);
+    await supabaseAdmin.from('users').delete().eq('id', userId).eq('woreda_id', activeWoreda);
 
     return { success: true };
   } catch (error: any) {
@@ -160,6 +205,19 @@ export async function deleteRepresentativeAction(userId: string) {
 
 export async function resetRepresentativePasswordAction(userId: string, phone: string, fullName: string) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
+    const { data: targetProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('user_id, woreda_id')
+      .eq('user_id', userId)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!targetProfile || targetProfile.woreda_id !== activeWoreda) {
+      return { error: 'Representative not found in your woreda.' };
+    }
+
     const password = crypto.randomBytes(4).toString('hex'); // 8 characters
 
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
@@ -196,6 +254,39 @@ function getPeriodCategory(period: string): string {
   return 'q3';
 }
 
+async function verifyReportCaller(targetUserId: string): Promise<{ activeWoreda: string; regionName: string } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized: Authentication required.' };
+  }
+
+  const activeWoreda = await getServerActiveWoreda();
+  const woredaConfig = getWoredaConfig(activeWoreda);
+
+  const isAdmin = await verifyAdminUser(user.id, user.email);
+  if (isAdmin) {
+    return { activeWoreda, regionName: woredaConfig.name };
+  }
+
+  if (user.id !== targetUserId) {
+    return { error: 'Forbidden: Cannot submit reports for another user.' };
+  }
+
+  const { data: repProfile } = await supabaseAdmin
+    .from('user_profiles')
+    .select('woreda_id, system_role')
+    .eq('user_id', user.id)
+    .eq('woreda_id', activeWoreda)
+    .maybeSingle();
+
+  if (!repProfile || repProfile.woreda_id !== activeWoreda) {
+    return { error: 'Forbidden: User does not belong to this woreda.' };
+  }
+
+  return { activeWoreda, regionName: woredaConfig.name };
+}
+
 export async function saveReportFormAction(
   userId: string,
   region: string,
@@ -204,6 +295,12 @@ export async function saveReportFormAction(
   formsData: any
 ) {
   try {
+    const authCheck = await verifyReportCaller(userId);
+    if ('error' in authCheck) {
+      return { error: authCheck.error };
+    }
+    const { activeWoreda, regionName } = authCheck;
+
     // Check if period is valid
     if (!canSubmitReport(period)) {
       return { error: 'ሪፖርት ማቅረቢያ ጊዜ አይደለም። (Not in reporting window)' };
@@ -211,20 +308,18 @@ export async function saveReportFormAction(
 
     // Fetch current form schemas to snapshot
     const { data: schemas } = await supabaseAdmin.from('form_schemas').select('*');
-    const activeWoreda = await getServerActiveWoreda();
-    const matchedWoreda = WOREDAS_LIST.find(w => w.name === region)?.id || activeWoreda;
 
     const payload = {
       user_id: userId,
       submitter_id: userId,
-      woreda_id: matchedWoreda,
-      title: `የ${region} ${period} ሪፖርት`,
+      woreda_id: activeWoreda,
+      title: `የ${regionName} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),
       period_category: getPeriodCategory(period),
       submitter_level: 'woreda',
-      region_name: region,
-      region,
+      region_name: regionName,
+      region: regionName,
       year,
       period,
       forms_data: formsData,
@@ -234,11 +329,11 @@ export async function saveReportFormAction(
       updated_at: new Date().toISOString()
     };
 
-    // 1. Check if report already exists for (region, year, period)
+    // 1. Check if report already exists for (woreda_id, year, period)
     const { data: existingReports } = await supabaseAdmin
       .from('reports')
       .select('id')
-      .eq('region', region)
+      .eq('woreda_id', activeWoreda)
       .eq('year', year)
       .eq('period', period)
       .limit(1);
@@ -247,7 +342,8 @@ export async function saveReportFormAction(
       const { error: updateError } = await supabaseAdmin
         .from('reports')
         .update(payload)
-        .eq('id', existingReports[0].id);
+        .eq('id', existingReports[0].id)
+        .eq('woreda_id', activeWoreda);
 
       if (updateError) return { error: updateError.message };
     } else {
@@ -272,26 +368,30 @@ export async function submitReportAction(
   formsData: any
 ) {
   try {
+    const authCheck = await verifyReportCaller(userId);
+    if ('error' in authCheck) {
+      return { error: authCheck.error };
+    }
+    const { activeWoreda, regionName } = authCheck;
+
     if (!canSubmitReport(period)) {
       return { error: 'ሪፖርት ማቅረቢያ ጊዜ አይደለም። (Not in reporting window)' };
     }
 
     // Fetch current form schemas to snapshot
     const { data: schemas } = await supabaseAdmin.from('form_schemas').select('*');
-    const activeWoreda = await getServerActiveWoreda();
-    const matchedWoreda = WOREDAS_LIST.find(w => w.name === region)?.id || activeWoreda;
 
     const payload = {
       user_id: userId,
       submitter_id: userId,
-      woreda_id: matchedWoreda,
-      title: `የ${region} ${period} ሪፖርት`,
+      woreda_id: activeWoreda,
+      title: `የ${regionName} ${period} ሪፖርት`,
       report_type: 'numerical',
       budget_year: String(year),
       period_category: getPeriodCategory(period),
       submitter_level: 'woreda',
-      region_name: region,
-      region,
+      region_name: regionName,
+      region: regionName,
       year,
       period,
       forms_data: formsData,
@@ -302,11 +402,11 @@ export async function submitReportAction(
       updated_at: new Date().toISOString()
     };
 
-    // 1. Check if report already exists for (region, year, period)
+    // 1. Check if report already exists for (woreda_id, year, period)
     const { data: existingReports } = await supabaseAdmin
       .from('reports')
       .select('id')
-      .eq('region', region)
+      .eq('woreda_id', activeWoreda)
       .eq('year', year)
       .eq('period', period)
       .limit(1);
@@ -315,7 +415,8 @@ export async function submitReportAction(
       const { error: updateError } = await supabaseAdmin
         .from('reports')
         .update(payload)
-        .eq('id', existingReports[0].id);
+        .eq('id', existingReports[0].id)
+        .eq('woreda_id', activeWoreda);
 
       if (updateError) return { error: updateError.message };
     } else {
@@ -337,10 +438,13 @@ export async function provideAdminFeedbackAction(
   feedback: string
 ) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
     const { data: report, error: fetchError } = await supabaseAdmin
       .from('reports')
       .select('region, user_id')
       .eq('id', reportId)
+      .eq('woreda_id', activeWoreda)
       .single();
 
     if (fetchError || !report) return { error: 'Failed to fetch report details' };
@@ -351,7 +455,8 @@ export async function provideAdminFeedbackAction(
         admin_feedback: feedback,
         status: 'reviewed'
       })
-      .eq('id', reportId);
+      .eq('id', reportId)
+      .eq('woreda_id', activeWoreda);
 
     if (error) return { error: error.message };
 
@@ -383,12 +488,15 @@ export async function provideAdminFeedbackAction(
 
 export async function approveReportAction(reportId: string) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
     const { error } = await supabaseAdmin
       .from('reports')
       .update({
         status: 'approved'
       })
-      .eq('id', reportId);
+      .eq('id', reportId)
+      .eq('woreda_id', activeWoreda);
 
     if (error) return { error: error.message };
     return { success: true };

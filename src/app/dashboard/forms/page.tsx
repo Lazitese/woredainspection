@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { verifyAdminUser } from "@/lib/adminAuth";
 import { sortFormSchemas } from "@/utils/schemaSort";
 import { getWoredaConfig } from "@/config/woredas";
+import { getServerActiveWoreda } from "@/utils/supabase/server-woreda";
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,7 @@ export default async function FormsPage({
   }
 
   const resolvedParams = searchParams ? await searchParams : {};
-  const woredaSlug = resolvedParams.woreda || 'woreda1';
+  const woredaSlug = resolvedParams.woreda || (await getServerActiveWoreda());
   const woredaConfig = getWoredaConfig(woredaSlug);
 
   // Fetch admin profile to get woreda or fallback to active woreda from URL

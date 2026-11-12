@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://federalinspection.gov.et';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et';
 
   return {
     rules: {

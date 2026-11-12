@@ -5,7 +5,7 @@
 
 import { wrapEmailTemplate } from "./email-service";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://icods.raey.work";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://woreda.akkinspection.com.et";
 
 // ─── 1. Complaint / Suggestion Submission Templates ─────────────────────────
 

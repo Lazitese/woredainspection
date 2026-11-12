@@ -52,7 +52,7 @@ export const sletenaService = {
           isActive: d.is_active ?? true,
           categoryType: 'NEED' as const,
           submittersCount: d.submitters_count || 0,
-          shareableLink: d.shareable_link || `https://icods.raey.work/sletena/submit?cat=${d.id}`,
+          shareableLink: d.shareable_link || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et'}/sletena/submit?cat=${d.id}`,
           selectedDirectiveIds: d.selected_directive_ids || [],
           questions: d.questions || [],
         }));
@@ -85,7 +85,7 @@ export const sletenaService = {
           isActive: d.is_active ?? true,
           categoryType: 'SATISFACTION' as const,
           submittersCount: d.submitters_count || 0,
-          shareableLink: d.shareable_link || `https://icods.raey.work/sletena/erkata?cat=${d.id}`,
+          shareableLink: d.shareable_link || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et'}/sletena/erkata?cat=${d.id}`,
           selectedDirectiveIds: d.selected_directive_ids || [],
           questions: d.questions || [],
         }));
@@ -105,7 +105,7 @@ export const sletenaService = {
     categoryData: Omit<TrainingCategory, 'id' | 'submittersCount' | 'shareableLink'>
   ): Promise<TrainingCategory> => {
     const newId = `cat-${Date.now()}`;
-    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://icods.raey.work';
+    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et');
     const linkPath = categoryData.categoryType === 'SATISFACTION' ? '/sletena/erkata?cat=' : '/sletena/submit?cat=';
     const shareableLink = `${origin}${linkPath}${newId}`;
 
@@ -252,7 +252,7 @@ export const sletenaService = {
             is_active: true,
             category_type: 'NEED',
             submitters_count: 1,
-            shareable_link: `https://icods.raey.work/sletena/submit?cat=${submission.categoryId}`,
+            shareable_link: `${typeof window !== 'undefined' && window.location?.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et')}/sletena/submit?cat=${submission.categoryId}`,
           },
         ]);
       }
@@ -387,7 +387,7 @@ export const sletenaService = {
             is_active: true,
             category_type: 'SATISFACTION',
             submitters_count: 1,
-            shareable_link: `https://icods.raey.work/sletena/erkata?cat=${submission.categoryId}`,
+            shareable_link: `${typeof window !== 'undefined' && window.location?.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et')}/sletena/erkata?cat=${submission.categoryId}`,
           },
         ]);
       }

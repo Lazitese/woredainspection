@@ -70,7 +70,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Quick pills for 12 woredas */}
+          {/* Quick pills for 13 woredas */}
           <div className="flex flex-wrap justify-center gap-2 mt-2">
             {WOREDAS_LIST.map((w) => (
               <Link

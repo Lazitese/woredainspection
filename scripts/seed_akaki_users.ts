@@ -66,7 +66,7 @@ export const WOREDA_SUPER_ADMINS: WoredaSuperAdminSeed[] = WOREDAS_LIST.map((w) 
 
 async function seedWoredaSuperAdmins() {
   console.log("==================================================================");
-  console.log("  SEEDING 12 WOREDA SUPER ADMINS (WOREDA 1 - 13, SKIPPING 12)     ");
+  console.log("  SEEDING 13 WOREDA SUPER ADMINS (WOREDA 1 - 13)                 ");
   console.log("==================================================================");
   console.log(`Target Supabase URL: ${supabaseUrl}\n`);
 

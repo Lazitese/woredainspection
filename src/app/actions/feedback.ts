@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { getServerActiveWoreda } from "@/utils/supabase/server-woreda";
+import { requireAuthenticatedWoredaAdmin } from "@/lib/adminAuth";
 
 export async function submitFeedback(category: string, rating: string, review: string, region?: string, sector?: string) {
   let sentiment = "neutral";
@@ -21,6 +23,8 @@ export async function submitFeedback(category: string, rating: string, review: s
     throw new Error("ለጊዜው አስተያየት መስጠት አይችሉም፣ እባክዎ ከ2 ሰዓት በኋላ እንደገና ይሞክሩ።");
   }
 
+  const activeWoreda = await getServerActiveWoreda();
+
   const { error } = await supabaseAdmin.from("feedbacks").insert({
     category,
     rating,
@@ -28,6 +32,7 @@ export async function submitFeedback(category: string, rating: string, review: s
     sentiment,
     region,
     sector,
+    woreda_id: activeWoreda,
   });
 
   if (error) {
@@ -39,9 +44,11 @@ export async function submitFeedback(category: string, rating: string, review: s
 }
 
 export async function getFeedbacks() {
+  const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
   const { data, error } = await supabaseAdmin
     .from("feedbacks")
     .select("*")
+    .eq("woreda_id", activeWoreda)
     .order("created_at", { ascending: false });
 
   if (error) {

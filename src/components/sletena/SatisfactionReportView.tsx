@@ -68,7 +68,7 @@ export const SatisfactionReportView: React.FC<SatisfactionReportViewProps> = ({
 
   const handleCopyLink = () => {
     if (!category) return;
-    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://icods.raey.work';
+    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et');
     const link = `${origin}/sletena/erkata?cat=${category.id}`;
     navigator.clipboard.writeText(link);
     setCopiedLink(true);

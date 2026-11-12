@@ -4,10 +4,11 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyNewPeriodEnrollment, notifyFinalScoreApproved } from '@/lib/notify';
 import { normalizePhoneToE164 } from '@/lib/phone';
 import { getServerActiveWoreda } from '@/utils/supabase/server-woreda';
+import { requireAuthenticatedWoredaAdmin } from '@/lib/adminAuth';
 
 export async function createAssessmentPeriodAction(periodName: string, year: string, periodHalf: string) {
   try {
-    const activeWoreda = await getServerActiveWoreda();
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
 
     const { data, error } = await supabaseAdmin
       .from('assessment_periods')
@@ -25,16 +26,16 @@ export async function createAssessmentPeriodAction(periodName: string, year: str
   }
 }
 
-/** Fetch all unique users in the system for assessment assignment */
+/** Fetch all unique users in the active woreda for assessment assignment */
 export async function getExistingAssessmentUsersAction() {
   try {
-    const activeWoreda = await getServerActiveWoreda();
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
 
-    // 1. Fetch all users from public.users scoped to the active woreda
+    // 1. Fetch all users from public.users scoped strictly to the active woreda
     const { data: usersData, error: usersErr } = await supabaseAdmin
       .from('users')
       .select('id, full_name, phone_number, woreda_id')
-      .or(`woreda_id.eq.${activeWoreda},woreda_id.is.null`)
+      .eq('woreda_id', activeWoreda)
       .order('full_name', { ascending: true });
 
     if (usersErr) throw usersErr;
@@ -83,11 +84,34 @@ export async function addExistingUsersToNewPeriodAction(opts: {
   periodName: string;
   users: { user_id: string; full_name: string; phone_number: string; email?: string; role: string }[];
 }) {
-  const activeWoreda = await getServerActiveWoreda();
+  const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+  const { data: periodRow } = await supabaseAdmin
+    .from('assessment_periods')
+    .select('id')
+    .eq('id', opts.periodId)
+    .eq('woreda_id', activeWoreda)
+    .maybeSingle();
+
+  if (!periodRow) {
+    return { results: opts.users.map(u => ({ user_id: u.user_id, success: false, notified: false })) };
+  }
+
   const results: { user_id: string; success: boolean; notified: boolean }[] = [];
 
   for (const user of opts.users) {
     try {
+      const { data: userRow } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('id', user.user_id)
+        .eq('woreda_id', activeWoreda)
+        .maybeSingle();
+
+      if (!userRow) {
+        results.push({ user_id: user.user_id, success: false, notified: false });
+        continue;
+      }
+
       // Upsert into period_members (no-op if already enrolled)
       const { error } = await supabaseAdmin
         .from('period_members')
@@ -127,16 +151,20 @@ export async function notifyFinalApprovalAction(opts: {
   finalScore: number;
 }) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
     const { data: period } = await supabaseAdmin
       .from('assessment_periods')
       .select('name')
       .eq('id', opts.periodId)
+      .eq('woreda_id', activeWoreda)
       .single();
 
     const { data: user } = await supabaseAdmin
       .from('users')
       .select('full_name, phone_number')
       .eq('id', opts.userId)
+      .eq('woreda_id', activeWoreda)
       .single();
 
     if (!user || !user.phone_number) {
@@ -168,6 +196,20 @@ export async function updateAssessmentUserAction(data: {
   partyResponsibility?: string;
 }) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
+
+    // Ensure user belongs strictly to activeWoreda
+    const { data: existingUser } = await supabaseAdmin
+      .from('users')
+      .select('id, woreda_id')
+      .eq('id', data.userId)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!existingUser) {
+      return { success: false, error: 'ተጠቃሚው በዚህ ወረዳ አልተገኘም።' };
+    }
+
     const cleanPhone = normalizePhoneToE164(data.phone);
 
     // Update public.users
@@ -177,7 +219,8 @@ export async function updateAssessmentUserAction(data: {
         full_name: data.fullName,
         phone_number: cleanPhone,
       })
-      .eq('id', data.userId);
+      .eq('id', data.userId)
+      .eq('woreda_id', activeWoreda);
 
     if (userErr) throw userErr;
 
@@ -186,6 +229,7 @@ export async function updateAssessmentUserAction(data: {
       user_metadata: {
         full_name: data.fullName,
         phone: cleanPhone,
+        woreda_id: activeWoreda,
       }
     });
 
@@ -201,6 +245,7 @@ export async function updateAssessmentUserAction(data: {
         .from('user_profiles')
         .upsert({
           user_id: data.userId,
+          woreda_id: activeWoreda,
           ...profileUpdate,
         }, { onConflict: 'user_id' });
     }
@@ -210,7 +255,8 @@ export async function updateAssessmentUserAction(data: {
       await supabaseAdmin
         .from('period_members')
         .update({ role: data.role })
-        .eq('user_id', data.userId);
+        .eq('user_id', data.userId)
+        .eq('woreda_id', activeWoreda);
     }
 
     return { success: true };
@@ -223,16 +269,28 @@ export async function updateAssessmentUserAction(data: {
 /** Delete an assessment user from database and Auth */
 export async function deleteAssessmentUserAction(userId: string) {
   try {
+    const { activeWoreda } = await requireAuthenticatedWoredaAdmin();
     if (!userId) return { success: false, error: 'User ID is required' };
 
+    const { data: targetUser } = await supabaseAdmin
+      .from('users')
+      .select('id, woreda_id')
+      .eq('id', userId)
+      .eq('woreda_id', activeWoreda)
+      .maybeSingle();
+
+    if (!targetUser) {
+      return { success: false, error: 'User not found in this woreda.' };
+    }
+
     // 1. Delete from period_members
-    await supabaseAdmin.from('period_members').delete().eq('user_id', userId);
+    await supabaseAdmin.from('period_members').delete().eq('user_id', userId).eq('woreda_id', activeWoreda);
 
     // 2. Delete from user_profiles
-    await supabaseAdmin.from('user_profiles').delete().eq('user_id', userId);
+    await supabaseAdmin.from('user_profiles').delete().eq('user_id', userId).eq('woreda_id', activeWoreda);
 
     // 3. Delete from users table
-    await supabaseAdmin.from('users').delete().eq('id', userId);
+    await supabaseAdmin.from('users').delete().eq('id', userId).eq('woreda_id', activeWoreda);
 
     // 4. Delete from Supabase Auth
     const { error: authErr } = await supabaseAdmin.auth.admin.deleteUser(userId);

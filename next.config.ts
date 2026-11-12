@@ -2,6 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   async redirects() {
     return [
       {
@@ -31,6 +32,26 @@ const nextConfig: NextConfig = {
   ],
   images: {
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "woreda.akkinspection.com.et",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "woreda.akkinspection.com.et",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.akkinspection.com.et",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "*.akkinspection.com.et",
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "db.akkinspection.com.et",

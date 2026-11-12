@@ -4,19 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconForms, IconLoader2, IconPhone, IconLock } from "@tabler/icons-react";
-import { createBrowserClient } from "@supabase/ssr";
+import { supabase } from "@/lib/supabaseClient";
 import { resolveLoginEmail, verifyLoginAttempt } from "@/app/actions/auth";
+import { useWoreda } from "@/providers/woreda-provider";
 
 export default function FormsLoginPage() {
+  const { createWoredaUrl, woredaSlug, woreda } = useWoreda();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,23 +45,24 @@ export default function FormsLoginPage() {
         throw signInError;
       }
 
-      // Check if they are actually a representative
+      // Check if they are an active representative belonging strictly to this woreda
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('system_role')
+        .select('system_role, woreda_id')
         .eq('user_id', data.user.id)
+        .eq('woreda_id', woredaSlug)
         .maybeSingle();
 
-      if (profile && profile.system_role !== 'representative') {
+      if (!profile || profile.system_role !== 'representative' || profile.woreda_id !== woredaSlug) {
         await supabase.auth.signOut();
-        throw new Error("መዳረሻ አልተፈቀደም፡ የተወካይ መለያ የለዎትም። (Access Denied: Not a representative)");
+        throw new Error(`መዳረሻ አልተፈቀደም፡ ይህ የተወካይ መለያ ለ${woreda.nameAm} አልተመዘገበም።`);
       }
 
       const needsPasswordChange = data.user.user_metadata?.force_password_change || data.user.user_metadata?.requires_password_change;
       if (needsPasswordChange) {
-        window.location.href = "/representative/change-password";
+        window.location.href = createWoredaUrl("/representative/change-password");
       } else {
-        window.location.href = "/representative/dashboard";
+        window.location.href = createWoredaUrl("/representative/dashboard");
       }
     } catch (err: any) {
       console.error('[RepLogin] Login error:', err.message);
@@ -154,13 +153,13 @@ export default function FormsLoginPage() {
 
           <div className="mt-8 text-center space-y-4">
             <Link
-              href="/representative/reset-password"
+              href={createWoredaUrl("/representative/reset-password")}
               className="block text-sm text-brand-blue hover:underline transition-colors font-medium"
             >
               የይለፍ ቃል ረሱ? (Forgot Password?)
             </Link>
             <Link
-              href="/"
+              href={createWoredaUrl("/")}
               className="inline-block text-sm text-text-secondary hover:text-brand-blue transition-colors font-medium"
             >
               &larr; Back to Home

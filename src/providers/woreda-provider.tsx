@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { WoredaConfig, getWoredaConfig, DEFAULT_WOREDA } from '@/config/woredas';
+import { WoredaConfig, getWoredaConfig, DEFAULT_WOREDA, isValidWoreda } from '@/config/woredas';
+import { extractWoredaFromHost } from '@/utils/supabase/woreda-fetch';
 import { useParams, usePathname } from 'next/navigation';
 
 interface WoredaContextType {
@@ -9,6 +10,7 @@ interface WoredaContextType {
   activeWoreda: WoredaConfig;
   woredaSlug: string;
   woredaPrefix: string;
+  isSubdomain: boolean;
   createWoredaUrl: (path: string) => string;
 }
 
@@ -17,42 +19,63 @@ const WoredaContext = createContext<WoredaContextType>({
   activeWoreda: DEFAULT_WOREDA,
   woredaSlug: DEFAULT_WOREDA.slug,
   woredaPrefix: `/${DEFAULT_WOREDA.slug}`,
+  isSubdomain: false,
   createWoredaUrl: (path: string) => `/${DEFAULT_WOREDA.slug}${path.startsWith('/') ? path : `/${path}`}`,
 });
 
 export function WoredaProvider({
   children,
   initialWoreda,
+  isSubdomain = false,
 }: {
   children: React.ReactNode;
   initialWoreda?: WoredaConfig;
+  isSubdomain?: boolean;
 }) {
   const params = useParams();
   const pathname = usePathname();
 
+  const browserHostWoreda =
+    typeof window !== 'undefined' ? extractWoredaFromHost(window.location.hostname) : null;
+  const effectiveIsSubdomain = Boolean(isSubdomain || browserHostWoreda);
+
   const activeWoreda = useMemo(() => {
-    if (initialWoreda) return initialWoreda;
-    if (params?.woreda && typeof params.woreda === 'string') {
+    if (browserHostWoreda) {
+      return getWoredaConfig(browserHostWoreda);
+    }
+    if (params?.woreda && typeof params.woreda === 'string' && isValidWoreda(params.woreda)) {
       return getWoredaConfig(params.woreda);
     }
     // Check if pathname starts with a woreda slug e.g. /woreda1/...
     if (pathname) {
-      const match = pathname.match(/^\/(woreda\d+)/);
-      if (match) {
-        return getWoredaConfig(match[1]);
+      const match = pathname.match(/^\/(woreda\d+)(?:\/|$)/i);
+      if (match && isValidWoreda(match[1].toLowerCase())) {
+        return getWoredaConfig(match[1].toLowerCase());
       }
     }
+    if (initialWoreda) return initialWoreda;
     return DEFAULT_WOREDA;
-  }, [params, pathname, initialWoreda]);
+  }, [browserHostWoreda, params, pathname, initialWoreda]);
 
-  const woredaPrefix = `/${activeWoreda.slug}`;
+  const woredaPrefix = effectiveIsSubdomain ? '' : `/${activeWoreda.slug}`;
 
   const createWoredaUrl = (path: string) => {
-    if (!path) return woredaPrefix;
+    if (!path) return woredaPrefix || '/';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    if (effectiveIsSubdomain) {
+      const stripped = cleanPath.replace(/^\/woreda\d+(?=\/|$)/i, '');
+      return stripped || '/';
+    }
     if (cleanPath === '/') return woredaPrefix;
-    if (cleanPath.startsWith(woredaPrefix)) return cleanPath;
+    if (
+      cleanPath === woredaPrefix ||
+      cleanPath.startsWith(`${woredaPrefix}/`) ||
+      cleanPath.startsWith(`${woredaPrefix}#`) ||
+      cleanPath.startsWith(`${woredaPrefix}?`)
+    ) {
+      return cleanPath;
+    }
     return `${woredaPrefix}${cleanPath}`;
   };
 
@@ -63,6 +86,7 @@ export function WoredaProvider({
         activeWoreda,
         woredaSlug: activeWoreda.slug,
         woredaPrefix,
+        isSubdomain: effectiveIsSubdomain,
         createWoredaUrl,
       }}
     >

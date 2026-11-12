@@ -4,6 +4,8 @@ import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import { WoredaProvider } from "@/providers/woreda-provider";
+import { getWoredaConfig } from "@/config/woredas";
+import { getServerActiveWoreda, isServerSubdomainRequest } from "@/utils/supabase/server-woreda";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -19,7 +21,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.raey.work'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et'),
   title: {
     default: "የወረዳዎች ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን ፅ/ቤቶች",
     template: "%s | የወረዳ ብልጽግና የኢንስፔክሽንና የስነ ምግባር ኮሚሽን"
@@ -59,11 +61,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [activeWoredaId, subdomainMode] = await Promise.all([
+    getServerActiveWoreda(),
+    isServerSubdomainRequest(),
+  ]);
+  const initialWoreda = getWoredaConfig(activeWoredaId);
+
   return (
     <html
       lang="am"
@@ -73,7 +81,7 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans" suppressHydrationWarning>
         <I18nProvider>
-          <WoredaProvider>
+          <WoredaProvider initialWoreda={initialWoreda} isSubdomain={subdomainMode}>
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"

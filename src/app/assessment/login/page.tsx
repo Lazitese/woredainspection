@@ -6,8 +6,10 @@ import { Loader2 } from 'lucide-react';
 import { verifyLoginAttempt, resolveLoginEmail } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useWoreda } from '@/providers/woreda-provider';
 
 export default function AssessmentLoginPage() {
+  const { woredaSlug, woreda, createWoredaUrl } = useWoreda();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -50,16 +52,24 @@ export default function AssessmentLoginPage() {
         await supabase.auth.signOut();
         throw new Error("መዳረሻ አልተፈቀደም፡ እባክዎ በአስተዳዳሪ መግቢያ ይጠቀሙ (Access Denied: Please use the Admin login).");
       }
-      
-      // Allow: representatives can also be enrolled in assessment periods
-      // No block on system_role === 'representative'
-      
+
+      // Ensure user belongs strictly to the active woreda
+      const [{ data: woredaUser }, { data: woredaMember }] = await Promise.all([
+        supabase.from('users').select('id').eq('id', data.user!.id).eq('woreda_id', woredaSlug).maybeSingle(),
+        supabase.from('period_members').select('id').eq('user_id', data.user!.id).eq('woreda_id', woredaSlug).limit(1).maybeSingle(),
+      ]);
+
+      if (!woredaUser && !woredaMember) {
+        await supabase.auth.signOut();
+        throw new Error(`መዳረሻ አልተፈቀደም፡ ይህ መለያ ለ${woreda.nameAm} አልተመዘገበም።`);
+      }
+
       // Force change password on first login
       const needsPasswordChange = data.user?.user_metadata?.force_password_change || data.user?.user_metadata?.requires_password_change;
       if (needsPasswordChange) {
-        router.push('/assessment/change-password');
+        router.push(createWoredaUrl('/assessment/change-password'));
       } else {
-        router.push('/assessment');
+        router.push(createWoredaUrl('/assessment'));
       }
     } catch (error: any) {
       setErrorMsg(error.message || 'Login failed. Please try again.');

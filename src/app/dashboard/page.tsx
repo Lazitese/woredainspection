@@ -14,7 +14,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { verifyAdminUser } from "@/lib/adminAuth";
-import { getServerActiveWoreda } from "@/utils/supabase/server-woreda";
+import { getServerActiveWoreda, isServerSubdomainRequest } from "@/utils/supabase/server-woreda";
 import { getWoredaConfig } from "@/config/woredas";
 
 export const dynamic = 'force-dynamic';
@@ -22,17 +22,21 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const woredaId = await getServerActiveWoreda();
+  const [woredaId, isSubdomain] = await Promise.all([
+    getServerActiveWoreda(),
+    isServerSubdomainRequest(),
+  ]);
   const woredaConfig = getWoredaConfig(woredaId);
+  const woredaPrefix = isSubdomain ? '' : `/${woredaId}`;
 
   if (!user) {
-    redirect(`/${woredaId}/auth/login`);
+    redirect(`${woredaPrefix}/auth/login`);
   }
 
   // Verify admin access server-side
   const isAdminAuthorized = await verifyAdminUser(user.id, user.email);
   if (!isAdminAuthorized) {
-    redirect(`/${woredaId}/auth/login?error=unauthorized`);
+    redirect(`${woredaPrefix}/auth/login?error=unauthorized`);
   }
 
   // Fetch real analytics data from Supabase
@@ -120,7 +124,7 @@ export default async function DashboardPage() {
               </h2>
               <p className="text-xs text-text-secondary mt-0.5">የቀረቡ አቤቱታዎችና ጥቆማዎች የሂደት ሁኔታ ክፍፍል</p>
             </div>
-            <Link href={`/${woredaId}/dashboard/complaints`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
+            <Link href={`${woredaPrefix}/dashboard/complaints`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
               ዝርዝር ይመልከቱ <IconArrowUpRight size={14} />
             </Link>
           </div>
@@ -203,7 +207,7 @@ export default async function DashboardPage() {
               </h2>
               <p className="text-xs text-text-secondary mt-0.5">በ{woredaConfig.nameAm} ኮሚሽን ውስጥ የሚገኙ ንቁ አመራሮችና አባላት</p>
             </div>
-            <Link href={`/${woredaId}/dashboard/personnel`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
+            <Link href={`${woredaPrefix}/dashboard/personnel`} className="text-xs font-bold text-brand-blue hover:underline flex items-center gap-1">
               አመራሮችን ማስተዳደር <IconArrowUpRight size={14} />
             </Link>
           </div>

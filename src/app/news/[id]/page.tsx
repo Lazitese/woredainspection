@@ -9,6 +9,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { createNewsSlug } from "@/lib/slug";
 
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from "@/lib/youtube";
+import { isServerSubdomainRequest } from "@/utils/supabase/server-woreda";
 import { resolveActiveWoreda } from "@/utils/supabase/woreda-fetch";
 
 import type { Metadata } from "next";
@@ -44,7 +45,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const activeWoreda = await resolveActiveWoreda();
+  const [activeWoreda, isSubdomain] = await Promise.all([
+    resolveActiveWoreda(),
+    isServerSubdomainRequest(),
+  ]);
+  const woredaPrefix = isSubdomain ? '' : `/${activeWoreda}`;
   
   const item = await newsService.getArticle(id);
   if (!item) notFound();
@@ -81,16 +86,16 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
           />
           <div className="relative z-10 mx-auto max-w-5xl px-5 sm:px-8">
             <Link
-              href={`/${activeWoreda}#news`}
+              href={`${woredaPrefix}/#news`.replace('//', '/')}
               className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-slate-400 transition-colors hover:text-[#014BAA]"
             >
               <ArrowLeft className="size-3.5" />
               ወደ ዜናዎች ተመለስ
             </Link>
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-              <Link href={`/${activeWoreda}`} className="transition-colors hover:text-[#014BAA]">መነሻ</Link>
+              <Link href={woredaPrefix || '/'} className="transition-colors hover:text-[#014BAA]">መነሻ</Link>
               <ChevronRight className="size-3.5" />
-              <Link href={`/${activeWoreda}#news`} className="transition-colors hover:text-[#014BAA]">ዜና</Link>
+              <Link href={`${woredaPrefix}/#news`.replace('//', '/')} className="transition-colors hover:text-[#014BAA]">ዜና</Link>
               <ChevronRight className="size-3.5" />
               <span className="text-slate-400 line-clamp-1">{item.title}</span>
             </div>
@@ -202,7 +207,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                     return (
                       <Link
                         key={news.id}
-                        href={`/${activeWoreda}/news/${createNewsSlug(news.id, news.title)}`}
+                        href={`${woredaPrefix}/news/${createNewsSlug(news.id, news.title)}`}
                         className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:ring-[#014BAA]/20"
                       >
                         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">

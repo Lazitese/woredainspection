@@ -41,10 +41,22 @@ export function extractWoredaFromPathname(pathname?: string | null): string | nu
   return null;
 }
 
+export function extractWoredaFromHost(host?: string | null): string | null {
+  if (!host) return null;
+  const hostname = host.split(':')[0].trim().toLowerCase();
+  const match = hostname.match(/^(woreda\d+)\./);
+  if (match && isValidWoreda(match[1])) {
+    return match[1];
+  }
+  return null;
+}
+
 export function extractWoredaFromUrl(urlStr?: string | null): string | null {
   if (!urlStr) return null;
   try {
     const parsed = new URL(urlStr, 'http://localhost:3000');
+    const fromHost = extractWoredaFromHost(parsed.hostname);
+    if (fromHost) return fromHost;
     const fromPath = extractWoredaFromPathname(parsed.pathname);
     if (fromPath) return fromPath;
     const fromQuery = parsed.searchParams.get('woreda')?.toLowerCase();
@@ -56,10 +68,16 @@ export function extractWoredaFromUrl(urlStr?: string | null): string | null {
 }
 
 /**
- * Resolves the active woreda ID in the browser from the URL pathname, query param, or cookie.
+ * Resolves the active woreda ID in the browser from subdomain host, URL pathname, query param, or cookie.
  */
 export function getBrowserActiveWoreda(): string {
   if (typeof window !== 'undefined') {
+    const fromHost = extractWoredaFromHost(window.location.hostname);
+    if (fromHost) {
+      document.cookie = `active_woreda=${fromHost}; path=/; max-age=31536000; SameSite=Lax`;
+      return fromHost;
+    }
+
     const fromPath = extractWoredaFromPathname(window.location.pathname);
     if (fromPath) {
       document.cookie = `active_woreda=${fromPath}; path=/; max-age=31536000; SameSite=Lax`;
@@ -92,6 +110,13 @@ export async function resolveActiveWoreda(): Promise<string> {
   try {
     const { headers, cookies } = await import('next/headers');
     const headerStore = await headers();
+
+    const fromHost = extractWoredaFromHost(
+      headerStore.get('x-forwarded-host') || headerStore.get('host')
+    );
+    if (fromHost) {
+      return fromHost;
+    }
 
     const hWoreda = headerStore.get('x-woreda-id')?.toLowerCase();
     if (hWoreda && isValidWoreda(hWoreda)) {

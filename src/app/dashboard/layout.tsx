@@ -5,9 +5,11 @@ import { useRouter, usePathname } from 'next/navigation';
 // Force webpack rebuild to pick up the .tsx extension
 import { AdminProvider, useAdmin } from '@/lib/hooks/useAdmin';
 import { supabase } from '@/lib/supabaseClient';
+import { useWoreda } from '@/providers/woreda-provider';
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const { profile, loading } = useAdmin();
+  const { createWoredaUrl } = useWoreda();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,7 +33,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
       if (timeSinceLastActivity >= 300000) { // 5 minutes
         clearInterval(inactivityIntervalRef.current!);
         supabase.auth.signOut().then(() => {
-          router.push('/auth/login?reason=inactivity');
+          router.push(createWoredaUrl('/auth/login?reason=inactivity'));
         });
       }
     }, 10000);
@@ -42,16 +44,16 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
         clearInterval(inactivityIntervalRef.current);
       }
     };
-  }, [loading, profile, router]);
+  }, [loading, profile, router, createWoredaUrl]);
 
   useEffect(() => {
     if (!loading && !profile) {
-      // If no admin profile exists, sign out and redirect
+      // If no admin profile exists for this woreda, sign out and redirect
       supabase.auth.signOut().then(() => {
-        router.push('/auth/login');
+        router.push(createWoredaUrl('/auth/login?error=unauthorized'));
       });
     }
-  }, [loading, profile, router]);
+  }, [loading, profile, router, createWoredaUrl]);
 
   if (loading || !profile) {
     return (
@@ -64,9 +66,12 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // Normalize pathname by stripping optional /woredaN prefix in path-based mode
+  const normalizedPathname = pathname.replace(/^\/woreda\d+(?=\/|$)/i, '') || '/';
+
   // Check module access based on pathname
-  if (profile.access_level === 'specific' && profile.role !== 'super_admin' && pathname !== '/dashboard') {
-    const segments = pathname.split('/').filter(Boolean);
+  if (profile.access_level === 'specific' && profile.role !== 'super_admin' && normalizedPathname !== '/dashboard') {
+    const segments = normalizedPathname.split('/').filter(Boolean);
     if (segments.length >= 2 && segments[0] === 'dashboard') {
       let moduleName = segments[1];
       // Map multi-segment routes to their module IDs
@@ -88,7 +93,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
               <h2 className="text-xl font-semibold text-amber-700 dark:text-amber-500 mb-2">Restricted Area</h2>
               <p className="text-slate-600 dark:text-slate-400 mb-6 text-sm">Your administrator profile does not have permission to access the <strong>{moduleName}</strong> module. If you believe this is an error, please contact a super admin.</p>
               <button 
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push(createWoredaUrl('/dashboard'))}
                 className="px-5 py-2.5 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl transition-colors font-semibold text-sm"
               >
                 Return to Dashboard

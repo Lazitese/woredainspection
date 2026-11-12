@@ -1,52 +1,31 @@
 import { FormsRepView } from "@/components/dashboard/forms/FormsRepView";
 import { createClient } from "@/utils/supabase/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { ReportPeriod } from "@/lib/et-calendar";
 import { RepLogoutButton } from "@/components/layout/rep-logout-button";
 import { sortFormSchemas } from "@/utils/schemaSort";
+import { getServerActiveWoreda } from "@/utils/supabase/server-woreda";
 
 export default async function RepHistoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const activeWoreda = await getServerActiveWoreda();
 
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) {
     redirect('/representative/login');
   }
 
-  let profile: any = null;
-  const { data: userProfile } = await supabase
+  const { data: profile } = await supabase
     .from('user_profiles')
-    .select('system_role, region, user_id')
+    .select('system_role, region, user_id, woreda_id')
     .eq('user_id', userData.user.id)
+    .eq('woreda_id', activeWoreda)
     .maybeSingle();
 
-  if (userProfile?.system_role === 'representative') {
-    profile = userProfile;
-  } else {
-    const { data: adminProfile } = await supabaseAdmin
-      .from('user_profiles')
-      .select('system_role, region, user_id')
-      .eq('user_id', userData.user.id)
-      .maybeSingle();
-
-    if (adminProfile?.system_role === 'representative') {
-      profile = adminProfile;
-    }
-  }
-
-  if (!profile && (userData.user.user_metadata?.role === 'representative' || userData.user.user_metadata?.system_role === 'representative')) {
-    profile = {
-      system_role: 'representative',
-      region: userData.user.user_metadata?.region || 'አዲስ አበባ',
-      user_id: userData.user.id,
-    };
-  }
-
-  if (!profile || profile.system_role !== 'representative') {
+  if (!profile || profile.system_role !== 'representative' || profile.woreda_id !== activeWoreda) {
     redirect('/representative/login?error=access_denied');
   }
 

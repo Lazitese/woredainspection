@@ -53,7 +53,7 @@ export const DataManagementTable: React.FC<DataManagementTableProps> = ({
   );
 
   const getShareableLink = (category: TrainingCategory) => {
-    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://icods.raey.work';
+    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et');
     return `${origin}/sletena/submit?cat=${category.id}`;
   };
 

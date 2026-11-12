@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://federalinspection.gov.et';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://woreda.akkinspection.com.et';
 
   // Define public routes that should be indexed by search engines
   const publicRoutes = [

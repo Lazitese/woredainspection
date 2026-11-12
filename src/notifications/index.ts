@@ -20,7 +20,7 @@ import {
   buildReportNotificationTemplates,
 } from "./templates";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ICODS.raey.work";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://woreda.akkinspection.com.et";
 
 export interface NotifyResult {
   success: boolean;
