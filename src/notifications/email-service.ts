@@ -62,18 +62,23 @@ export async function sendEmail(
   html: string,
   textContent?: string
 ): Promise<SendEmailResult> {
+  const brevoApiKey = process.env.BREVO_API_KEY || BREVO_API_KEY;
+  const brevoFromEmail = process.env.BREVO_FROM_EMAIL || BREVO_FROM_EMAIL || "alazartesema1@gmail.com";
+  const brevoFromName = process.env.BREVO_FROM_NAME || BREVO_FROM_NAME || "ICODiS System";
+  const resendApiKey = process.env.RESEND_API_KEY || RESEND_API_KEY;
+
   // 1. Try Brevo API if key is present
-  if (BREVO_API_KEY) {
+  if (brevoApiKey) {
     try {
       const response = await fetch(BREVO_API_URL, {
         method: "POST",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "api-key": BREVO_API_KEY,
+          "api-key": brevoApiKey,
         },
         body: JSON.stringify({
-          sender: { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL },
+          sender: { name: brevoFromName, email: brevoFromEmail },
           to: [{ email: to }],
           subject: subject,
           htmlContent: html,
@@ -96,13 +101,13 @@ export async function sendEmail(
   }
 
   // 2. Try Resend API if key is present
-  if (RESEND_API_KEY) {
+  if (resendApiKey) {
     try {
       const response = await fetch(RESEND_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
+          Authorization: `Bearer ${resendApiKey}`,
         },
         body: JSON.stringify({
           from: DEFAULT_FROM_EMAIL,
